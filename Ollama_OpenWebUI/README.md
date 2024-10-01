@@ -3,7 +3,7 @@
 - **OpenWebUI安裝於container**
 
 ## 1. 樹莓派安裝Docker
-### 1.1 [**1.1官網說明**](https://docs.docker.com/engine/install/debian/)
+###  [1.1官網說明](https://docs.docker.com/engine/install/debian/)
   - 請使用Install using the apt repository章節步驟
   - 注意完成後要將user pi 加入至 docker group
   - `sudo usermod -aG docker pi`

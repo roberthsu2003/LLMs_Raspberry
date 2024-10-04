@@ -12,6 +12,31 @@
 - [**2.1官網說明**](https://github.com/ollama/ollama)
 	- **使用Linux安裝**
 
+### 2.1 修改環境變數
+- 主要目的是讓ollama接受外部主機的呼叫
+**2.1.1 步驟1:**
+透過呼叫 systemctl edit ollama.service 編輯 systemd 服務。這將打開一個編輯器。
+
+```
+sudo vim /etc/systemd/system/ollama.service
+```
+
+**2.1.2步驟2:**
+對於每個環境變量，在 [Service] 部分下新增一行 Environment：
+
+```
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0"
+```
+
+**2.1.3步驟3:**
+
+```
+systemctl daemon-reload
+systemctl restart ollama
+```
+
+
 ### 2.1 Ollama安裝Open LLMs
 - [**官網支援LLMs清單**](https://ollama.com/library)
 - 安裝方法
@@ -31,7 +56,7 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 
 > 2. ## 呼叫方式將會改變,port 從3000改為8080,例如:http://localhost:8080
 
-### 3.2 安裝方式2
+### 3.2 安裝方式2-(目前有錯誤!尚未解決)
 
 ```
 docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.docker.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main

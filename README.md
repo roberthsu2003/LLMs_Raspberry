@@ -9,3 +9,5 @@
 - PiOS **No Desktop**
 
 ## 1. [Ollama 和 OpenWebUI應用](./Ollama_OpenWebUI) 
+
+- 1.1 [**openWebUI API**](./OpenWebUI_API)

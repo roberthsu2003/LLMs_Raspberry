@@ -17,7 +17,7 @@
 - 使用ssh連線
 - 使用vnc viewer連線
 - 使用pi connection遠端連線
-- tunnel連線
+- tunnel連線[待整理資料](./tunnel連線待整理資料.md)
   - 使用ssh tunnel連線
   - 使用ngrok tunnel連線(建立遠端連線通道,開發階段使用)
   - 使用Tailscale tunnel連線(建立虛擬區網)

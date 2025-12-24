@@ -3,11 +3,35 @@
 
 ## 硬體需求
 - Raspberry PI 5
-- 記憶體4GB-8GB,建議**8GB**
+- 記憶體4GB,8GB,16GB 建議**8GB**(一般操作),16GB(LLM生成式應用)
 
 ## 作業系統需求
 - PiOS **No Desktop**
 
-## 1. [Ollama 和 OpenWebUI應用](./Ollama_OpenWebUI) 
+## 待完成事項
+- 安裝流程說明
+- 教室區網連線
+  - 使用教室無線網路AP(Wireless Access Point)連線
+  - 使用dongle wifi連線
+  - 使用手機熱點連線
+- 使用ssh連線
+- 使用vnc viewer連線
+- 使用pi connection遠端連線
+- tunnel連線
+  - 使用ssh tunnel連線
+  - 使用ngrok tunnel連線(建立遠端連線通道,開發階段使用)
+  - 使用Tailscale tunnel連線(建立虛擬區網)
+  - 使用cloudflare tunnel連線(遠端連線使用,正式上線使用)
+- 本機安裝應用程式(npm,pip)
+- docker
+- ollama 安裝
+- openWebUI 安裝
+- n8n 安裝
+- webserver 安裝
 
-- 1.1 [**openWebUI API**](./OpenWebUI_API)
+
+- 使用openWebUI API
+- 使用Ollama 和 OpenWebUI應用
+- 使用openWebUI API
+
+## 安裝流程說明

@@ -2,8 +2,11 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>Next Gen Code Review</title>
+  <title>⚠️ 請使用新版專案</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- ⚠️ 此檔案已過時，請使用 public/index.html -->
+  <meta http-equiv="refresh" content="3;url=public/index.html">
 
   <style>
     :root {
@@ -199,63 +202,38 @@
   </style>
 </head>
 <body>
-
-  <!-- Navbar -->
-  <header>
-    <div class="logo">Graphite-Style</div>
-
-    <nav>
-      <a href="#">Features</a>
-      <a href="#">Docs</a>
-      <a href="#">Pricing</a>
-      <a href="#">Contact</a>
-    </nav>
-
-    <div class="nav-actions">
-      <button class="btn">Log in</button>
-      <button class="btn btn-primary">Sign up</button>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero">
+  
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 40px;">
     <div>
-      <h1>
-        下一世代的<br />
-        程式碼審查
-      </h1>
-
-      <p>
-        使用 AI 協助你的團隊更快交付高品質程式碼，
-        在 Pull Request 階段即時發現問題。
+      <h1 style="font-size: 48px; margin-bottom: 24px;">⚠️ 專案已更新</h1>
+      <p style="font-size: 18px; color: var(--muted); margin-bottom: 32px; max-width: 600px;">
+        此檔案已過時。專案已重新組織，所有檔案已移至 <code>public/</code> 資料夾。
       </p>
-
-      <div class="hero-actions">
-        <button class="btn btn-primary">免費開始</button>
-        <button class="btn">申請 Demo</button>
+      <p style="font-size: 16px; color: var(--muted); margin-bottom: 32px;">
+        正在自動跳轉到新版本... (3 秒)
+      </p>
+      <a href="public/index.html" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+        立即前往新版本
+      </a>
+      <div style="margin-top: 40px; padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <h3 style="font-size: 18px; margin-bottom: 12px;">📂 新的專案結構</h3>
+        <pre style="text-align: left; color: var(--muted); font-size: 13px; line-height: 1.6;">
+public/
+├── index.html      # 主頁面
+├── css/
+│   └── style.css   # 樣式表
+└── js/
+    └── main.js     # JavaScript
+        </pre>
       </div>
     </div>
-
-    <div class="glow-wrap">
-      <div class="glow-shape"></div>
-      <div class="glow-shape"></div>
-      <div class="glow-shape"></div>
-    </div>
-  </section>
-
-  <!-- Brands -->
-  <section class="brands">
-    <div>Shopify</div>
-    <div>Snowflake</div>
-    <div>Figma</div>
-    <div>Datadog</div>
-  </section>
+  </div>
 
   <script>
-    // 可放互動邏輯，例如按鈕事件
-    document.querySelector(".btn-primary").addEventListener("click", () => {
-      alert("歡迎開始使用！");
-    });
+    // 3 秒後自動跳轉
+    setTimeout(() => {
+      window.location.href = 'public/index.html';
+    }, 3000);
   </script>
 
 </body>

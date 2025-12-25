@@ -1,0 +1,507 @@
+/* ===== CSS 變數定義 ===== */
+:root {
+  --bg: #0b0b0f;
+  --text: #ffffff;
+  --muted: #a0a0b2;
+  --accent: #b084ff;
+  --accent-soft: rgba(176, 132, 255, 0.2);
+  --card: #15151c;
+  --border: #262636;
+}
+
+/* ===== 全域樣式 ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               "PingFang TC", "Noto Sans TC", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(
+    circle at 70% 30%,
+    #1a1430 0%,
+    var(--bg) 40%
+  );
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== 導航欄 ===== */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 60px;
+  position: sticky;
+  top: 0;
+  background: rgba(11, 11, 15, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.logo:hover {
+  opacity: 0.8;
+}
+
+nav {
+  display: flex;
+  gap: 14px;
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+nav a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ===== 按鈕樣式 ===== */
+.btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    #ffd6ff
+  );
+  color: #000;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: 0 10px 30px rgba(176, 132, 255, 0.4);
+}
+
+/* ===== Hero 區域 ===== */
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  padding: 80px 60px;
+  align-items: center;
+  gap: 40px;
+  min-height: calc(100vh - 120px);
+}
+
+.hero-content {
+  animation: fadeInUp 0.8s ease;
+}
+
+.hero h1 {
+  font-size: 56px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 520px;
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.hero-actions button {
+  font-size: 16px;
+  padding: 12px 24px;
+}
+
+/* ===== 發光形狀動畫 ===== */
+.glow-wrap {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  margin: auto;
+  animation: fadeInScale 1s ease 0.3s both;
+}
+
+.glow-shape {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  border: 2px solid white;
+  filter: blur(0.3px);
+  opacity: 0.85;
+  animation: spin 20s linear infinite;
+}
+
+.glow-shape:nth-child(1) {
+  transform: rotate(0deg);
+}
+
+.glow-shape:nth-child(2) {
+  transform: rotate(12deg);
+  opacity: 0.6;
+  animation: spin 25s linear infinite reverse;
+}
+
+.glow-shape:nth-child(3) {
+  transform: rotate(-12deg);
+  opacity: 0.4;
+  animation: spin 30s linear infinite;
+}
+
+.glow-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(
+    circle,
+    var(--accent-soft),
+    transparent 70%
+  );
+  z-index: -1;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* ===== 品牌標誌區域 ===== */
+.brands {
+  padding: 40px 60px;
+  display: flex;
+  gap: 40px;
+  color: var(--muted);
+  font-size: 14px;
+  opacity: 0.7;
+  align-items: center;
+}
+
+.brands-title {
+  font-size: 13px;
+  margin-right: 20px;
+  white-space: nowrap;
+}
+
+.brands-list {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.brand-item {
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.brand-item:hover {
+  opacity: 1;
+  color: var(--text);
+}
+
+/* ===== Footer ===== */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 30px 60px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 60px;
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===== 動畫定義 ===== */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ===== Modal 樣式 ===== */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+  animation: scaleIn 0.3s ease;
+}
+
+.modal-content h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.modal-content p {
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.modal-close {
+  margin-top: 12px;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Toast 提示樣式 ===== */
+.toast {
+  position: fixed;
+  top: 100px;
+  right: 40px;
+  background: linear-gradient(135deg, var(--accent), #ffd6ff);
+  color: #000;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(176, 132, 255, 0.4);
+  z-index: 10000;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* ===== 響應式設計 ===== */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 60px 24px;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .hero p {
+    max-width: 100%;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  header {
+    padding: 20px 24px;
+  }
+
+  .glow-wrap {
+    width: 320px;
+    height: 320px;
+  }
+
+  .brands {
+    padding: 40px 24px;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  footer {
+    padding: 30px 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  nav {
+    display: none;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions button {
+    width: 100%;
+  }
+
+  .glow-wrap {
+    width: 280px;
+    height: 280px;
+  }
+
+  .toast {
+    right: 20px;
+    left: 20px;
+  }
+
+  .modal-content {
+    margin: 0 20px;
+    padding: 30px;
+  }
+}
+
+/* ===== 選取文字樣式 ===== */
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* ===== 滾動條樣式 ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-soft);
+}
+
+/* ===== 平滑滾動 ===== */
+html {
+  scroll-behavior: smooth;
+}
+

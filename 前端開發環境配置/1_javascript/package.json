@@ -1,0 +1,26 @@
+{
+  "name": "next-gen-code-review",
+  "version": "1.0.0",
+  "description": "下一世代程式碼審查平台 - 純 JavaScript 網頁應用（無需 Node.js）",
+  "main": "public/index.html",
+  "scripts": {
+    "serve": "python3 -m http.server 8000 --directory public",
+    "info": "echo '✨ 純 JavaScript 專案 - 無需安裝依賴，直接開啟 public/index.html 即可！'"
+  },
+  "keywords": [
+    "javascript",
+    "html",
+    "css",
+    "static-website",
+    "raspberry-pi",
+    "nginx"
+  ],
+  "author": "Next Gen Code Review Team",
+  "license": "MIT",
+  "homepage": "https://github.com/yourusername/LLMs_Raspberry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/LLMs_Raspberry.git"
+  }
+}
+

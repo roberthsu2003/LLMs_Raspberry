@@ -4,6 +4,20 @@
 
 ---
 
+## 什麼是 Nginx？
+
+Nginx (發音為 "Engine-X") 是一個高性能的 HTTP 和反向代理伺服器。它以「事件驅動（Event-driven）」的架構聞名，這意味著它可以用非常少的記憶體資源處理大量的連線，非常適合硬體資源有限的樹莓派。
+
+### 核心功能與優勢
+1.  **高併發處理**：相比傳統的 Apache，Nginx 在處理大量同時連線時表現更優異。
+2.  **反向代理 (Reverse Proxy)**：可以作為前端伺服器，將流量轉發給後端的應用程式（如 Node.js, Python Flask/Django）。
+3.  **負載均衡 (Load Balancing)**：如果有服務集群，Nginx 可以協助分配流量。
+4.  **靜態檔案服務**：處理圖片、CSS、JS 等靜態檔案的速度極快。
+
+---
+
+---
+
 ### 第一步：更新系統
 
 在開始安裝任何軟體之前，請先確保你的樹莓派系統是最新的。打開終端機（Terminal）並輸入：
@@ -99,6 +113,114 @@ sudo systemctl start nginx #啟動nginx
 sudo systemctl status nginx #查看nginx狀態
 sudo systemctl reload nginx #重新載入nginx
 ```
+
+---
+
+## Nginx 設定檔結構說明書
+
+Nginx 的強大來自於其靈活的設定檔。了解其結構對未來進行進階設定（如綁定網域、HTTPS）非常重要。
+
+### 主要設定檔位置
+*   **主設定檔**：`/etc/nginx/nginx.conf` (全域設定)
+*   **站點設定檔**：`/etc/nginx/sites-available/` (存放所有設定) 與 `/etc/nginx/sites-enabled/` (存放已啟用設定)
+
+### 設定檔層級結構 (`nginx.conf`)
+Nginx 設定檔由「區塊 (Block)」組成，層級如下：
+
+```nginx
+# 全域區塊 (Global Block)：設定 user, worker_processes 等
+user www-data;
+worker_processes auto;
+
+events {
+    # events 區塊：設定最大連線數
+    worker_connections 768;
+}
+
+http {
+    # http 區塊：設定 web 相關參數，如 mime types, log format
+    
+    server {
+        # server 區塊：定義一個虛擬主機 (Virtual Host)
+        listen 80;
+        server_name example.com; # 網域名稱
+
+        location / {
+            # location 區塊：URL 匹配規則
+            root /var/www/html;
+            index index.html;
+        }
+
+        location /api {
+            # 反向代理範例
+            proxy_pass http://localhost:3000;
+        }
+    }
+}
+```
+
+### 常用指令速查
+| 指令 | 說明 | 範例 |
+| :--- | :--- | :--- |
+| `worker_processes` | 工作進程數，通常設為 `auto` (與 CPU 核心數相同) | `worker_processes auto;` |
+| `listen` | 監聽的端口 (Port) | `listen 80;` |
+| `server_name` | 該站點綁定的網域名稱 | `server_name mypi.local;` |
+| `root` | 靜態檔案的根目錄路徑 | `root /var/www/my-site;` |
+| `index` | 預設首頁檔案名稱 | `index index.html;` |
+| `proxy_pass` | 將請求轉發給其他伺服器 (反向代理) | `proxy_pass http://127.0.0.1:5000;` |
+
+---
+
+## Nginx 靜態網頁部署設定：預設目錄 vs 自訂目錄
+
+在配置 Nginx serving 靜態檔案時，主要有兩種檔案放置策略：
+
+### 1. 使用預設目錄 (Default Directory)
+Nginx 安裝後會預設一個網頁根目錄，通常位於 `/var/www/html`。
+
+*   **特點**：
+    *   **快速上手**：無需修改 Nginx 的主要設定檔，服務啟動即可看到內容。
+    *   **結構單純**：適合單一專案或是剛開始學習伺服器部署時使用。
+*   **操作方式**：如上述「第四步」所示，直接將檔案放入 `/var/www/html` 即可。
+
+### 2. 使用自訂目錄 (Custom Directory)
+實際開發中，我們通常會希望將網站檔案放在自己規劃的專案路徑下（例如 `/home/pi/projects/my-web`），而不是系統預設路徑。
+
+*   **特點**：
+    *   **管理靈活**：可以將不同專案分開管理，便於版本控制（Git）與備份。
+    *   **多站點支援**：透過設定不同的 `server` block，可以在同一台伺服器上同時運行多個網站。
+*   **配置範例**：
+    需要修改 Nginx 的站點設定檔 (通常位於 `/etc/nginx/sites-available/default`)，將 `root` 指令指向你的自訂資料夾路徑。
+
+    1. 編輯設定檔：
+       `sudo nano /etc/nginx/sites-available/default`
+
+    2. 修改 `root` 路徑：
+       ```nginx
+       server {
+           listen 80 default_server;
+           listen [::]:80 default_server;
+
+           # 將 root 指向你的自訂專案資料夾 (例如 /home/pi/my-website)
+           root /home/pi/my-website; 
+           
+           index index.html index.htm index.nginx-debian.html;
+
+           server_name _;
+
+           location / {
+               try_files $uri $uri/ =404;
+           }
+       }
+       ```
+
+### 注意事項
+*   **檔案權限 (Permissions)**：使用自訂目錄時，最常遇到的問題是 `403 Forbidden`。這通常是因為 Nginx 的執行使用者（通常是 `www-data`）沒有權限讀取你的 `home` 目錄。
+    *   **解決方式**：確保你的專案資料夾和其上層目錄對其他使用者有讀取/執行權限。
+    *   指令範例：`chmod 755 /home/pi`
+*   **設定生效**：修改設定檔後，務必測試語法並重啟 Nginx：
+    *   `sudo nginx -t` (檢查語法)
+    *   `sudo systemctl reload nginx` (重啟)
 
 ---
 

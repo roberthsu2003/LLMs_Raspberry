@@ -24,11 +24,9 @@
   - 使用Tailscale tunnel連線(建立虛擬區網)
   - 使用cloudflare tunnel連線(遠端連線使用,正式上線使用)
 - 本機安裝應用程式(npm,pip)
-- docker
-- ollama 安裝
-- openWebUI 安裝
-- n8n 安裝
-- webserver 安裝
+  - nodejs 安裝
+  - uv安裝
+  - miniconda安裝
 
 
 - 使用openWebUI API

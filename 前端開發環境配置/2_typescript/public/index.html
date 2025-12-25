@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback Platform - TypeScript Demo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 頂部導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <a href="#" class="nav-link">Product</a>
+                <a href="#" class="nav-link">Resources</a>
+                <a href="#" class="nav-link">Enterprise</a>
+                <a href="#" class="nav-link">Customers</a>
+                <a href="#" class="nav-link">Pricing</a>
+            </div>
+            <div class="nav-right">
+                <button class="btn-secondary">Log in</button>
+                <button class="btn-primary">Contact sales</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <!-- 標籤 -->
+                    <div class="badge">
+                        <span class="badge-icon">▶</span>
+                        <span>WATCH THE FALL LAUNCH 2025 KEYNOTE</span>
+                        <span class="arrow">↗</span>
+                    </div>
+
+                    <!-- 主標題 -->
+                    <h1 class="hero-title">
+                        Finally, all of your<br>
+                        customer feedback<br>
+                        in one place
+                    </h1>
+
+                    <!-- 描述 -->
+                    <p class="hero-description">
+                        Design better products with instant insights. Chat with sales 
+                        calls, summarize support tickets, track themes on a dashboard, 
+                        and auto-generate reports. The possibilities are endless.
+                    </p>
+
+                    <!-- 按鈕 -->
+                    <div class="hero-buttons">
+                        <button class="btn-large btn-primary" id="contactBtn">Contact sales</button>
+                        <button class="btn-large btn-secondary" id="tryFreeBtn">Try Dovetail free</button>
+                    </div>
+
+                    <!-- 合作夥伴 -->
+                    <div class="partners">
+                        <p class="partners-title">Connecting the world's leading companies to their customers:</p>
+                        <div class="partners-logos">
+                            <div class="partner-logo">Shopify</div>
+                            <div class="partner-logo">AWS</div>
+                            <div class="partner-logo">Atlassian</div>
+                            <div class="partner-logo">Notion</div>
+                            <div class="partner-logo">Canva</div>
+                            <div class="partner-logo">Lovable</div>
+                        </div>
+                        <div class="ratings">
+                            <div class="rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating-score">4.5/5 G2</span>
+                            </div>
+                            <div class="rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating-score">4.6/5 CAPTERRA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右側卡片 -->
+                <div class="hero-right">
+                    <div class="feature-grid">
+                        <!-- CALLS Card -->
+                        <div class="feature-card" data-category="calls">
+                            <div class="card-header">CALLS</div>
+                            <div class="card-icons">
+                                <div class="icon-item" style="background: #7C3AED;">📞</div>
+                                <div class="icon-item" style="background: #10B981;">🎤</div>
+                                <div class="icon-item" style="background: #3B82F6;">💬</div>
+                                <div class="icon-item" style="background: #8B5CF6;">⭐</div>
+                                <div class="icon-item" style="background: #06B6D4;">📊</div>
+                                <div class="icon-item" style="background: #6366F1;">🎥</div>
+                            </div>
+                        </div>
+
+                        <!-- TICKETS Card -->
+                        <div class="feature-card" data-category="tickets">
+                            <div class="card-header">TICKETS</div>
+                            <div class="card-icons">
+                                <div class="icon-item" style="background: #EC4899;">🎫</div>
+                                <div class="icon-item" style="background: #F59E0B;">⚡</div>
+                                <div class="icon-item" style="background: #EF4444;">📧</div>
+                                <div class="icon-item" style="background: #8B5CF6;">📋</div>
+                                <div class="icon-item" style="background: #14B8A6;">Z</div>
+                                <div class="icon-item" style="background: #3B82F6;">◆</div>
+                            </div>
+                        </div>
+
+                        <!-- REVIEWS Card -->
+                        <div class="feature-card" data-category="reviews">
+                            <div class="card-header">REVIEWS</div>
+                            <div class="card-icons">
+                                <div class="icon-item" style="background: #5865F2;">💬</div>
+                                <div class="icon-item" style="background: #EC4899;">💝</div>
+                                <div class="icon-item" style="background: #F97316;">G</div>
+                                <div class="icon-item" style="background: #8B5CF6;">⭐</div>
+                                <div class="icon-item" style="background: #10B981;">▶</div>
+                                <div class="icon-item" style="background: #3B82F6;">🔺</div>
+                            </div>
+                        </div>
+
+                        <!-- SURVEYS Card -->
+                        <div class="feature-card" data-category="surveys">
+                            <div class="card-header">SURVEYS</div>
+                            <div class="card-icons">
+                                <div class="icon-item" style="background: #7C3AED;">S</div>
+                                <div class="icon-item" style="background: #A855F7;">📄</div>
+                                <div class="icon-item" style="background: #3B82F6;">📊</div>
+                                <div class="icon-item" style="background: #06B6D4;">📋</div>
+                                <div class="icon-item" style="background: #10B981;">◼</div>
+                                <div class="icon-item" style="background: #14B8A6;">🌿</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 連接線動畫容器 -->
+                    <svg class="connection-lines" width="100%" height="100%">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0" />
+                                <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <span>Dovetail</span>
+                </div>
+                <div class="footer-right">
+                    <span>curated by</span>
+                    <strong>Mobbin</strong>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 載入 TypeScript 編譯後的 JavaScript -->
+    <script type="module" src="../dist/index.js"></script>
+</body>
+</html>
+

@@ -10,3 +10,9 @@ export function multiply(a: number, b: number): number {
   return a * b;
 }
 
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error('除數不能為零');
+  }
+  return a / b;
+}

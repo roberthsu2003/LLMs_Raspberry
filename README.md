@@ -14,10 +14,11 @@
   - 使用教室無線網路AP(Wireless Access Point)連線
   - 使用dongle wifi連線
   - 使用手機熱點連線
-- 使用ssh連線
+- 使用ssh連線,使用filezilla連線(sftp)
 - 使用vnc viewer連線
 - 使用pi connection遠端連線
 - 基本的Linux操作指令
+- 了解user,group,資料夾和檔案權限rwx的管理
 - tunnel連線[待整理資料](./tunnel連線待整理資料.md)
   - 使用ssh tunnel連線
   - 使用ngrok tunnel連線(建立遠端連線通道,開發階段使用)

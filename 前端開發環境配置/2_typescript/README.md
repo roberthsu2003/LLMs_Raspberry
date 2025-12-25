@@ -1,5 +1,834 @@
 # TypeScript 開發環境配置
 
+> 本專案示範如何建立一個完整的 TypeScript 開發環境，包含 ES6 模組、型別定義、Source Maps 等專業配置。
+
+---
+
+# 📋 目錄
+
+- [👥 非開發者指南](#-非開發者指南) - 如何使用本專案
+- [👨‍💻 開發者指南](#-開發者指南) - 如何開發和維護本專案
+- [🚀 部署到樹莓派](#-部署到樹莓派) - Nginx 部署完整指南
+
+---
+
+# 👥 非開發者指南
+
+> 💡 這部分適合不需要修改程式碼，只需要執行和使用本專案的使用者。
+
+## 🚀 快速開始
+
+### 🎯 本專案是什麼？
+
+這是一個 TypeScript 示範專案，包含簡單的數學運算功能。即使您不懂程式設計，也可以按照以下步驟快速執行。
+
+**功能說明：**
+- ✅ 執行數學運算（加法、減法、乘法）
+- ✅ 顯示計算結果
+- ✅ 可部署到樹莓派網頁伺服器
+
+### 📂 資料夾說明
+
+```
+2_typescript/
+├── src/           # 程式源碼（TypeScript）
+├── dist/          # 編譯後的檔案（自動產生）
+├── package.json   # 專案設定檔
+└── README.md      # 說明文件（本檔案）
+```
+
+## 🔧 系統需求
+
+在開始之前，請確保已安裝：
+- **Node.js**（版本 18 以上）- [下載連結](https://nodejs.org/)
+- **npm**（隨 Node.js 一起安裝）
+
+**檢查是否已安裝：**
+```bash
+node --version    # 應顯示 v18.x.x 或更高
+npm --version     # 應顯示版本號
+```
+
+## ⚙️ 安裝步驟
+
+### 步驟 1：進入專案資料夾
+
+```bash
+cd 前端開發環境配置/2_typescript
+```
+
+### 步驟 2：安裝必要套件
+
+```bash
+npm install
+```
+
+> 💡 **說明：** 這個指令會自動安裝所有需要的套件。
+
+## ▶️ 執行專案
+
+### 方法一：編譯後執行（推薦）
+
+```bash
+# 1. 編譯程式
+npm run build
+
+# 2. 執行程式
+npm run start
+```
+
+**您會看到：**
+```
+加法:10 + 5 = 15
+減法:10 - 5 = 5
+```
+
+### 方法二：一鍵編譯並執行
+
+```bash
+npm run dev
+```
+
+> 💡 **說明：** 這個指令會自動完成編譯和執行兩個步驟。
+
+## 🧹 清理編譯檔案
+
+如果需要清除編譯產生的檔案：
+
+```bash
+npm run clean
+```
+
+## ❓ 常見問題
+
+### Q1: 執行時出現「找不到模組」錯誤？
+**A:** 請先執行 `npm install` 安裝必要套件。
+
+### Q2: `dist/` 資料夾是空的？
+**A:** 需要先執行 `npm run build` 進行編譯。
+
+### Q3: 如何修改計算的數字？
+**A:** 請參考下方的「開發者指南」章節。
+
+### Q4: 可以在樹莓派上執行嗎？
+**A:** 可以！請參考本文件最下方的「部署到樹莓派」章節。
+
+---
+
+# 👨‍💻 開發者指南
+
+> 💻 這部分適合需要修改程式碼、添加功能的開發者。
+
+## 📋 技術架構
+
+本專案使用的技術：
+- ✅ **TypeScript 5.9.3** - 靜態型別檢查
+- ✅ **ES6 模組系統** - `import`/`export` 語法
+- ✅ **Node.js** - 執行環境
+- ✅ **嚴格型別檢查** - 提前發現錯誤
+- ✅ **Source Map** - 方便除錯
+- ✅ **型別定義檔** - 自動生成 `.d.ts`
+
+## 📂 詳細專案結構
+
+```
+2_typescript/
+├── src/                    # TypeScript 源碼
+│   ├── index.ts           # 程式進入點
+│   └── utils/             # 工具函式模組
+│       └── math.ts        # 數學運算函式
+├── dist/                   # 編譯輸出（自動生成）
+│   ├── index.js           # 編譯後的 JS
+│   ├── index.js.map       # Source Map
+│   ├── index.d.ts         # 型別定義檔
+│   ├── index.d.ts.map     # 型別定義 Source Map
+│   └── utils/
+│       ├── math.js
+│       ├── math.js.map
+│       ├── math.d.ts
+│       └── math.d.ts.map
+├── node_modules/          # 依賴套件
+├── package.json           # npm 專案配置
+├── package-lock.json      # 套件版本鎖定
+├── tsconfig.json          # TypeScript 編譯器配置
+└── README.md              # 本文件
+```
+
+## 📝 程式碼說明
+
+### `src/utils/math.ts` - 數學運算模組
+
+```typescript
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export function subtract(a: number, b: number): number {
+  return a - b;
+}
+
+export function multiply(a: number, b: number): number {
+  return a * b;
+}
+```
+
+### `src/index.ts` - 主程式
+
+```typescript
+import { add, subtract } from './utils/math.js';
+
+const result1 = add(10, 5);
+const result2 = subtract(10, 5);
+
+console.log(`加法:10 + 5 = ${result1}`);
+console.log(`減法:10 - 5 = ${result2}`);
+```
+
+## ⚙️ 重要配置檔案
+
+### `package.json` - npm 專案配置
+
+```json
+{
+  "name": "2_typescript",
+  "version": "1.0.0",
+  "type": "module",          // ⚠️ 重要：使用 ES6 模組
+  "scripts": {
+    "build": "tsc",          // 編譯 TypeScript
+    "start": "node dist/index.js",  // 執行編譯後的程式
+    "dev": "tsc && node dist/index.js",  // 編譯並執行
+    "clean": "rm -rf dist"   // 清理編譯輸出
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.0.3"
+  }
+}
+```
+
+**關鍵設定說明：**
+- `"type": "module"` - 啟用 ES6 模組系統，這是為什麼 import 路徑要用 `.js`
+
+### `tsconfig.json` - TypeScript 編譯器配置
+
+```json
+{
+  "compilerOptions": {
+    // 檔案配置
+    "rootDir": "./src",          // 源碼目錄
+    "outDir": "./dist",          // 輸出目錄
+    
+    // 模組系統
+    "module": "nodenext",        // Node.js ES 模組
+    "target": "esnext",          // 編譯目標（最新 ECMAScript）
+    
+    // 型別檢查（嚴格模式）
+    "strict": true,              // 啟用所有嚴格檢查
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    
+    // 輸出檔案
+    "sourceMap": true,           // 生成 Source Map（除錯用）
+    "declaration": true,         // 生成 .d.ts 型別定義檔
+    "declarationMap": true,      // 生成型別定義 Source Map
+    
+    // 其他
+    "verbatimModuleSyntax": true,  // 嚴格模組語法
+    "skipLibCheck": true          // 跳過函式庫檢查（加快編譯）
+  }
+}
+```
+
+## 🔨 開發工作流程
+
+### 1. 修改程式碼
+
+```bash
+# 使用任何編輯器開啟檔案
+code src/index.ts
+```
+
+### 2. 編譯檢查
+
+```bash
+npm run build
+```
+
+### 3. 測試執行
+
+```bash
+npm run start
+```
+
+### 4. 開發模式（自動編譯+執行）
+
+```bash
+npm run dev
+```
+
+## 🐛 常見開發問題
+
+### Q: 為什麼 import 路徑要用 `.js` 而不是 `.ts`？
+
+```typescript
+// ✅ 正確
+import { add } from './utils/math.js';
+
+// ❌ 錯誤
+import { add } from './utils/math.ts';
+import { add } from './utils/math';
+```
+
+**原因：**
+- `"type": "module"` 使用 ES6 模組
+- ES6 模組的 import 路徑必須明確指定副檔名
+- TypeScript 編譯後是 `.js` 檔案，所以要寫 `.js`
+
+### Q: 出現「verbatimModuleSyntax」錯誤？
+
+**錯誤訊息：**
+```
+ECMAScript imports and exports cannot be written in a CommonJS file
+```
+
+**解決方案：**
+確保 `package.json` 中有 `"type": "module"`。
+
+### Q: 如何新增功能模組？
+
+1. 在 `src/` 下建立新檔案，例如 `src/utils/string.ts`
+2. 匯出函式：
+
+```typescript
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+```
+
+3. 在 `src/index.ts` 中匯入：
+
+```typescript
+import { capitalize } from './utils/string.js';
+```
+
+## 📦 可用的 npm 指令
+
+| 指令 | 說明 | 使用時機 |
+|------|------|---------|
+| `npm install` | 安裝依賴套件 | 首次使用或套件更新後 |
+| `npm run build` | 編譯 TypeScript | 修改程式碼後 |
+| `npm run start` | 執行編譯後的程式 | 測試功能 |
+| `npm run dev` | 編譯並執行 | 開發時快速測試 |
+| `npm run clean` | 清理編譯輸出 | 重新編譯前 |
+
+---
+
+# 🚀 部署到樹莓派
+
+> 🍓 完整的樹莓派部署指南，包含 Nginx 網頁伺服器配置。
+
+## ⚠️ 重要說明
+
+本專案目前是 **Node.js CLI 應用程式**，有兩種部署方式：
+
+### 方式一：在樹莓派上直接執行（無需 Nginx）
+適合：命令列執行、定時任務、後端處理
+
+### 方式二：改造成網頁應用並用 Nginx 部署
+適合：瀏覽器訪問、Web 介面
+
+下面將詳細說明兩種方式。
+
+---
+
+## 🔧 方式一：樹莓派上直接執行 Node.js
+
+### 步驟 1：在樹莓派上安裝 Node.js
+
+```bash
+# 更新系統
+sudo apt update && sudo apt upgrade -y
+
+# 安裝 Node.js（LTS 版本）
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 驗證安裝
+node --version    # 應顯示 v18.x.x 或更高
+npm --version
+```
+
+### 步驟 2：上傳專案到樹莓派
+
+**方法 A：使用 Git（推薦）**
+
+```bash
+# 在樹莓派上
+cd ~
+git clone [您的專案 Git URL]
+cd LLMs_Raspberry/前端開發環境配置/2_typescript
+```
+
+**方法 B：使用 SCP 上傳**
+
+```bash
+# 在您的電腦上執行
+scp -r 前端開發環境配置/2_typescript pi@[樹莓派IP]:/home/pi/
+```
+
+### 步驟 3：安裝依賴並執行
+
+```bash
+# 在樹莓派上
+cd ~/2_typescript
+npm install
+npm run build
+npm run start
+```
+
+### 步驟 4：設定為系統服務（開機自動執行）
+
+建立 systemd 服務檔案：
+
+```bash
+sudo nano /etc/systemd/system/typescript-app.service
+```
+
+輸入以下內容：
+
+```ini
+[Unit]
+Description=TypeScript Demo Application
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/2_typescript
+ExecStart=/usr/bin/node /home/pi/2_typescript/dist/index.js
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+啟用並啟動服務：
+
+```bash
+# 重新載入 systemd
+sudo systemctl daemon-reload
+
+# 啟用服務（開機自動啟動）
+sudo systemctl enable typescript-app.service
+
+# 立即啟動服務
+sudo systemctl start typescript-app.service
+
+# 查看服務狀態
+sudo systemctl status typescript-app.service
+
+# 查看日誌
+sudo journalctl -u typescript-app.service -f
+```
+
+---
+
+## 🌐 方式二：改造成網頁應用 + Nginx 部署
+
+### 為什麼需要改造？
+
+目前的專案是 CLI 應用，輸出到終端機。要在瀏覽器中顯示，需要：
+1. 建立 HTML 介面
+2. 將 TypeScript 編譯成瀏覽器可執行的 JavaScript
+3. 使用 Nginx 提供網頁服務
+
+### 步驟 1：改造專案為網頁應用
+
+#### 1.1 修改 TypeScript 配置
+
+編輯 `tsconfig.json`：
+
+```json
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "ES2020",           // 改為瀏覽器支援的模組
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],     // 添加 DOM API
+    "strict": true,
+    "sourceMap": true,
+    "declaration": false,          // 瀏覽器不需要型別定義檔
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  }
+}
+```
+
+#### 1.2 修改源碼以支援瀏覽器
+
+**修改 `src/utils/math.ts`：**（保持不變）
+
+```typescript
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export function subtract(a: number, b: number): number {
+  return a - b;
+}
+
+export function multiply(a: number, b: number): number {
+  return a * b;
+}
+```
+
+**修改 `src/index.ts`：**
+
+```typescript
+import { add, subtract, multiply } from './utils/math.js';
+
+// 建立結果顯示函式
+function displayResult(operation: string, a: number, b: number, result: number) {
+  const resultDiv = document.getElementById('results');
+  if (resultDiv) {
+    const p = document.createElement('p');
+    p.textContent = `${operation}: ${a} 和 ${b} = ${result}`;
+    resultDiv.appendChild(p);
+  }
+}
+
+// 等待 DOM 載入完成
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('TypeScript 網頁應用已啟動！');
+  
+  // 執行計算
+  const num1 = 10;
+  const num2 = 5;
+  
+  displayResult('加法', num1, num2, add(num1, num2));
+  displayResult('減法', num1, num2, subtract(num1, num2));
+  displayResult('乘法', num1, num2, multiply(num1, num2));
+});
+```
+
+#### 1.3 建立 HTML 檔案
+
+在專案根目錄建立 `public/index.html`：
+
+```bash
+mkdir -p public
+nano public/index.html
+```
+
+輸入以下內容：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript 數學運算示範</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        #results {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+        #results p {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 TypeScript 數學運算示範</h1>
+        
+        <div class="info">
+            <strong>📌 專案說明：</strong>
+            本網頁展示 TypeScript 編譯後在瀏覽器中執行的效果。
+            所有計算都在您的瀏覽器中本地執行。
+        </div>
+        
+        <h2>📊 計算結果</h2>
+        <div id="results">
+            <p>⏳ 正在載入...</p>
+        </div>
+    </div>
+    
+    <footer>
+        🍓 部署在樹莓派 Nginx | TypeScript Demo Application
+    </footer>
+    
+    <!-- 載入 TypeScript 編譯後的 JavaScript -->
+    <script type="module" src="../dist/index.js"></script>
+</body>
+</html>
+```
+
+#### 1.4 更新 package.json
+
+```json
+{
+  "name": "2_typescript",
+  "version": "1.0.0",
+  "description": "學習用",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "clean": "rm -rf dist",
+    "build:web": "tsc && cp -r public dist/"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}
+```
+
+### 步驟 2：編譯專案
+
+```bash
+npm run build
+```
+
+### 步驟 3：在樹莓派上安裝 Nginx
+
+```bash
+# 安裝 Nginx
+sudo apt update
+sudo apt install nginx -y
+
+# 啟動 Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# 檢查狀態
+sudo systemctl status nginx
+```
+
+### 步驟 4：上傳檔案到樹莓派
+
+```bash
+# 在您的電腦上
+scp -r 前端開發環境配置/2_typescript pi@[樹莓派IP]:/home/pi/
+```
+
+### 步驟 5：設定 Nginx
+
+建立網站配置：
+
+```bash
+sudo nano /etc/nginx/sites-available/typescript-app
+```
+
+輸入以下配置：
+
+```nginx
+server {
+    listen 80;
+    server_name [您的樹莓派IP或域名];
+
+    # 網站根目錄
+    root /home/pi/2_typescript;
+    index public/index.html;
+
+    # 主頁面
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # 靜態檔案（JS, CSS）
+    location ~* \.(js|css|map)$ {
+        expires 1d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # 錯誤頁面
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+}
+```
+
+啟用網站：
+
+```bash
+# 建立符號連結
+sudo ln -s /etc/nginx/sites-available/typescript-app /etc/nginx/sites-enabled/
+
+# 測試配置
+sudo nginx -t
+
+# 重新載入 Nginx
+sudo systemctl reload nginx
+```
+
+### 步驟 6：設定檔案權限
+
+```bash
+# 確保 Nginx 可以讀取檔案
+sudo chown -R pi:www-data /home/pi/2_typescript
+sudo chmod -R 755 /home/pi/2_typescript
+```
+
+### 步驟 7：測試網站
+
+在瀏覽器中訪問：
+```
+http://[樹莓派IP]
+```
+
+您應該會看到美觀的網頁介面，顯示數學運算結果！
+
+---
+
+## 🔒 進階配置（選用）
+
+### 1. 設定 HTTPS（使用 Let's Encrypt）
+
+```bash
+# 安裝 Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# 取得 SSL 憑證
+sudo certbot --nginx -d your-domain.com
+
+# 自動更新憑證
+sudo certbot renew --dry-run
+```
+
+### 2. 設定防火牆
+
+```bash
+# 允許 HTTP 和 HTTPS
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+```
+
+### 3. 效能優化
+
+編輯 Nginx 配置以啟用 Gzip 壓縮：
+
+```nginx
+# 在 server 區塊中添加
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+```
+
+---
+
+## 📝 部署檢查清單
+
+- [ ] 樹莓派已安裝 Node.js
+- [ ] 樹莓派已安裝 Nginx
+- [ ] 專案已上傳到樹莓派
+- [ ] 執行 `npm install` 安裝依賴
+- [ ] 執行 `npm run build` 編譯專案
+- [ ] Nginx 配置檔案已設定
+- [ ] 檔案權限已正確設定
+- [ ] Nginx 已重新載入
+- [ ] 可以在瀏覽器中訪問網站
+- [ ] （選用）已設定 HTTPS
+- [ ] （選用）已設定防火牆
+
+---
+
+## 🐛 部署疑難排解
+
+### 問題 1：Nginx 無法啟動
+
+```bash
+# 檢查配置錯誤
+sudo nginx -t
+
+# 查看錯誤日誌
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 問題 2：無法訪問網站
+
+```bash
+# 檢查 Nginx 狀態
+sudo systemctl status nginx
+
+# 檢查防火牆
+sudo ufw status
+
+# 檢查樹莓派 IP
+hostname -I
+```
+
+### 問題 3：JavaScript 檔案 404 錯誤
+
+- 確認 `dist/` 資料夾存在且包含 `.js` 檔案
+- 檢查 HTML 中的 script 路徑是否正確
+- 確認檔案權限：`ls -la /home/pi/2_typescript/dist/`
+
+### 問題 4：TypeScript 編譯錯誤
+
+```bash
+# 清理並重新編譯
+npm run clean
+npm run build
+
+# 檢查 Node.js 版本
+node --version  # 應該是 v18+ 
+```
+
+---
+
+## 📚 詳細教學文件
+
+以下是完整的 TypeScript 學習指南，適合想深入了解 TypeScript 的開發者。
+
 ## 目錄
 - [簡介](#簡介)
 - [什麼是 TypeScript](#什麼是-typescript)

@@ -63,6 +63,70 @@ npm --version
    npm install -g <package-name>
    ```
 
+### 三種安裝方式的詳細說明
+
+這三種安裝方式，主要差在「裝到哪裡」以及「在專案生命週期扮演什麼角色」。
+
+#### 1. `npm install <package-name>`
+
+- **安裝位置**：裝到「目前專案」底下（`node_modules` 目錄）
+- **寫入位置**：會寫進 `package.json` 的 **dependencies**
+- **代表意義**：這個套件在「專案執行時」會用到
+- **典型範例**：React、react-dom、axios、react-router-dom 等運行時需要的庫
+
+```bash
+npm install react react-dom
+# 執行後會在 package.json 的 dependencies 中看到：
+# "dependencies": {
+#   "react": "^18.2.0",
+#   "react-dom": "^18.2.0"
+# }
+```
+
+#### 2. `npm install --save-dev <package-name>`
+
+- **安裝位置**：一樣裝到目前專案（`node_modules` 目錄）
+- **寫入位置**：會寫進 `package.json` 的 **devDependencies**
+- **代表意義**：只在「開發或建置階段」會用到，不會被打包到生產版本
+- **典型範例**：TypeScript、ESLint、Vite、測試框架（Vitest、Jest）、建置工具等
+
+```bash
+npm install --save-dev typescript vite @vitejs/plugin-react
+# 執行後會在 package.json 的 devDependencies 中看到：
+# "devDependencies": {
+#   "typescript": "^5.2.0",
+#   "vite": "^4.4.5",
+#   "@vitejs/plugin-react": "^4.0.9"
+# }
+```
+
+#### 3. `npm install -g <package-name>`
+
+- **安裝位置**：裝到「全域環境」，不是專案目錄下
+- **寫入位置**：**不會寫進**目前專案的 `package.json`
+- **代表意義**：這個套件通常是當成「命令列工具」來用，可以在任何資料夾下執行指令
+- **典型範例**：npm、pnpm、eslint CLI、typescript 的 tsc、create-vite、create-react-app 等全域工具
+
+```bash
+npm install -g typescript
+# 安裝後可以在任何目錄下直接使用：
+tsc --version
+# 而不需要在專案中執行
+```
+
+### 什麼時候用哪一種？
+
+- **專案執行會用到的庫** → 用 `npm install`，讓它進 `dependencies`
+  - 例如：React、Vue、Angular、狀態管理庫、UI 元件庫等
+
+- **只在開發、測試、建置用的工具** → 用 `npm install --save-dev`，讓它進 `devDependencies`
+  - 例如：TypeScript、ESLint、Prettier、建置工具（Vite、Webpack）、測試框架等
+
+- **想在任何專案、任何資料夾都可以直接下指令的工具** → 用 `npm install -g`
+  - 例如：全域 CLI 工具、腳手架工具等
+
+**建議**：在教學或實務專案中，通常會鼓勵先以「專案本地安裝」（前兩種）為主，只有真的需要全域 CLI 時才用 `-g`。這樣可以確保專案的依賴關係明確，並且不同專案可以使用不同版本的同一工具。
+
 2. **專案初始化**
    ```bash
    # 創建新的 package.json 檔案

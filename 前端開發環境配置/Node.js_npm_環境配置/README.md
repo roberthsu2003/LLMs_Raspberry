@@ -148,6 +148,106 @@ tsc --version
    npm start
    ```
 
+### npm scripts 的詳細說明
+
+可以把 `npm run`、`npm test`、`npm start` 全部當成「幫你下長指令的快捷鍵」。以下用具體情境來說明：
+
+#### 核心概念
+
+- **package.json = 遙控器的按鈕說明表**：  
+  `scripts` 裡面每一行，就是幫某個「按鈕」取名字，例如：`"dev": "vite"`、`"build": "tsc && vite build"`。
+
+- **npm run XXX = 按下那顆按鈕**：  
+  `npm run dev` 就是「按下 dev 按鈕」，實際在背後幫你執行 `vite` 這個指令。
+
+**重要觀念**：`npm run` 後面接的是「按鈕名字」，不是系統指令本身。
+
+#### 實例 1：啟動開發伺服器（npm run dev）
+
+假設 `package.json` 裡有這段：
+
+```json
+"scripts": {
+  "dev": "vite"
+}
+```
+
+**說明**：
+
+- 如果不用 `npm run`，原本要打的指令是：`vite`
+- 但使用 `npm run dev` 時，npm 會去 `package.json` 找 `dev` 這個腳本，幫你執行 `vite`
+- **所以在開發時，只要記得打 `npm run dev` 就可以啟動開發伺服器**
+
+**流程圖**：
+
+```
+學生打：npm run dev
+  ↓
+npm 去看 package.json
+  ↓
+找到 "dev": "vite"
+  ↓
+實際執行：vite
+```
+
+#### 實例 2：建置專案（npm run build）
+
+`package.json` 範例：
+
+```json
+"scripts": {
+  "build": "tsc && vite build"
+}
+```
+
+**說明**：
+
+- 真正的完整指令其實是：`tsc && vite build`，對初學者來說又長又難記
+- 我們幫它取一個簡單的名字叫 `build`，之後只要打：`npm run build` 就代表「先編譯 TypeScript，再打包 React 專案」
+- **要產生正式版時，只要記得打：`npm run build`**
+
+**流程圖**：
+
+```
+學生打：npm run build
+  ↓
+npm 找 "build": "tsc && vite build"
+  ↓
+依序幫你跑 tsc 再跑 vite build
+```
+
+#### 實例 3：程式碼檢查、測試（npm run lint / npm test）
+
+`package.json` 可能有：
+
+```json
+"scripts": {
+  "lint": "eslint . --ext ts,tsx",
+  "test": "vitest"
+}
+```
+
+**說明**：
+
+- 「如果你想檢查程式碼有沒有問題，就打：`npm run lint`。」背後實際在跑的是 `eslint . --ext ts,tsx`
+- 「如果你要跑自動化測試，就打：`npm test`。」npm 會自動對應到 `"test": "vitest"` 這個腳本
+
+**重點**：學生不需要背 `eslint . --ext ts,tsx` 或 `vitest`，只要記得那幾個常用按鈕名稱：`dev` / `build` / `lint` / `test`。
+
+#### 為什麼有時候是 npm test / npm start，不用 run？
+
+在 `npm` 裡有兩個「特例名稱」：
+
+- `npm start` 會自動對應到 `"start": "..."` 這個腳本
+- `npm test` 會自動對應到 `"test": "..."` 這個腳本
+
+**說明**：
+
+- 「`npm start` 就等於 `npm run start`，只是 npm 幫你省略了 `run`」
+- 「`npm test` 也是一樣的道理」
+
+**重要概念**：語法不同，但概念完全一樣，都是在執行 package.json 裡面對應的腳本。
+
 ### 在 TypeScript + React 專案中的常見用法
 
 ```bash

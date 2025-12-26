@@ -250,6 +250,10 @@ npm 找 "build": "tsc && vite build"
 
 ### 在 TypeScript + React 專案中的常見用法
 
+這幾行可以用「蓋房子」的比喻來講：React 是房子本體，TypeScript 是設計藍圖檢查工具，Vite 是施工機器，Vitest / Testing Library 是驗屋工具。
+
+#### 基本安裝指令
+
 ```bash
 # 安裝 React 和相關套件
 npm install react react-dom
@@ -263,6 +267,67 @@ npm install --save-dev vite @vitejs/plugin-react
 # 安裝測試工具
 npm install --save-dev vitest @testing-library/react
 ```
+
+#### 各套件詳細說明
+
+##### 1. React / react-dom：真的在跑的程式
+
+```bash
+npm install react react-dom
+```
+
+**說明**：
+
+- **react**：讓你可以用「元件」的方式寫畫面，是整個畫面的核心程式庫
+- **react-dom**：負責把 React 畫面「插進去」瀏覽器的 `<div id="root">` 裡
+
+**重點**：沒有這兩個，你根本跑不起任何 React 畫面，畫面完全出不來。這兩個套件是執行時必需的，所以放在 `dependencies`。
+
+##### 2. TypeScript + 型別定義：幫你抓錯的輔助輪
+
+```bash
+npm install --save-dev typescript @types/react @types/react-dom
+```
+
+**說明**：
+
+- **typescript**：讓你可以用 TypeScript 寫程式，編譯時幫你檢查型別錯誤，像程式的「拼字檢查 + 文法檢查」
+- **@types/react / @types/react-dom**：把 React 的 API 補上型別說明，讓編輯器知道哪些 props 可以用、型別是什麼
+
+**重點**：這些東西只在開發的時候用來幫你抓錯，線上給使用者看的程式碼裡不會包含它們，所以放在 `devDependencies`。
+
+##### 3. Vite / @vitejs/plugin-react：開發時的伺服器 + 打包機器
+
+```bash
+npm install --save-dev vite @vitejs/plugin-react
+```
+
+**說明**：
+
+- **vite**：幫你開啟開發用網站（localhost:5173），支援一邊改程式一邊即時更新畫面，也幫你把程式打包成正式版檔案
+- **@vitejs/plugin-react**：讓 Vite 聽得懂 React / JSX / Fast Refresh 等功能，是 Vite 的「React 外掛」
+
+**重點**：這兩個是「開發工具」，用來啟動專案跟打包，不是給使用者在瀏覽器裡直接用的。
+
+##### 4. Vitest / Testing Library：自動幫你驗收功能
+
+```bash
+npm install --save-dev vitest @testing-library/react
+```
+
+**說明**：
+
+- **vitest**：測試框架，負責跑「程式是否照預期運作」的自動化測試
+- **@testing-library/react**：幫你在測試裡模擬使用者操作 React 元件（像點按鈕、輸入文字）
+
+**重點**：這些是「驗屋工具」，是工程師自己用來確認程式沒壞掉的，不會放到最後給使用者看的檔案裡。
+
+#### 一句話版本總結
+
+- **React / react-dom**：**畫面本體**，畫面跑起來一定要有
+- **TypeScript + @types**：**寫程式時幫你抓錯的工具**，只在開發時用
+- **Vite + plugin**：**啟動本地網站與打包的工具**
+- **Vitest + Testing Library**：**自動幫你測試功能有沒有壞掉的工具**
 
 ---
 

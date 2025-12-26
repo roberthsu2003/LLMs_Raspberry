@@ -398,6 +398,40 @@ npm run build      # 建置生產版本
 npm run lint       # 執行程式碼檢查
 ```
 
+**核心概念**：這一段可以教學生：「這是幫常用工作取『指令快捷鍵』，以後只要記住短名字就好，不用每次打長長的指令。」
+
+##### 常用 scripts 詳細說明
+
+- **dev: "vite"**  
+  「開發時用的指令。」打 `npm run dev` 就會開啟本地開發伺服器（例如 http://localhost:5173），畫面會跟著程式碼即時更新。
+
+- **build: "tsc && vite build"**  
+  「要產生正式版網站時用。」打 `npm run build`，會先做 TypeScript 編譯（`tsc`），再用 Vite 把專案打包成可以上線放到伺服器的檔案（輸出到 dist/）。
+
+- **build:prod: "npm run build"**  
+  「給『正式環境』用的別名。」打 `npm run build:prod`，其實就是再去執行一次 `npm run build`，很多團隊習慣把「正式環境建置」命名成 `build:prod`，比較好看得懂。
+
+- **preview: "vite preview"**  
+  「模擬上線後會長什麼樣。」先 `npm run build` 產生 dist/，再打 `npm run preview`，就可以在本機用類似正式環境的方式瀏覽打包後的網站。
+
+- **lint: "eslint . --ext ts,tsx"**  
+  「幫你檢查程式碼寫得好不好。」打 `npm run lint`，ESLint 會掃描所有 ts / tsx 檔，找出不推薦的寫法或潛在 bug，像寫程式的文法老師。
+
+- **type-check: "tsc --noEmit"**  
+  「只檢查 TypeScript 型別，不產生檔案。」打 `npm run type-check`，會檢查型別錯誤，但不輸出 js，常在 CI 或提交前確認沒有型別問題。
+
+- **test: "vitest"**  
+  「自動跑測試。」打 `npm test` 或 `npm run test`，Vitest 會執行測試檔案，幫你確認功能還正常，避免改一段程式害其他地方壞掉。
+
+- **clean: "rm -rf dist node_modules"**  
+  「把環境整個清乾淨。」打 `npm run clean`，會刪掉打包輸出的 dist/ 和所有套件的 node_modules/，通常是環境壞掉時重來用的指令，**要提醒學生這個會刪很多東西，使用前要謹慎**。
+
+##### 課堂上可以直接說的版本
+
+- 「這個 `scripts` 區塊是在幫常做的事情取名字。」
+- 「以後你只要記住幾個：`npm run dev` 開發、`npm run build` 打包、`npm run preview` 看打包後結果、`npm run lint` 檢查程式、`npm test` 跑測試。」
+- 「背後那串英文是電腦真正執行的指令，先不用背，會用這幾個快捷鍵就夠了。」
+
 #### 3. **dependencies（生產依賴）**
 
 專案運行時需要的套件，會被打包到最終產品中：

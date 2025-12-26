@@ -238,18 +238,54 @@ Nginx 安裝後會預設一個網頁根目錄，通常位於 `/var/www/html`。
 
     2. 修改 `root` 路徑：
        ```nginx
+       # server { } 區塊：定義一個虛擬伺服器（網站站點）
+       # 一個 server 區塊代表一個網站的設定，可以有多個 server 區塊來運行多個網站
        server {
+           
+           # listen 指令：指定 Nginx 監聽的端口和 IP 地址
+           # listen 80：監聽 IPv4 的 80 端口（HTTP 標準端口）
+           # default_server：將此 server 區塊設為預設站點（當請求的域名不匹配任何站點時，使用此站點）
            listen 80 default_server;
+           
+           # listen [::]:80：監聽 IPv6 的 80 端口
+           # [::] 是 IPv6 的「所有地址」表示法，等同於 IPv4 的 0.0.0.0
            listen [::]:80 default_server;
 
-           # 將 root 指向你的自訂專案資料夾 (例如 /home/pi/my-website)
+           # root 指令：指定網站檔案的根目錄路徑
+           # 當用戶訪問網站時，Nginx 會在這個目錄中尋找對應的檔案
+           # 例如：訪問 http://你的IP/index.html，Nginx 會在 /home/pi/my-website/index.html 尋找檔案
            root /home/pi/my-website; 
            
+           # index 指令：指定當用戶訪問目錄（而非具體檔案）時，預設要載入的檔案名稱
+           # Nginx 會按照順序尋找這些檔案，找到第一個存在的檔案就使用它
+           # 例如：訪問 http://你的IP/，會依序尋找 index.html、index.htm、index.nginx-debian.html
            index index.html index.htm index.nginx-debian.html;
 
+           # server_name 指令：指定這個 server 區塊要回應的網域名稱
+           # _ (底線) 表示「匹配所有域名」或「不匹配任何特定域名」
+           # 通常用在 default_server 上，作為預設站點
+           # 如果要綁定特定域名，可以改為：server_name example.com www.example.com;
            server_name _;
 
+           # location 區塊：定義特定 URL 路徑的處理規則
+           # location / 表示匹配所有以 / 開頭的 URL（也就是所有請求）
            location / {
+               # try_files 指令：嘗試按照順序尋找檔案
+               # $uri：先嘗試直接使用請求的 URI 作為檔案路徑
+               # $uri/：如果找不到檔案，嘗試將 URI 當作目錄，尋找該目錄下的預設檔案（由 index 指令指定）
+               # =404：如果以上都找不到，返回 404 錯誤
+               # 
+               # 範例流程：
+               # 1. 用戶訪問 http://你的IP/about.html
+               #    → try_files 先找 /home/pi/my-website/about.html
+               #    → 找到就返回
+               # 2. 用戶訪問 http://你的IP/blog/
+               #    → try_files 先找 /home/pi/my-website/blog/ (作為檔案，找不到)
+               #    → 再找 /home/pi/my-website/blog/ (作為目錄)
+               #    → 在該目錄下找 index.html（由 index 指令指定）
+               #    → 找到就返回
+               # 3. 用戶訪問 http://你的IP/not-exist.html
+               #    → 都找不到，返回 404 錯誤
                try_files $uri $uri/ =404;
            }
        }

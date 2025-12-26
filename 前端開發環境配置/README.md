@@ -29,4 +29,5 @@
 
 ## 🚀 部署配置
 
+- [部署至樹莓派的方式](./部署至樹莓派/README.md) - 使用 FileZilla、SCP、rsync 等方式部署
 - [Nginx 網站伺服器配置](./建立web_server/README.md) - 網站部署指南

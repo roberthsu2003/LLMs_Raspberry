@@ -1,31 +1,32 @@
 # 前端開發環境配置
 
-## 線上AI生成網頁工具
+## 🎨 設計參考
 
-👉 [線上AI生成網頁工具完整說明](./線上AI生成網頁工具/README.md)
+- [網頁設計創意發想參考網站](./網頁設計參考網站/README.md)
+
+## 📖 快速指南
+
+### 🔧 專案判斷與配置
+
+- [🎯 專案類型判斷指南](./專案類型判斷指南/README.md) - 判斷專案類型並選擇正確的開發工具
+- [🤖 線上AI生成網頁工具](./線上AI生成網頁工具/README.md) - 使用 AI 平台生成前端專案
 
 ---
 
-## 🎯 專案類型判斷指南
-
-👉 [專案類型判斷指南完整說明](./專案類型判斷指南/README.md)
-
----
-
-## 📚 相關資源
+## 💻 開發環境配置
 
 - [Node.js 和 npm 環境配置](./Node.js_npm_環境配置/README.md) - 詳細的 Node.js/npm 說明
-- [JavaScript 專案配置](./1_javascript/README.md) - 純 JavaScript 專案指南
-- [TypeScript 專案配置](./2_typescript/README.md) - TypeScript 專案指南
-- [React 專案配置](./3_typescript_react/README.md) - React 專案指南
-- [Nginx 網站伺服器配置](./建立web_server/README.md) - 部署指南
 
 ---
 
-## [Nginx網站伺服器配置](./建立web_server/README.md)
-## [Node.js_npm_環境配置](./Node.js_npm_環境配置/README.md)
-## 實務專案網站
-### [網頁設計創意發想參考網站](./網頁設計參考網站/README.md)
-### [javascript網站](./1_javascript/README.md)
-### [typescript網站](./2_typescript/README.md)
-### [react網站](./3_typescript_react/README.md)
+## 📦 專案範例
+
+- [JavaScript 專案](./1_javascript/README.md) - 純 JavaScript 專案配置指南
+- [TypeScript 專案](./2_typescript/README.md) - TypeScript 專案配置指南
+- [React 專案](./3_typescript_react/README.md) - TypeScript + React 專案配置指南
+
+---
+
+## 🚀 部署配置
+
+- [Nginx 網站伺服器配置](./建立web_server/README.md) - 網站部署指南

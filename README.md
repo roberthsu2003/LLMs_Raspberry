@@ -34,5 +34,5 @@
 - 使用Ollama 和 OpenWebUI應用
 - 使用openWebUI API
 
-## raspberry pi安裝流程說明
+## [raspberry pi安裝流程說明](./pi安裝流程說明/README.md)
 ## [前端開發環境配置](./前端開發環境配置/README.md)

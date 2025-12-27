@@ -35,5 +35,6 @@
 - 使用openWebUI API
 
 ## [raspberry pi安裝流程說明](./pi安裝流程說明/README.md)
+## [透過ssh連線,輸入中文會有亂碼的解決方法](./透過ssh連線-輸入中文會有亂碼的解決方法.md)
 ## [file_server安裝流程說明](./file_server安裝流程說明/README.md)
 ## [前端開發環境配置](./前端開發環境配置/README.md)

@@ -35,4 +35,5 @@
 - 使用openWebUI API
 
 ## [raspberry pi安裝流程說明](./pi安裝流程說明/README.md)
+## [file_server安裝流程說明](./file_server安裝流程說明/README.md)
 ## [前端開發環境配置](./前端開發環境配置/README.md)

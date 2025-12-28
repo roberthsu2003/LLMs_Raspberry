@@ -36,5 +36,17 @@
 
 ## [raspberry pi安裝流程說明](./pi安裝流程說明/README.md)
 ## [透過ssh連線,輸入中文會有亂碼的解決方法](./透過ssh連線-輸入中文會有亂碼的解決方法.md)
+## Linux指令操作說明
+  - 基本指令
+  - 檔案操作
+  - 目錄操作
+  - 權限操作
+  - 使用者操作
+  - 群組操作
+  - 行程操作
+## ollama安裝流程說明
+## openwebui安裝流程說明
+## ngrok tunnel連線說明
+## cloudflare tunnel連線說明
 ## [file_server安裝流程說明](./file_server安裝流程說明/README.md)
 ## [前端開發環境配置](./前端開發環境配置/README.md)

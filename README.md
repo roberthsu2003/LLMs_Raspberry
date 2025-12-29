@@ -6,17 +6,10 @@
 - 記憶體4GB,8GB,16GB 建議**8GB**(一般操作),16GB(LLM生成式應用)
 
 ## 作業系統需求
-- PiOS **No Desktop**
+- PiOS
 
 ## 待完成事項
-- 安裝流程說明
-- 教室區網連線
-  - 使用教室無線網路AP(Wireless Access Point)連線
-  - 使用dongle wifi連線
-  - 使用手機熱點連線
 - 使用ssh連線,使用filezilla連線(sftp)
-- 使用vnc viewer連線
-- 使用pi connection遠端連線
 - 基本的Linux操作指令
 - 了解user,group,資料夾和檔案權限rwx的管理
 - tunnel連線[待整理資料](./tunnel連線待整理資料.md)

@@ -1,0 +1,9 @@
+標題: 了解Host,Container,Image關係
+主體: Host,Container,Image
+對像: 學生
+目標: 讓學生了解Host,Container和Image之關係
+風格: 手繪風格,淡淡的水彩填色
+視覺隱喻:
+  Host: 一台外部的大電腦
+  Container: 是大電腦內的小型電腦,可以隨時開關
+  Image: 一個建立小型電腦的安裝光碟片

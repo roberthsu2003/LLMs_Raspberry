@@ -115,77 +115,6 @@ Raspberry Pi 官方推薦使用 **Raspberry Pi OS**（基於 Debian）。
    - 點擊 "WRITE"
    - 確認警告訊息
    - 等待燒錄完成（通常需要 5-10 分鐘）
-
-### 使用其他工具（Windows）
-
-**使用 Win32 Disk Imager**：
-
-1. 下載並安裝 [Win32 Disk Imager](https://sourceforge.net/projects/win32diskimager/)
-2. 解壓縮下載的 `.img.xz` 檔案（使用 7-Zip 或 WinRAR）
-3. 開啟 Win32 Disk Imager
-4. 選擇映像檔（`.img` 檔案）
-5. 選擇 SD 卡裝置
-6. 點擊 "Write" 開始燒錄
-
-**使用 Rufus**：
-
-1. 下載並開啟 [Rufus](https://rufus.ie/)
-2. 選擇 SD 卡
-3. 選擇映像檔
-4. 點擊 "開始"
-
-### 使用其他工具（macOS）
-
-**使用內建工具（終端機）**：
-
-1. **找出 SD 卡裝置**：
-```bash
-diskutil list
-```
-記下 SD 卡的識別碼（例如：`/dev/disk2`）
-
-2. **卸載 SD 卡**：
-```bash
-diskutil unmountDisk /dev/disk2
-```
-
-3. **燒錄映像檔**：
-```bash
-sudo dd if=/path/to/raspios.img of=/dev/rdisk2 bs=1m
-```
-**注意**：將 `/dev/disk2` 改為 `rdisk2` 可以加快速度
-
-4. **等待完成**：過程可能需要 10-20 分鐘
-
-**使用 Balena Etcher**（圖形界面，推薦）：
-
-1. 下載並安裝 [Balena Etcher](https://www.balena.io/etcher/)
-2. 開啟 Etcher
-3. 選擇映像檔
-4. 選擇 SD 卡
-5. 點擊 "Flash!" 開始燒錄
-
-### 使用其他工具（Linux）
-
-**使用 dd 指令**：
-
-1. **找出 SD 卡裝置**：
-```bash
-lsblk
-# 或
-sudo fdisk -l
-```
-
-2. **卸載 SD 卡**（如果已掛載）：
-```bash
-sudo umount /dev/sdX1  # 將 X 替換為你的裝置代號
-```
-
-3. **燒錄映像檔**：
-```bash
-sudo dd if=/path/to/raspios.img of=/dev/sdX bs=4M status=progress oflag=sync
-```
-
 ---
 
 ## 首次開機設定
@@ -236,12 +165,11 @@ hostname -I
 - 登入路由器管理頁面（通常是 `192.168.1.1`）
 - 查看已連接裝置列表
 
-**使用網路掃描工具**：
+**使用網路ping工具**：
 ```bash
-# macOS/Linux
-nmap -sn 192.168.1.0/24  # 將 192.168.1 改為你的網段
+# macOS/Linux/Windows
+ping 你的ip或hostname
 
-# Windows（使用 Advanced IP Scanner 等工具）
 ```
 
 2. **SSH 連線**：
@@ -286,7 +214,7 @@ sudo raspi-config
 2. **Interface Options**：
    - **SSH**：啟用/停用 SSH
    - **VNC**：啟用/停用 VNC（圖形界面遠端桌面）
-   - **SPI / I2C / Serial Port**：啟用硬體介面（用於連接感應器等）
+   - **RPi Connect** 啟用/停用 Raspberry Pi Connect(外網控制)
 
 3. **Localisation Options**：
    - **Change Locale**：設定語言和地區
@@ -304,64 +232,13 @@ sudo raspi-config
 
 ---
 
-## 網路設定
+## 網路設定(建議使用桌面wifi設定)
 
-### 設定 Wi-Fi（命令列）
+**上課用途**
 
-如果沒有使用圖形界面，可以使用命令列設定 Wi-Fi：
-
-1. **編輯 Wi-Fi 設定檔**：
-```bash
-sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-```
-
-2. **在檔案末尾加入以下內容**：
-```conf
-network={
-    ssid="你的WiFi名稱"
-    psk="你的WiFi密碼"
-}
-```
-
-3. **儲存並離開**（`Ctrl + O` 儲存，`Ctrl + X` 離開）
-
-4. **重新啟動網路服務**：
-```bash
-sudo systemctl restart networking
-# 或
-sudo wpa_cli -i wlan0 reconfigure
-```
-
-### 設定靜態 IP 位址（可選）
-
-如果需要固定 IP 位址：
-
-1. **編輯 DHCP 設定檔**：
-```bash
-sudo nano /etc/dhcpcd.conf
-```
-
-2. **在檔案末尾加入**（有線網路）：
-```conf
-interface eth0
-static ip_address=192.168.1.100/24
-static routers=192.168.1.1
-static domain_name_servers=192.168.1.1 8.8.8.8
-```
-
-**或 Wi-Fi**：
-```conf
-interface wlan0
-static ip_address=192.168.1.100/24
-static routers=192.168.1.1
-static domain_name_servers=192.168.1.1 8.8.8.8
-```
-
-3. **重新啟動網路服務**：
-```bash
-sudo systemctl restart dhcpcd
-```
-
+- 新增手機熱點
+- 新增Dongle wifi熱點
+- 新增家中wifi熱點
 ---
 
 ## SSH 設定
@@ -372,60 +249,6 @@ sudo systemctl restart dhcpcd
 ```bash
 sudo raspi-config
 # Interfacing Options → SSH → Enable
-```
-
-**方法二：手動建立檔案**：
-```bash
-sudo systemctl enable ssh
-sudo systemctl start ssh
-```
-
-**方法三：建立空檔案**（舊方法，仍可用）：
-```bash
-sudo touch /boot/ssh
-```
-
-### 使用 SSH 金鑰認證（免密碼登入，推薦）
-
-1. **在本機電腦生成 SSH 金鑰**（如果還沒有）：
-```bash
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-```
-
-2. **將公鑰複製到樹莓派**：
-```bash
-ssh-copy-id 使用者名稱@樹莓派IP位址
-# 例如：ssh-copy-id pi@192.168.1.100
-```
-
-3. **測試免密碼登入**：
-```bash
-ssh 使用者名稱@樹莓派IP位址
-```
-
-### 修改 SSH 設定（進階，提高安全性）
-
-1. **編輯 SSH 設定檔**：
-```bash
-sudo nano /etc/ssh/sshd_config
-```
-
-2. **建議修改的項目**：
-```conf
-# 禁止 root 使用者登入（如果有啟用 root）
-PermitRootLogin no
-
-# 僅允許使用金鑰認證（可選，提高安全性）
-PasswordAuthentication no
-PubkeyAuthentication yes
-
-# 修改 SSH 端口（可選，避免被掃描）
-Port 2222
-```
-
-3. **重新啟動 SSH 服務**：
-```bash
-sudo systemctl restart ssh
 ```
 
 ---
@@ -612,20 +435,3 @@ sudo nano /boot/config.txt
 ```
 
 ---
-
-## 📚 相關資源
-
-- [Raspberry Pi 官方網站](https://www.raspberrypi.com/)
-- [Raspberry Pi 官方文件](https://www.raspberrypi.com/documentation/)
-- [Raspberry Pi 論壇](https://forums.raspberrypi.com/)
-
----
-
-## 💡 下一步
-
-安裝完成後，你可以：
-
-- [設定網頁伺服器](../../前端開發環境配置/建立web_server/README.md)
-- [部署前端專案](../../前端開發環境配置/部署至樹莓派/README.md)
-- [配置開發環境](../../前端開發環境配置/README.md)
-

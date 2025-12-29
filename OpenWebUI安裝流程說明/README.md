@@ -110,6 +110,94 @@ ollama serve
 *   `OLLAMA_HOST=0.0.0.0` 是在改 **Server 是否接受外部連線**
 *   不設 → 容器一定連不到
 
+<br>
+
+#### 🤔 進階提問：如何讓 OLLAMA_HOST 設定永久生效？
+
+這個問題其實**已經進入「Linux 啟動流程等級」的理解了**，非常適合進階學習與教學。
+
+---
+
+##### 先給最重要的結論（避免混亂）
+
+👉 **「一開終端機就有」＝ Shell 啟動時載入的環境變數**
+👉 **但這「不等於」systemd 服務的環境變數**
+
+這兩件事一定要分清楚。
+
+---
+
+##### 🚫 為什麼只設定終端機是不夠的？（重要觀念）
+
+很多教學會讓你把 `export OLLAMA_HOST=0.0.0.0` 加到 `~/.bashrc` 檔案裡。這樣你每次打開終端機時，這個變數就自動設定好了。
+
+但你很快會發現問題：
+> 「為什麼我明明設定了 `.bashrc`，但電腦重開機後，OpenWebUI 還是連不到 Ollama？」
+
+👉 **因為 Ollama 服務是由 `systemd` 管理的，而 `systemd` 完全不讀取你個人的 `.bashrc` 或 `.profile` 檔案！**
+
+---
+
+##### ✅ 正確的「最完整解法」（實務＋教學）
+
+我們需要「分層設定」，同時滿足「給人用的」和「給服務用的」兩種情境。
+
+**1. 給「服務用」：修改 systemd 設定（這才是關鍵）**
+
+這一步確保電腦重開機後，Ollama 服務本身就是以正確的方式啟動。
+
+```bash
+# 編輯 ollama 的 systemd 設定
+sudo systemctl edit ollama
+```
+
+這會打開一個編輯器。在裡面加入以下內容：
+```ini
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0"
+```
+-   存檔並關閉編輯器。
+-   這個操作會在 `/etc/systemd/system/ollama.service.d/override.conf` 建立一個覆寫檔案，這是最標準、最安全的作法。
+
+然後，重載設定並重啟 Ollama 服務：
+```bash
+# 重新載入 systemd 管理的設定
+sudo systemctl daemon-reload
+
+# 重啟 Ollama 服務讓新設定生效
+sudo systemctl restart ollama
+```
+做完這一步，Ollama 服務就永遠會監聽 `0.0.0.0` 了，一勞永逸。
+
+**2. 給「人用」：修改 `.bashrc` 設定**
+
+這一步是為了方便你自己在終端機裡做測試或除錯。
+
+```bash
+# 編輯你個人家目錄下的 .bashrc 檔案
+nano ~/.bashrc
+```
+
+在檔案的**最下面**加入這一行：
+```bash
+export OLLAMA_HOST=0.0.0.0
+```
+存檔後，執行 `source ~/.bashrc` 或重開一個終端機，你就可以用 `echo $OLLAMA_HOST` 看到變數了。這讓你在手動執行 `curl` 或其他指令時，也能模擬相同的環境。
+
+---
+
+##### 總結（可以直接放投影片）
+
+> 想要「服務重開也還在」
+> → 用 `systemd Environment=`
+>
+> 想要「一開終端機方便測試」
+> → 用 `.bashrc`
+>
+> **兩者目標不同，不能互相取代。**
+
+---
+
 **第 2 步：執行 OpenWebUI 容器**
 
 打開終端機，執行以下指令：

@@ -44,7 +44,7 @@
 ### 核心服務：部署 LLM 模型與 WebUI
 這是整個專案的核心。我們將安裝 Ollama 來運行語言模型，並透過 Docker 部署 OpenWebUI 作為操作介面。
 
-1.  **安裝 Docker**：OpenWebUI 推薦使用 Docker 部署，請先完成安裝。
+1.  **安裝 Docker**：OpenWebUI 推薦使用 Docker 部署。
     > 📚 **詳細指南**：[Docker 安裝流程說明](./Docker安裝流程說明/README.md)
 
 2.  **安裝 Ollama**：作為本地端 LLM 的運行框架。

@@ -33,7 +33,7 @@
 > [**透過ssh連線,輸入中文會有亂碼的解決方法**](./透過ssh連線-輸入中文會有亂碼的解決方法.md)
 ## [Linux指令操作說明](./Linux指令操作說明)
   
-## ollama安裝流程說明
+## [ollama安裝流程說明](./ollama安裝流程說明)
 ## openwebui安裝流程說明
 ## ngrok tunnel連線說明
 ## cloudflare tunnel連線說明

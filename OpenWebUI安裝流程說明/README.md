@@ -58,8 +58,26 @@ docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/da
 
 此指令只會啟動 OpenWebUI，而不會啟動 Ollama。
 
+可以移除--restart always
+
+> 使用--add-host=host.docker.internal:host-gateway官方做法會失敗,無法連上ollama
+
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+---
+
+**使用官方備分做法才可以成功**
+
+可以移除--restart always
+
+> 1. 使用`--=network=host`官方備分作法,才可以連線上ollama  
+> 2. 連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
+> 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
+
+```bash
+docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
 ### 第 2 步：連接到 Ollama

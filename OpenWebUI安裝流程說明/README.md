@@ -93,15 +93,20 @@ docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app
 
 ## 4. 如何更新 OpenWebUI
 
-官方推薦使用 `Watchtower` 這個工具來幫助你更新 Docker 容器。
+官方推薦使用 `Watchtower` 這個工具來幫助你更新 Docker 容器。它會自動拉取最新的映像檔，並用新的映像檔重啟你的容器。
 
-你可以執行以下指令來手動觸發一次更新：
+請根據你的安裝方式選擇對應的指令，`--run-once` 後面的 `open-webui` 是你當初用 `--name` 參數設定的容器名稱。
 
+**通用更新指令**：
 ```bash
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock nickfedor/watchtower --run-once open-webui
 ```
 
-它會自動拉取最新的 `ghcr.io/open-webui/open-webui:ollama` 映像檔，並用新的映像檔重啟你的容器。
+**重要提示**：
+-   如果你是按照【情況 A】（主機已有Ollama）安裝的，Watchtower 會自動拉取 `open-webui:main` 的最新版本。
+-   如果你是按照【情況 B】（整合包）安裝的，Watchtower 會自動拉取 `open-webui:ollama` 的最新版本。
+
+Watchtower 會偵測你當前容器使用的是哪個映像檔標籤 (tag)，並拉取該標籤的最新版，所以上述指令對兩種情況都適用。
 
 ---
 

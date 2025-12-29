@@ -232,7 +232,7 @@ sudo raspi-config
 
 ---
 
-## 網路設定(建議使用桌面wifi設定)
+## 網路設定
 
 **上課用途**
 
@@ -305,7 +305,9 @@ sudo apt install curl wget -y
 sudo apt install python3 python3-pip -y
 
 # Node.js 和 npm（使用 NodeSource 安裝最新版本）
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+# NodeSource 的通用 'lts' 腳本已停用，請指定主版本號。
+# 例如，使用 20.x (目前的 LTS 版本)。您可以將 "20.x" 替換為其他版本，例如 "18.x"。
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # 或使用預設版本

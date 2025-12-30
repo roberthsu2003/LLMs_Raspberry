@@ -91,8 +91,9 @@
 - [**Docker Run**](./Docker/DockerRun.md)
 - [**Docker Compose**](./Docker/DockerRun.md)
 
-### N8N伺服器(Docker)架設
-
+### N8N
+- [**N8N是什麼?**](./n8n/n8n是什麼.md)
+- [**N8N伺服器架設-Docker**](./n8n/使用Docker架設n8n.md)
 
 ### 進階應用 
 完成核心部署後，您可以依照需求擴充更多功能。

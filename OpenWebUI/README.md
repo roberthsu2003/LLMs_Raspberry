@@ -30,7 +30,8 @@
 - 介紹向量文字,參考網址:https://ai4k12.org/word-embedding-demo/
 
 **工作流程**
-> step1 至`設定`->`檔案`->`嵌入模型`內,輸入`BAAI/bge-m3`並按下**下載**
+> step1 使用ollama->`ollama pull bge-m3`
+> step1 至`設定`->`檔案`->`嵌入模型`內,選取`bge-m3:latest`並按下**下載**
 > 主要使用`工作區`的欄位
 
 ### **📌 3. 自訂工作流與管線（Pipelines）**

@@ -45,17 +45,19 @@
 這是整個專案的核心。我們將安裝 Ollama 來運行語言模型，並透過 Docker 部署 OpenWebUI 作為操作介面。
 
 1.  **安裝 Docker**：OpenWebUI 推薦使用 Docker 部署。
-    > 📚 **詳細指南**：[Docker 安裝流程說明](./Docker安裝流程說明/README.md)
+    > 📚 **詳細指南**：[Docker 安裝流程說明](./Docker/Docker安裝流程說明.md)
 
 2.  **安裝 Ollama**：作為本地端 LLM 的運行框架。
     > 📚 **詳細指南**：[Ollama 安裝流程說明](./ollama安裝流程說明/README.md)
 
 3.  **部署 OpenWebUI**：安裝並設定網頁使用者介面。
-    > 📚 **詳細指南**：[OpenWebUI 安裝流程說明](./OpenWebUI安裝流程說明/README.md)
+    > 📚 **詳細指南**：[OpenWebUI 安裝流程說明](./OpenWebUI/OpenWebUI安裝流程說明/README.md)
 
 4. **本地AI編輯器整合Ollama**:
    
    > Zed 和 Agent Client Protocol
+ 
+
 
 ---
 
@@ -83,7 +85,11 @@
 
 ### 掌握Docker
 
-[掌握Docker](./掌握Docker)
+- [**掌握Docker**](./Docker/掌握Docker.md)
+- [**Docker Hub**](./Docker/直接使用Docker_Hub.md)
+- [**Docker Image**](./Docker/DockerFile.md)
+- [**Docker Run**](./Docker/DockerRun.md)
+- [**Docker Compose**](./Docker/DockerRun.md)
 
 ### N8N伺服器(Docker)架設
 

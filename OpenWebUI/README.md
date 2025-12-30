@@ -10,13 +10,28 @@
 學生可透過視覺化界面直接與語言模型對話、設定參數、選擇不同模型。
 
 **實作**
-- 使用 Ollama 運行模型
+- 使用 Ollama 運行模型 
+
+> 比較特別,必需手動改為`http://127.0.0.1:11434`
+
 - 使用 Open Router 運行模型
-- 使用大模型API（如 GPT-4)
+> OpenRouter 官方 API 的 base URL 是：`https://openrouter.ai/api/v1`
+
+- 使用大模型API(GPT-4,GEMINI)
+> Google API 的 base URL 是：`https://generativelanguage.googleapis.com/v1beta/openai`
+
+- 使用語音外部模型
+> 使用ElevenLabs的服務,要至左下角的Developers申請APIkey
+> 設定要要OpenWebUI的`語音`設定
 
 ### **📌 2. 檢索增強生成（RAG）**
 
-可將教學文件、知識庫導入，讓模型回答時結合本地文件知識。
+- 將教學文件、知識庫導入，讓模型回答時結合本地文件知識。
+- 介紹向量文字,參考網址:https://ai4k12.org/word-embedding-demo/
+
+**工作流程**
+> step1 至`設定`->`檔案`->`嵌入模型`內,輸入`BAAI/bge-m3`並按下**下載**
+> 主要使用`工作區`的欄位
 
 ### **📌 3. 自訂工作流與管線（Pipelines）**
 

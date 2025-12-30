@@ -51,13 +51,7 @@
     > 📚 **詳細指南**：[Ollama 安裝流程說明](./ollama安裝流程說明/README.md)
 
 3.  **部署 OpenWebUI**：安裝並設定網頁使用者介面。
-    > 📚 **詳細指南**：[OpenWebUI 安裝流程說明](./OpenWebUI/OpenWebUI安裝流程說明/README.md)
-
-4. **本地AI編輯器整合Ollama**:
-   
-   > Zed 和 Agent Client Protocol
- 
-
+    > 📚 **詳細指南**：[OpenWebUI](./OpenWebUI)
 
 ---
 

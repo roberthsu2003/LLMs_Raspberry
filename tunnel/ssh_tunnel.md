@@ -115,7 +115,9 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3-pip python3-dev
-sudo pip3 install jupyter notebook
+python3 -m venv ~/jupyter_env 
+source ~/jupyter_env/bin/activate
+pip install jupyter notebook ipykernel
 jupyter notebook --generate-config
 ```
 

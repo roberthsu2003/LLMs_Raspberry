@@ -23,13 +23,13 @@ ngrok 透過建立安全的反向代理通道，將遠端公網請求轉發到�
    
    - 安裝ngrok應用程式
    
-   ```bash
-  wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
-  tar xvzf ngrok-v3-stable-linux-arm64.tgz
-  sudo mv ngrok /usr/local/bin/
-  ngrok version
-  rm ngrok-v3-stable-linux-arm64.tgz
-   ```
+```bash 
+wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
+tar xvzf ngrok-v3-stable-linux-arm64.tgz
+sudo mv ngrok /usr/local/bin/
+ngrok version
+rm ngrok-v3-stable-linux-arm64.tgz
+  ```
   
    - 保留認證token
    - 記得你的公用網址

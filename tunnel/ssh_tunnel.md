@@ -45,13 +45,8 @@ SSH連線僅提供終端機存取（如`ssh pi@raspberry-ip`執行指令），�
 
 - **Raspberry Pi (Server)：** 確認 SSH 服務已開啟，並安裝一個簡單的服務 (如網頁伺服器或資料庫)。
 - **Windows (Client)：**
-    - **推薦工具：** Windows 10/11 內建的 PowerShell 或 Command Prompt (CMD) 即可（不需要額外下載 PuTTY，降低學習門檻）。
+    - **推薦工具：** Windows 10/11 內建的 PowerShell 或 Command Prompt (CMD) 即可。
     - **備選工具：** 如果需要圖形化理解，可使用 MobaXterm 或 VS Code。
-
-#### 3. 實作驗證階段 (Action)
-
-- 執行指令建立隧道。
-- 在 Windows 瀏覽器驗證結果。
 
 ---
 
@@ -77,11 +72,11 @@ echo "<h1>Hello from the Secret Tunnel!</h1>" > index.html
 python3 -m http.server --bind 127.0.0.1 8080
 ```
 
-> **教學點：** 此時請學生嘗試直接用 Windows 瀏覽器輸入 Pi 的 IP `:8080`，會發現**連不上**。這證明了防火牆或綁定限制生效中。
+> **驗證點：** 嘗試直接用 Windows 瀏覽器輸入 Pi 的 IP `:8080`，會發現**連不上**。這證明了防火牆或綁定限制生效中。
 
 #### 步驟 2：在 Windows 上打通隧道
 
-請學生打開 Windows 的 PowerShell，輸入以下指令：
+打開 Windows 的 PowerShell，輸入以下指令：
 
 PowerShell
 
@@ -97,7 +92,7 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 
 #### 步驟 3：見證奇蹟
 
-請學生打開 Windows 的瀏覽器，網址列輸入：
+打開 Windows 的瀏覽器，網址列輸入：
 
 [http://localhost:9000](http://localhost:9000)
 

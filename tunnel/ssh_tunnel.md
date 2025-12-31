@@ -9,6 +9,8 @@
 
 SSH連線是基本遠端登入功能，而SSH Tunnel則在SSH連線基礎上建立埠轉發通道，實現流量加密轉送與突破限制。
 
+![ssh連線和ssh_tunnel不同](./images/ssh連線和ssh_tunnel不同.png)
+
 ### 主要差別
 SSH連線僅提供終端機存取（如`ssh pi@raspberry-ip`執行指令），不改變其他流量路徑；SSH Tunnel額外轉發指定埠流量，例如`ssh -L 8080:localhost:80 pi@raspberry-ip`讓本地8080埠連到Raspberry Pi的80埠服務。
 
@@ -21,5 +23,5 @@ SSH連線僅提供終端機存取（如`ssh pi@raspberry-ip`執行指令），�
 | **流量範圍** | 僅SSH埠22                       | 多埠轉發，偽裝成SSH流量            |
 | **應用**  | 管理伺服器指令                  | 突破防火牆存取內網服務             |[1][6]
 
-### 教學情境應用
-在Windows Warp終端，SSH連線用於登入Raspberry Pi管理；Tunnel則用於安全存取受限服務，如MQTT埠1883，避免公網暴露。
+
+終端機使用SSH連線用於登入Raspberry Pi管理；Tunnel則用於安全存取受限服務，如MQTT埠1883，避免公網暴露。

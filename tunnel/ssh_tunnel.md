@@ -102,26 +102,36 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 
 ---
 
-### 第三部分：產生練習的情境 (Practice Scenarios)
-
-為了讓學生理解「為什麼要學這個」，請指派以下三個不同難度的任務情境：
-
-#### 情境一：資料庫管理員的難題 (Database Security)
-
-- **背景：** 你在 Raspberry Pi 上安裝了 MySQL 或 Redis 資料庫。為了安全，設定檔限制 `bind-address = 127.0.0.1`，不准外網直接連線。
-- **任務：** 你現在想用 Windows 上的資料庫軟體 (如 DBeaver 或 Workbench) 管理 Pi 裡的資料。
-- **解法：** 建立隧道 `L 3306:127.0.0.1:3306`，然後讓 DBeaver 連線 Windows 的 `localhost:3306`。
+### 練習 (Practice Scenarios)
 
 #### 情境二：Jupyter Notebook 遠端算圖 (Data Science)
 
-- **背景：** 學生在 Pi 上跑 AI 模型訓練，使用 Jupyter Notebook。Jupyter 預設跑在 8888 Port。
-- **任務：** 不想把 Jupyter 的密碼暴露在公網，但想在 Windows 舒服地寫 Code。
+- **背景：** 一個電腦教室, 樹莓派上跑Jupyter伺服器 預設跑在8888 Port。
+- **任務：** 只有部份電腦可以使用這個jupyter伺服器,學生只要執行一個bash檔就可以開啟伺服器。
+
+- **樹莓派上建立jupyter notebook伺服器**
+
+**安裝步驟**
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-dev
+sudo pip3 install jupyter notebook
+jupyter notebook --generate-config
+```
+
+**設定僅本地存取**  
+設定僅本地存取
+
+```bash
+c.NotebookApp.ip = '127.0.0.1'    # 僅本地存取
+c.NotebookApp.port = 8888          # 預設埠
+c.NotebookApp.open_browser = False # 不自動開瀏覽器
+c.NotebookApp.allow_remote_access = False # 不充許遠端連結
+```
+
+**設定密碼**
+```bash
+jupyter notebook password
+```
+
 - **解法：** `ssh -L 8888:localhost:8888 pi@<IP>`，直接在 Windows 瀏覽器寫 Python。
-
-#### 情境三：跳板攻擊 (The Jump Host - 進階)
-
-- **背景：** * 設備 A：Windows (學生)。
-    - 設備 B：Raspberry Pi (可連網)。
-    - 設備 C：學校內網的一台印表機或是 Web Server (無法直接連網，但 Pi 連得到它)。
-- **任務：** 你的 Windows 連不到設備 C，但 Pi 連得到。請把 Pi 當作跳板 (Jump Host)，存取設備 C 的網頁介面。
-- **解法：** `ssh -L 8080:<設備C的IP>:80 pi@<Pi的IP>`。這會讓學生理解隧道不只是連到 Pi，還可以透過 Pi 連到更遠的地方。

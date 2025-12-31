@@ -110,14 +110,19 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 - **任務：** 只有部份電腦可以使用這個jupyter伺服器,學生只要執行一個bash檔就可以開啟伺服器。
 
 - **樹莓派上建立jupyter notebook伺服器**
-
+  - 預設綁定127.0.0.1:8888,無法從外部連結
+  - 設定僅本地存取
+  - 新的python現在預設要建立虛擬環境才可以安裝套件
+  - 需要執行jupyter notebook才可以開啟
+  
 **安裝步驟**
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3-pip python3-dev
-python3 -m venv ~/jupyter_env 
+python3 -m venv ~/jupyter_env
 source ~/jupyter_env/bin/activate
 pip install jupyter notebook ipykernel
+# 安裝到這一步後,本機已可以啟動jupyter notebook
 jupyter notebook --generate-config
 ```
 
@@ -133,6 +138,12 @@ c.NotebookApp.allow_remote_access = False # 不充許遠端連結
 **設定密碼**
 ```bash
 jupyter notebook password
+```
+
+**本機執行jupyter notebook**
+```bash
+source ~/jupyter_env/bin/activate
+jupyter notebook --no-browser --ip=127.0.0.1 --port=8888
 ```
 
 - **解法：** `ssh -L 8888:localhost:8888 pi@<IP>`，直接在 Windows 瀏覽器寫 Python。

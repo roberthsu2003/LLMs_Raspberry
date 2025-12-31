@@ -69,6 +69,7 @@ cd tunnel_test
 echo "<h1>Hello from the Secret Tunnel!</h1>" > index.html
 
 # 啟動網頁伺服器，限定只能由 localhost (127.0.0.1) 存取，Port 為 8080
+# 進入tunnel_test的資料夾
 python3 -m http.server --bind 127.0.0.1 8080
 ```
 

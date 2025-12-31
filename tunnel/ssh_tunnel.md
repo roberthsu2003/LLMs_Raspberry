@@ -119,14 +119,17 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3-pip python3-dev
-python3 -m venv ~/jupyter_env
-source ~/jupyter_env/bin/activate
-pip install jupyter notebook ipykernel
+python3 -m venv ~/jupyter_env #建立虛擬環境
+source ~/jupyter_env/bin/activate #啟動虛擬環境
+pip install jupyter notebook ipykernel #安裝jupyter notebook
+jupyter notebook password #設定密碼
 # 安裝到這一步後,本機已可以啟動jupyter notebook
-jupyter notebook --generate-config
+jupyter notebook --generate-config # 產生設定檔
 ```
 
 **設定僅本地存取**  
+
+設定`/home/pi/.jupyter/jupyter_notebook_config.py`
 
 ```bash
 c.NotebookApp.ip = '127.0.0.1'    # 僅本地存取

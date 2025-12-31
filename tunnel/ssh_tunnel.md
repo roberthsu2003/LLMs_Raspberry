@@ -34,10 +34,12 @@ SSH連線僅提供終端機存取（如`ssh pi@raspberry-ip`執行指令），�
 
 #### 1. 概念建立階段 (Concept)
 
-- **痛點引導：** 詢問學生，如果 Raspberry Pi 上有一個網頁伺服器只允許 `localhost` (本機) 連線，你要怎麼從你的 Windows 電腦看到它？
+- **痛點引導：**如果 Raspberry Pi 上有一個網頁伺服器只允許 `localhost` (本機) 連線，你要怎麼從你的 Windows 電腦看到它？
 - **傳統解法 vs. 隧道解法：**
     - *傳統：* 修改防火牆、開放 Public IP (危險、麻煩)。
     - *隧道：* 透過已經建立的 SSH 連線，把 Raspberry Pi 的某個 Port「對應」到 Windows 的某個 Port。
+    
+    ![](./images/連線受阻的解決方法.png)
 
 #### 2. 環境準備階段 (Setup)
 

@@ -104,7 +104,7 @@ ssh -L 9000:127.0.0.1:8080 pi@192.168.1.100
 
 ### 練習 (Practice Scenarios)
 
-#### 情境二：Jupyter Notebook 遠端算圖 (Data Science)
+#### 情境：Jupyter Notebook(Data Science)
 
 - **背景：** 一個電腦教室, 樹莓派上跑Jupyter伺服器 預設跑在8888 Port。
 - **任務：** 只有部份電腦可以使用這個jupyter伺服器,學生只要執行一個bash檔就可以開啟伺服器。
@@ -120,7 +120,6 @@ jupyter notebook --generate-config
 ```
 
 **設定僅本地存取**  
-設定僅本地存取
 
 ```bash
 c.NotebookApp.ip = '127.0.0.1'    # 僅本地存取

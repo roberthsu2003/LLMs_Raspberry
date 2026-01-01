@@ -37,7 +37,7 @@ dig NS 你的網址
 
 > 如果有cloudflare提供的2組伺服器網址,代表正確
 
-
+> [Cloudflare Tunnel Guide簡報檔下載](./Cloudflare_Tunnel_Guide.pptx)
 
 ## cloudflare專案內使用申請的`網址`
 ## godaddy.com改變Name Server位址

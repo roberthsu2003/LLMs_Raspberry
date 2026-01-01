@@ -39,6 +39,29 @@ dig NS 你的網址
 
 > [Cloudflare Tunnel Guide簡報檔下載](./Cloudflare_Tunnel_Guide.pptx)
 
-## cloudflare專案內使用申請的`網址`
-## godaddy.com改變Name Server位址
-## cloudflare Tunnel
+## cloudflare Tunnel的設定
+
+1. 在Cloudflare 建立隧道名稱(任意名稱),依據指示,安裝適當的軟體
+
+有2種方式可以啟動Tunnel:
+
+1. 在機器上安裝 cloudflared 後，可以安裝服務，以便在機器啟動時自動執行 Tunnel
+
+2. 只在目前的終端工作階段中手動執行 Tunnel:
+
+驗証方式:
+檢查下方的Connectors是否已經有連接器連線
+
+2. 設立主機名稱和服務
+
+- 主機名稱:設定子網域,例如->open-webui.網域名稱
+- 服務:本機端的網址,例如->http://localhost:8080
+
+
+
+### 步驟 1: 安裝 cloudflared
+在 Raspberry Pi 或伺服器上執行：
+
+```
+
+```

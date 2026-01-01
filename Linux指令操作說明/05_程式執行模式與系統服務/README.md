@@ -78,11 +78,8 @@
 
 
 | 關鍵觀念 | 說明 |
-
-| --- | --- |
-
+| :--- | :--- |
 | **背景工作 (`&`)** | 只解決了「不佔用終端機」的問題。 |
-
 | **`SIGHUP` 信號** | 才是程序在終端機關閉時被終止的根本原因。 |
 
 
@@ -110,7 +107,6 @@
 | 老師操作 (Teacher's Action) | 預期結果 (Expected Outcome) | 解說重點 (Explanation Points) |
 | :--- | :--- | :--- |
 | **(開啟新終端機)** <br> 1. `sleep 300 &` <br> 2. 關閉此終端機視窗。 <br> 3. **(回到原終端機)** <br> `ps aux \| grep sleep` | 找不到 `sleep` 程序。 | 驗證了我們剛才學到的：單純用 `&`，程序會因為 `SIGHUP` 而終止。 |
-
 | **(開啟新終端機)** <br> 1. `nohup sleep 300 &` <br> 2. 畫面上顯示 `nohup: ignoring input and appending output to 'nohup.out'` <br> 3. 關閉此終端機視窗。 <br> 4. **(回到原終端機)** <br> `ps aux \| grep sleep` | 依然可以找到 `sleep 300` 程序。 | 1. `nohup` 讓 `sleep` 程序忽略了 `SIGHUP` 信號，因此得以存活。<br> 2. 所有輸出會被自動導向到 `nohup.out` 檔案中。<br> 3. **重點：** `nohup` 依然不是「服務」，它不會開機自啟，如果程序自己掛了也沒人管。它只是一個臨時的、不可靠的方案。 |
 
 

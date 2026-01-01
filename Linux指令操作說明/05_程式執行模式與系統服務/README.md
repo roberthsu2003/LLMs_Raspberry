@@ -128,9 +128,7 @@
 
 
 | 核心概念 | `systemd` 的職責 | 關鍵指令 (以 `cloudflared` 為例) |
-
 | :--- | :--- | :--- |
-
 | **Daemon (守護程序)**：一個在背景執行、獨立於任何終端機、由系統管理的程序。 | 1. **開機自動啟動**：根據設定，在開機時自動運行服務。<br> 2. **狀態監控**：隨時可以查詢服務的運行狀態、讀取日誌。<br> 3. **自動重啟**：如果服務崩潰，`systemd` 可以自動將其重啟。<br> 4. **資源管理**：可以限制服務的 CPU 和記憶體用量。 | `systemctl status cloudflared` (看狀態)<br> `systemctl start cloudflared` (啟動)<br> `systemctl stop cloudflared` (停止)<br> `systemctl enable cloudflared` (設為開機啟動)<br> `systemctl disable cloudflared` (取消開機啟動)<br> `journalctl -u cloudflared` (看日誌) |
 
 

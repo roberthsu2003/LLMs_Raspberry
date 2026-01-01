@@ -117,19 +117,237 @@
 
 ## 6️⃣ `systemd`：真正的系統服務
 
+**目標**：透過實作，讓學生理解 `systemd` 作為現代 Linux 服務管理員的核心地位與優勢。
 
+### 6.1 `systemd` 的核心概念
 
-**目標**：闡述 `systemd` 作為現代 Linux 服務管理員的核心地位與優勢。
-
-
-
-**這部分以講解為主，搭配 `cloudflared` 或 `sshd` 作為實際案例。**
-
-
-
-| 核心概念 | `systemd` 的職責 | 關鍵指令 (以 `cloudflared` 為例) |
+| 核心概念 | `systemd` 的職責 | 關鍵指令 |
 | :--- | :--- | :--- |
-| **Daemon (守護程序)**：一個在背景執行、獨立於任何終端機、由系統管理的程序。 | 1. **開機自動啟動**：根據設定，在開機時自動運行服務。<br> 2. **狀態監控**：隨時可以查詢服務的運行狀態、讀取日誌。<br> 3. **自動重啟**：如果服務崩潰，`systemd` 可以自動將其重啟。<br> 4. **資源管理**：可以限制服務的 CPU 和記憶體用量。 | `systemctl status cloudflared` (看狀態)<br> `systemctl start cloudflared` (啟動)<br> `systemctl stop cloudflared` (停止)<br> `systemctl enable cloudflared` (設為開機啟動)<br> `systemctl disable cloudflared` (取消開機啟動)<br> `journalctl -u cloudflared` (看日誌) |
+| **Daemon (守護程序)**：一個在背景執行、獨立於任何終端機、由系統管理的程序。 | 1. **開機自動啟動**：根據設定，在開機時自動運行服務。<br> 2. **狀態監控**：隨時可以查詢服務的運行狀態、讀取日誌。<br> 3. **自動重啟**：如果服務崩潰，`systemd` 可以自動將其重啟。<br> 4. **資源管理**：可以限制服務的 CPU 和記憶體用量。 | `systemctl status <服務名>` (看狀態)<br> `systemctl start <服務名>` (啟動)<br> `systemctl stop <服務名>` (停止)<br> `systemctl enable <服務名>` (設為開機啟動)<br> `systemctl disable <服務名>` (取消開機啟動)<br> `journalctl -u <服務名>` (看日誌) |
+
+---
+
+### 6.2 實作範例：建立第一個 systemd 服務
+
+這個範例的設計理念是：**最小可理解、可觀察、可完整刪除**。
+
+#### 範例目標
+
+> **建立一個 systemd 服務，每 5 秒在 log 裡印一句話**
+> 
+> 關掉終端機、重新登入，它都還活著
+> 
+> 最後把它「乾乾淨淨地刪掉」
+
+#### Step 1：準備一個簡單的程式
+
+我們使用 Shell 腳本來建立一個「永遠不會結束的程式」：
+
+```bash
+sudo nano /usr/local/bin/hello-service.sh
+```
+
+**內容：**
+
+```bash
+#!/bin/bash
+
+while true
+do
+  echo "Hello from systemd at $(date)"
+  sleep 5
+done
+```
+
+**存檔後給執行權限：**
+
+```bash
+sudo chmod +x /usr/local/bin/hello-service.sh
+```
+
+**教學重點：**
+
+- 這就是一個「永遠不會結束的程式」
+- 如果用 `./hello-service.sh &` → **不是服務**
+- 接下來要交給 systemd 管
+
+---
+
+#### Step 2：建立 systemd 服務檔（核心）
+
+```bash
+sudo nano /etc/systemd/system/hello.service
+```
+
+**內容（極簡版）：**
+
+```ini
+[Unit]
+Description=My First systemd Demo Service
+
+[Service]
+ExecStart=/usr/local/bin/hello-service.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**教學時可以這樣講（一句一句）：**
+
+| 區段 | 說明 |
+| :--- | :--- |
+| `[Unit]` | 這是什麼服務（人看的） |
+| `[Service]` | 真正跑的程式是誰 |
+| `Restart=always` | 👉 **這一行就是 systemd 跟 nohup 最大的差別** |
+| `[Install]` | 什麼時候自動啟動 |
+
+---
+
+#### Step 3：讓 systemd「認識新服務」
+
+```bash
+sudo systemctl daemon-reload
+```
+
+**📌 教學比喻**
+
+> 「我新增了一張規格書，要跟 systemd 說一聲」
+
+---
+
+#### Step 4：啟動服務（關鍵轉折點）
+
+```bash
+sudo systemctl start hello.service
+```
+
+**立刻檢查狀態：**
+
+```bash
+systemctl status hello.service
+```
+
+**你會看到：**
+
+- `Active: active (running)`
+- PID
+- 沒有綁定任何終端機
+
+👉 **這一刻就是「它已經活在系統裡了」**
+
+---
+
+#### Step 5：看 log（這一步超有教學效果）
+
+```bash
+journalctl -u hello.service -f
+```
+
+**你會看到每 5 秒：**
+
+```
+Hello from systemd at ...
+```
+
+**這時你可以做一件很重要的事：**
+
+👉 **關掉終端機**  
+👉 重新登入  
+👉 再跑一次：
+
+```bash
+journalctl -u hello.service -n 5
+```
+
+**學生會瞬間懂一件事：**
+
+> 「原來服務真的跟終端機無關」
+
+---
+
+#### Step 6：停止服務（服務 ≠ 殺程序）
+
+```bash
+sudo systemctl stop hello.service
+```
+
+**再看：**
+
+```bash
+systemctl status hello.service
+```
+
+**狀態會變成：**
+
+```
+inactive (dead)
+```
+
+**📌 教學重點**
+
+> systemd 是「請它停止」，不是 kill 它
+
+---
+
+#### Step 7：完整「消滅」這個服務（收尾很重要）
+
+**1️⃣ 取消開機啟動（如果有）**
+
+```bash
+sudo systemctl disable hello.service
+```
+
+**2️⃣ 刪掉服務檔**
+
+```bash
+sudo rm /etc/systemd/system/hello.service
+```
+
+**3️⃣ 刪掉程式本體**
+
+```bash
+sudo rm /usr/local/bin/hello-service.sh
+```
+
+**4️⃣ 重新載入 systemd**
+
+```bash
+sudo systemctl daemon-reload
+```
+
+**5️⃣ 驗證真的不見了**
+
+```bash
+systemctl status hello.service
+```
+
+**會看到：**
+
+```
+Unit hello.service could not be found.
+```
+
+✅ **乾乾淨淨**
+
+---
+
+### 6.3 三種方法的對照比較
+
+這個範例讓我們可以很自然地對照三種方法的差異：
+
+| 方法 | 關終端機 | 自動重啟 | 系統管理 | 開機自啟 |
+| :--- | :--- | :--- | :--- | :--- |
+| `&` (背景工作) | ❌ | ❌ | ❌ | ❌ |
+| `nohup` | ✅ | ❌ | ❌ | ❌ |
+| `systemd` | ✅ | ✅ | ✅ | ✅ |
+
+**學生會真的看到：**
+
+- service 檔案在哪
+- systemd 怎麼管它
+- 刪掉就真的消失
+- 關掉終端機、重新登入，服務依然運行
 
 
 
@@ -139,18 +357,24 @@
 
 ## 7️⃣ 總結：為什麼正式環境一定要用服務
 
-
-
 **一句話總結**
 
 > **前景執行**是臨時測試，**背景工作**是暫時方便，**系統服務**才是讓你的程式「真正活在系統裡」的唯一方法。
 
+---
 
+### 實際應用場景對照
 
-**對照 `cloudflared` 案例**
+**以 `cloudflared` 或任何需要長期運行的服務為例：**
 
-- **手動執行 (`foreground`)**：適合在本機開發、除錯，能即時看到 log。
+| 執行方式 | 適用場景 | 優點 | 缺點 |
+| :--- | :--- | :--- | :--- |
+| **手動執行 (`foreground`)** | 本機開發、除錯 | 能即時看到 log，方便除錯 | 關閉終端機就停止，無法長期運行 |
+| **`nohup` 執行** | 臨時測試 | 簡單快速，關閉終端機不會停止 | 不會自動重啟，不會開機自啟，無法系統管理 |
+| **`systemd` 服務** | 正式環境、生產環境 | 自動重啟、開機自啟、系統管理、狀態監控 | 需要學習服務檔設定 |
 
-- **`nohup` 執行**：極不推薦！這是一種懶惰且不可靠的臨時方案。
+**結論：**
 
-- **`systemd` 服務**：正式環境的唯一選擇！確保了樹莓派重開機後，Tunnel 能自動連上，並且在意外中斷時能被系統監控和重啟。
+- **開發階段**：使用前景執行，方便除錯
+- **測試階段**：可以使用 `nohup` 快速測試
+- **正式環境**：**必須使用 `systemd`**！確保了服務在重開機後能自動啟動，並且在意外中斷時能被系統監控和重啟

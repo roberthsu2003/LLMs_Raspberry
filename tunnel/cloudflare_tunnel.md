@@ -5,6 +5,8 @@ Cloudflare Tunnel 是一種安全將內部資源連接到 Cloudflare 全球網�
 > 核心概念一句話：  
 > 只要 Nameserver 已經指向 Cloudflare，這個網域就「不再由 GoDaddy 管理 DNS」了
 
+![網域管轄權的轉移](./images/網域管轄權的轉移.png)
+
 ### 申請流程:
 - 步驟1: godaddy.com申請1年用的個人網址(NT:50元以內)
 - 步驟2: 登入 cloudflare.com，以申請的`個人網址`建立專案，進入DNS(Domain Name Server)的設定頁面，查看Cloudflare名稱伺服器的網址(一般都是2組)

@@ -45,7 +45,10 @@ dig NS your-domain.com
 
 ## 設定 Cloudflare Tunnel
 
+
 > 核心觀念：**建立一個 Tunnel 通道，並在您的裝置上執行 `cloudflared` 程式來連接它。接著，設定一個公開的主機名稱 (例如 `app.yourdomain.com`)，並將其對應到您本機的服務 (例如 `http://localhost:8080`)。**
+
+![設定Cloudflare_Tunnel](./images/設定Cloudflare_Tunnel.png)
 
 ### 步驟一：建立 Tunnel
 

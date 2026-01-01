@@ -53,8 +53,8 @@
 
 | 老師操作 (Teacher's Action) | 預期結果 (Expected Outcome) | 解說重點 (Explanation Points) |
 | :--- | :--- | :--- |
-| **(開啟新終端機)** <br> 1. `sleep 300 &` <br> 2. 關閉此終端機視窗。 <br> 3. **(回到原終端機)** <br> `ps aux | grep sleep` | 找不到 `sleep` 程序。 | 1. 關閉終端機時，系統會送出 `SIGHUP` (hang-up) 信號給該終端機的所有子程序。<br> 2. 預設情況下，程序收到 `SIGHUP` 就會終止。這就是為什麼 `cloudflared` 會斷線！ |
-| **(開啟新終端機)** <br> 1. `nohup sleep 300 &` <br> 2. 畫面上顯示 `nohup: ignoring input and appending output to 'nohup.out'` <br> 3. 關閉此終端機視窗。 <br> 4. **(回到原終端機)** <br> `ps aux | grep sleep` | 依然可以找到 `sleep 300` 程序。 | 1. `nohup` (no hang-up) 的作用就是「忽略 SIGHUP 信號」。<br> 2. 這樣即使關閉終端機，程序也能繼續存活。<br> 3. **重點：** `nohup` 依然不是「服務」，它不會開機自啟，如果程序自己掛了也沒人管。 |
+| **(開啟新終端機)** <br> 1. `sleep 300 &` <br> 2. 關閉此終端機視窗。 <br> 3. **(回到原終端機)** <br> `ps aux \| grep sleep` | 找不到 `sleep` 程序。 | 1. 關閉終端機時，系統會送出 `SIGHUP` (hang-up) 信號給該終端機的所有子程序。<br> 2. 預設情況下，程序收到 `SIGHUP` 就會終止。這就是為什麼 `cloudflared` 會斷線！ |
+| **(開啟新終端機)** <br> 1. `nohup sleep 300 &` <br> 2. 畫面上顯示 `nohup: ignoring input and appending output to 'nohup.out'` <br> 3. 關閉此終端機視窗。 <br> 4. **(回到原終端機)** <br> `ps aux \| grep sleep` | 依然可以找到 `sleep 300` 程序。 | 1. `nohup` (no hang-up) 的作用就是「忽略 SIGHUP 信號」。<br> 2. 這樣即使關閉終端機，程序也能繼續存活。<br> 3. **重點：** `nohup` 依然不是「服務」，它不會開機自啟，如果程序自己掛了也沒人管。 |
 
 ---
 

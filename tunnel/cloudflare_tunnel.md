@@ -8,6 +8,8 @@ Cloudflare Tunnel 是一種能夠安全地將您的內部服務連接到 Cloudfl
 
 ![網域管轄權的轉移](./images/網域管轄權的轉移.png)
 
+
+
 ### 步驟一：註冊網域並更新名稱伺服器
 
 1.  **註冊網域**：於網域註冊商（如 [GoDaddy](https://godaddy.com)）申請一個個人網域。
@@ -41,9 +43,16 @@ dig NS your-domain.com
 ```
 如果回傳的結果是 Cloudflare 提供的那兩組伺服器位址，即代表設定正確。
 
+![DNS解析流程圖](./images/DNS解析流程圖.png)
+
 > **相關資源**：[Cloudflare Tunnel 簡報檔下載](./Cloudflare_Tunnel_Guide.pptx)
 
 ## 設定 Cloudflare Tunnel
+
+
+**Tunnel vs 傳統的port Forwarding的關念圖**
+
+> [Tunnel vs 傳統的port Forwarding的關念圖](./images/tunnel_portForwarding.png)
 
 
 > 核心觀念：**建立一個 Tunnel 通道，並在您的裝置上執行 `cloudflared` 程式來連接它。接著，設定一個公開的主機名稱 (例如 `app.yourdomain.com`)，並將其對應到您本機的服務 (例如 `http://localhost:8080`)。**
@@ -75,5 +84,9 @@ Cloudflare 會提供對應您作業系統的安裝指令。安裝後，有兩種
 -   **服務 (Service)**：選擇協定 (HTTP/HTTPS等) 並填寫本機服務的位址。例如，`http://localhost:8080`。
 
 儲存後，任何人即可透過您設定的主機名稱，安全地存取您本機的服務。
+
+**完成**
+
+![the_full_journey](./images/the_full_journey.png)
 
 之後，您可以在 Cloudflare 的 Tunnel 設定頁面，透過 **通道名稱** 區塊的狀態來判斷連線是否成功。正常連線時會顯示 **`連線`**，若中斷則會顯示 **`關閉`**。

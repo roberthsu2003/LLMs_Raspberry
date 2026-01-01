@@ -50,7 +50,7 @@ dig NS your-domain.com
 ### 步驟一：建立 Tunnel
 
 1.  在 Cloudflare 儀表板，導覽至 **`Zero Trust`**。
-2.  在左側選單中，選擇 **`網路 (Network) > Tunnels`**。
+2.  在左側選單中，選擇 **`網路 (Network) > 連接器`**。
 3.  點擊 **`建立 Tunnel (Create a Tunnel)`**，並為您的 Tunnel 設定一個易於識別的名稱。
 
 ### 步驟二：安裝並執行 Connector
@@ -72,3 +72,5 @@ Cloudflare 會提供對應您作業系統的安裝指令。安裝後，有兩種
 -   **服務 (Service)**：選擇協定 (HTTP/HTTPS等) 並填寫本機服務的位址。例如，`http://localhost:8080`。
 
 儲存後，任何人即可透過您設定的主機名稱，安全地存取您本機的服務。
+
+之後，您可以在 Cloudflare 的 Tunnel 設定頁面，透過 **通道名稱** 區塊的狀態來判斷連線是否成功。正常連線時會顯示 **`連線`**，若中斷則會顯示 **`關閉`**。

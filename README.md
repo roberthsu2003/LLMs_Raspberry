@@ -49,7 +49,7 @@
 這是整個專案的核心。我們將安裝 Ollama 來運行語言模型，並透過 Docker 部署 OpenWebUI 作為操作介面。
 
 1.  **安裝 Docker**：OpenWebUI 推薦使用 Docker 部署。
-    > 📚 **詳細指南**：[Docker 安裝流程說明](./Docker/Docker安裝流程說明.md)
+    > 📚 **詳細指南**：[Docker 安裝流程說明](./Docker/raspberry安裝docker.md)
 
 2.  **安裝 Ollama**：作為本地端 LLM 的運行框架。
     > 📚 **詳細指南**：[Ollama 安裝流程說明](./ollama安裝流程說明/README.md)
@@ -86,7 +86,7 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 
 ### 掌握Docker
 
-- [**掌握Docker**](./Docker/掌握Docker.md)
+- [**樹莓派安裝Docker**](./Docker/raspberry安裝docker.md)
 - [**Docker Hub**](./Docker/直接使用Docker_Hub.md)
 - [**Docker Image**](./Docker/DockerFile.md)
 - [**Docker Run**](./Docker/DockerRun.md)

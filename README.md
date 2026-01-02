@@ -75,13 +75,13 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 
 ---
 
-### 雲端AI編輯器應用
+### 雲端 AI 編輯器與開發工具
 
-- lovable
-- bolt
-- replit
-- manus
-- v0
+-   **[Lovable](https://lovable.dev/)**：一個 AI 前端工程師，能學習您現有的 UI 組件庫，並自動為您建構新的頁面與功能。
+-   **[Bolt](https://www.bolt.dev/)**：一個 AI 原生的開發工作環境，旨在透過深度整合的 AI 功能，讓開發者能以思維的速度進行編碼與建構。
+-   **[Replit](https://replit.com/)**：一個功能強大的線上 IDE，其 AI 輔助編碼功能 (Ghostwriter) 能幫助使用者在瀏覽器中快速編寫、測試、部署及協作專案。
+-   **[Manus](https://manus.co/)**：專注於將設計轉為程式碼的 AI 開發者，能讀取您的 Figma 設計稿，並自動生成高品質的前端程式碼。
+-   **[v0.dev](https://v0.dev/)**：由 Vercel 團隊打造的生成式 UI 工具，可以根據您的文字描述，快速產生基於 React、Shadcn UI 和 Tailwind CSS 的使用者介面。
 
 
 ### 掌握Docker

@@ -112,13 +112,20 @@ newgrp docker
 # 檢查 Docker 版本
 docker --version
 
-# 檢查 Docker Compose 版本
-docker-compose --version
+# 檢查 Docker Compose 版本 (新版語法)
+docker compose version
 ```
 
-### 2. 測試 Docker 是否正常運作
+### 2. 執行 Hello World 測試 Docker 是否正常運作
+執行一個簡單的 `hello-world` 容器，這是驗證 Docker 是否安裝成功並能正常運作的最基本方法。
 ```bash
+# 執行 hello-world 容器
+docker run hello-world
+```
+如果看到 "Hello from Docker!" 的訊息，代表您的 Docker 環境已準備就緒！
 
+接著，您可以檢查更詳細的 Docker 系統資訊。
+```bash
 # 檢查 Docker 系統資訊
 docker system info
 ```
@@ -237,8 +244,8 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 EOF
 
-# 建立 requirements.txt
-echo "Flask==2.0.1" > requirements.txt
+# 建立 requirements.txt (建議使用較新版本)
+echo "Flask>=3.0.0" > requirements.txt
 
 # 建構映像檔
 docker build -t my-python-app .
@@ -249,9 +256,9 @@ docker run -d -p 5000:5000 --name my-app my-python-app
 
 ### 3. 使用 Docker Compose
 ```bash
-# 建立 docker-compose.yml
-cat > docker-compose.yml << EOF
-version: '3.8'
+# 建立 compose.yaml (新版 Docker Compose 建議的檔名)
+# 注意：新版的 Compose 檔案不再需要頂層的 'version' 標籤
+cat > compose.yaml << EOF
 services:
   web:
     build: .
@@ -263,7 +270,7 @@ services:
       - FLASK_ENV=development
 EOF
 
-# 啟動服務
+# 啟動服務 (Docker 會自動尋找 compose.yaml)
 docker compose up -d
 
 # 停止服務
@@ -274,20 +281,28 @@ docker compose down
 
 ## 📊 效能優化建議
 
-### 1. 記憶體管理
+### 1. 限制容器的記憶體使用
+Raspberry Pi 記憶體有限，直接限制每個容器可以使用的資源，是更直接有效的優化方式。現代的 Raspberry Pi OS 預設已啟用記憶體管理功能 (cgroups)，您無需手動修改系統啟動設定。
+
+您可以在執行容器時，透過參數來限制其記憶體用量：
 ```bash
-# 設定 Docker 記憶體限制
-echo 'GRUB_CMDLINE_LINUX="cgroup_enable=memory cgroup_memory=1"' | sudo tee -a /etc/default/grub
-sudo update-grub
+# 執行一個 Nginx 容器，並限制其最多使用 256MB 記憶體
+docker run -d -p 8080:80 --name my-limited-nginx --memory="256m" nginx:alpine
 ```
+- `--memory="256m"`: 設定容器可使用的最大記憶體。
+- 您也可以加上 `--memory-swap` 來限制 Swap 空間。
 
 ### 2. 儲存空間優化
 ```bash
-# 定期清理 Docker 系統
+# 定期清理 Docker 系統，包含未使用的容器、網路、映像檔和建置快取
+docker system prune -a
+
+# 若要連同未使用的 volume 一起刪除，請加上 --volumes 旗標 (請謹慎使用)
 docker system prune -a --volumes
 
-# 設定自動清理 (建立 cron 工作)
-echo "0 2 * * * docker system prune -f" | sudo crontab -
+# 設定自動清理 (建立 cron 工作)，例如在每天凌晨 2 點執行
+# 注意：-f 會強制執行，不會跳出確認訊息
+(sudo crontab -l 2>/dev/null; echo "0 2 * * * /usr/bin/docker system prune -af") | sudo crontab -
 ```
 
 ### 3. 網路優化

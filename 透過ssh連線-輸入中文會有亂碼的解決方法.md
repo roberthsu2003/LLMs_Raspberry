@@ -11,4 +11,5 @@ sudo nano /etc/default/locale
 ```bash
 LANG=zh_TW.UTF-8
 LC_ALL=zh_TW.UTF-8
+LC_CTYPE=zh_TW.UTF-8
 ```

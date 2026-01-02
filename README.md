@@ -88,9 +88,11 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 
 - [**樹莓派安裝Docker**](./Docker/raspberry安裝docker.md)
 - [**Docker Hub**](./Docker/Docker_Hub介紹.md)
+- [**Docker 常用的指令**](./Docker/Docker常用的指令.md)
 - [**Docker Run**](./Docker/DockerRun.md)
-- [**Docker Image**](./Docker/DockerFile.md)
-- [**Docker Compose**](./Docker/DockerRun.md)
+- [**撰寫Dockerfile**](./Docker/DockerFile.md)
+- [**Docker Compose**](./Docker/DockerCompose.md)
+- [**Docker Volume**](./Docker/DockerVolume.md)
 
 ### N8N
 - [**N8N是什麼?**](./n8n/n8n是什麼.md)
@@ -111,7 +113,12 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 
 	> 實作LineBot(message API)整合LLM大模型
 
-- **N8N基礎操作**
+- **n8n**
+
+  > [n8n講義](https://github.com/roberthsu2003/n8n)
+
+
+
 
 ---
 

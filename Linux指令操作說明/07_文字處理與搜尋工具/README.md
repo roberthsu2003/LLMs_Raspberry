@@ -31,6 +31,21 @@ grep [選項] 搜尋模式 檔案名
 | `grep -r "關鍵字" 目錄` | 遞迴搜尋目錄下所有檔案 | `grep -r "TODO" ~/projects` |
 | `grep -l "關鍵字" 檔案` | 只顯示包含關鍵字的檔案名 | `grep -l "error" *.log` |
 
+### 課堂示範：grep 基礎操作
+
+**目標：** 讓學生跟著老師一起操作，體驗 `grep` 的搜尋功能。
+
+| 老師操作 (Teacher's Action) | 預期結果 (Expected Outcome) | 解說重點 (Explanation Points) |
+| :--- | :--- | :--- |
+| **Step 1：建立測試日誌檔**<br>`cat > app.log << 'EOF'`<br>`2025-01-01 10:00:00 INFO: Application started`<br>`2025-01-01 10:05:00 ERROR: Database connection failed`<br>`2025-01-01 10:10:00 INFO: User logged in`<br>`2025-01-01 10:15:00 ERROR: File not found`<br>`2025-01-01 10:20:00 WARNING: Memory usage high`<br>`EOF` | 檔案 `app.log` 已建立 | 1. 使用 here-document 可以一次建立多行內容<br>2. 這是模擬的應用程式日誌檔 |
+| **Step 2：基本搜尋**<br>`grep "ERROR" app.log` | 顯示包含 "ERROR" 的兩行 | 1. `grep` 會找出所有包含關鍵字的行<br>2. 預設會高亮顯示匹配的文字 |
+| **Step 3：顯示行號**<br>`grep -n "ERROR" app.log` | 顯示行號和內容，例如：<br>`2:2025-01-01 10:05:00 ERROR: ...`<br>`4:2025-01-01 10:15:00 ERROR: ...` | 1. `-n` 參數會顯示行號<br>2. 這在除錯時非常有用 |
+| **Step 4：忽略大小寫**<br>`grep -i "error" app.log` | 同樣找到兩行 ERROR | 1. `-i` 參數會忽略大小寫<br>2. 這樣可以找到 "error"、"ERROR"、"Error" 等 |
+| **Step 5：搜尋多個關鍵字**<br>`grep -E "ERROR\|WARNING" app.log` | 顯示包含 ERROR 或 WARNING 的三行 | 1. `-E` 啟用擴展正則表達式<br>2. `\|` 表示「或」的關係 |
+
+**互動提問：**  
+「如果日誌檔很大，如何快速找出錯誤？」、「`grep -n` 和 `grep` 有什麼不同？」
+
 ### 實務範例
 
 **範例 1：在日誌檔中搜尋錯誤**
@@ -90,6 +105,20 @@ find [搜尋路徑] [搜尋條件] [動作]
 | `find . -user 使用者` | 搜尋特定使用者的檔案 | `find . -user pi` |
 | `find . -perm 644` | 搜尋特定權限的檔案 | `find . -perm 644` |
 
+### 課堂示範：find 基礎操作
+
+**目標：** 讓學生跟著老師一起操作，體驗 `find` 的檔案搜尋功能。
+
+| 老師操作 (Teacher's Action) | 預期結果 (Expected Outcome) | 解說重點 (Explanation Points) |
+| :--- | :--- | :--- |
+| **Step 1：建立測試環境**<br>`mkdir -p ~/demo_find/{docs,scripts,logs}`<br>`touch ~/demo_find/docs/file1.txt`<br>`touch ~/demo_find/scripts/script.sh`<br>`touch ~/demo_find/logs/app.log` | 建立測試目錄和檔案 | 1. 建立多層目錄結構<br>2. 建立不同類型的檔案 |
+| **Step 2：搜尋 .txt 檔案**<br>`find ~/demo_find -name "*.txt"` | 顯示：<br>`/home/pi/demo_find/docs/file1.txt` | 1. `-name` 根據檔名搜尋<br>2. `*` 是萬用字元，代表任意字元 |
+| **Step 3：只搜尋檔案**<br>`find ~/demo_find -type f` | 顯示所有檔案（不包含目錄） | 1. `-type f` 只搜尋檔案<br>2. `-type d` 只搜尋目錄 |
+| **Step 4：搜尋多種檔案類型**<br>`find ~/demo_find -name "*.txt" -o -name "*.log"` | 顯示所有 .txt 和 .log 檔案 | 1. `-o` 表示「或」的關係<br>2. 可以組合多個條件 |
+
+**互動提問：**  
+「如何找出所有 Python 檔案？」、「`find` 和 `ls` 有什麼不同？」
+
 ### 實務範例
 
 **範例 1：搜尋特定類型的檔案**
@@ -140,6 +169,19 @@ find ~ -type f -empty
 ```bash
 指令1 | 指令2 | 指令3
 ```
+
+### 課堂示範：管道組合操作
+
+**目標：** 讓學生跟著老師一起操作，體驗管道的強大功能。
+
+| 老師操作 (Teacher's Action) | 預期結果 (Expected Outcome) | 解說重點 (Explanation Points) |
+| :--- | :--- | :--- |
+| **Step 1：建立測試檔案**<br>`echo "import os" > ~/demo_find/scripts/test1.py`<br>`echo "import sys" > ~/demo_find/scripts/test2.py`<br>`echo "import os" > ~/demo_find/scripts/test3.py` | 建立三個 Python 檔案 | 準備測試資料 |
+| **Step 2：組合 find 和 grep**<br>`find ~/demo_find -name "*.py" -exec grep -H "import os" {} \;` | 顯示包含 "import os" 的檔案和行 | 1. `find` 找出所有 .py 檔案<br>2. `-exec` 對每個找到的檔案執行 `grep`<br>3. `-H` 顯示檔案名 |
+| **Step 3：統計檔案數量**<br>`ls -1 ~/demo_find | wc -l` | 顯示數字（檔案和目錄的總數） | 1. `ls -1` 每行一個檔案<br>2. `wc -l` 統計行數<br>3. 管道將前一個指令的輸出傳給下一個 |
+
+**互動提問：**  
+「管道 `\|` 的作用是什麼？」、「如何組合多個指令完成複雜任務？」
 
 ### 實務範例
 

@@ -31,7 +31,7 @@
 ## 🔧 系統需求
 
 開始前請確保已安裝：
-- **Node.js**（版本 18 以上）- [下載連結](https://nodejs.org/)
+- **Node.js**（版本 20.0 以上）- [下載連結](https://nodejs.org/)
 - **現代瀏覽器**（Chrome、Firefox、Safari 或 Edge）
 
 **檢查是否已安裝：**

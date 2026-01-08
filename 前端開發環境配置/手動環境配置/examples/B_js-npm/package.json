@@ -1,0 +1,12 @@
+{
+  "name": "js-npm",
+  "version": "1.0.0",
+  "description": "JavaScript + npm 範例（故意失敗）",
+  "type": "module",
+  "scripts": {
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

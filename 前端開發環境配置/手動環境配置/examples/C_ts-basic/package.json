@@ -1,0 +1,14 @@
+{
+  "name": "ts-basic",
+  "version": "1.0.0",
+  "description": "TypeScript 基礎範例（無框架、無 Vite）",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "npx http-server . -p 8080 -o"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

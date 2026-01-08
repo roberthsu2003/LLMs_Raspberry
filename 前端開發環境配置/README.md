@@ -16,6 +16,7 @@
 ## 💻 開發環境配置
 
 - [Node.js 和 npm 環境配置](./Node.js_npm_環境配置/README.md) - 詳細的 Node.js/npm 說明
+- [手動環境配置前端教學](./手動環境配置/README.md) - 手動環境配置前端教學
 
 ---
 

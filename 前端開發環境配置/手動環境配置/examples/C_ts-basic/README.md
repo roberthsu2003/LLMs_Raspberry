@@ -37,22 +37,234 @@ C_ts-basic/
 
 ---
 
-## 🚀 快速開始（5 分鐘體驗）
+## 🚀 快速開始（從零建立 TypeScript 專案）
 
-### 步驟 1：安裝依賴
+### 方法一：使用現有範例專案（快速體驗）
+
+如果你想快速體驗，可以直接使用現有的範例專案：
 
 ```bash
 # 進入專案目錄
 cd examples/C_ts-basic
 
-# 安裝 TypeScript
+# 安裝依賴
 npm install
+
+# 編譯 TypeScript
+npm run build
 ```
 
-**這會安裝：**
-- `typescript`：TypeScript 編譯器
+---
 
-### 步驟 2：查看原始 TypeScript 程式碼
+### 方法二：從零開始建立（推薦學習）
+
+如果你想完整理解 TypeScript 專案的建立過程，讓我們從零開始：
+
+#### 步驟 1：建立專案資料夾
+
+```bash
+# 建立專案資料夾
+mkdir my-typescript-project
+cd my-typescript-project
+```
+
+#### 步驟 2：初始化 npm 專案
+
+```bash
+# 初始化 npm 專案
+npm init -y
+```
+
+**這會建立 `package.json` 檔案：**
+```json
+{
+  "name": "my-typescript-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+```
+
+**💡 關鍵理解：**
+- `npm init` 建立 `package.json`，這是專案的配置檔案
+- 記錄專案資訊和依賴套件
+
+#### 步驟 3：安裝 TypeScript
+
+```bash
+# 安裝 TypeScript（作為開發依賴）
+npm install -D typescript
+```
+
+**這會：**
+- 下載 TypeScript 到 `node_modules/` 資料夾
+- 更新 `package.json`，加入 `devDependencies`：
+  ```json
+  {
+    "devDependencies": {
+      "typescript": "^5.0.0"
+    }
+  }
+  ```
+
+**💡 關鍵理解：**
+- `-D` 或 `--save-dev`：安裝到 `devDependencies`（開發時需要）
+- TypeScript 是開發工具，不會出現在最終的程式碼中
+
+#### 步驟 4：建立專案結構
+
+```bash
+# 建立原始碼資料夾
+mkdir src
+
+# 建立輸出資料夾（編譯後的檔案會放在這裡）
+mkdir dist
+```
+
+**專案結構：**
+```
+my-typescript-project/
+├── src/              # TypeScript 原始碼
+├── dist/             # 編譯後的 JavaScript（自動產生）
+└── package.json      # 專案配置
+```
+
+#### 步驟 5：建立 TypeScript 配置檔
+
+```bash
+# 建立 tsconfig.json
+npx tsc --init
+```
+
+**或者手動建立 `tsconfig.json`：**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "sourceMap": true,
+    "declaration": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+```
+
+**💡 關鍵配置說明：**
+- `target`：編譯後的 JavaScript 版本
+- `outDir`：輸出目錄（編譯後的檔案放在哪裡）
+- `rootDir`：原始碼目錄（TypeScript 檔案在哪裡）
+- `strict`：啟用嚴格模式
+
+#### 步驟 6：建立 TypeScript 程式碼
+
+**建立 `src/main.ts`：**
+```typescript
+// TypeScript 原始碼
+function add(a: number, b: number): number {
+    return a + b;
+}
+
+function greet(name: string): void {
+    console.log(`Hello, ${name}!`);
+}
+
+// 使用函數
+const result = add(1, 2);
+console.log(`1 + 2 = ${result}`);
+
+greet('World');
+
+// 在瀏覽器中顯示結果
+if (typeof document !== 'undefined') {
+    const app = document.querySelector('#app');
+    if (app) {
+        app.textContent = `計算結果：${result}`;
+    }
+}
+```
+
+#### 步驟 7：建立 HTML 檔案
+
+**建立 `index.html`：**
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript 基礎範例</title>
+</head>
+<body>
+    <h1>TypeScript 基礎</h1>
+    <div id="app"></div>
+    
+    <!-- 注意：引用編譯後的 JavaScript，不是 TypeScript -->
+    <script type="module" src="./dist/main.js"></script>
+</body>
+</html>
+```
+
+**💡 關鍵點：**
+- 引用的是 `./dist/main.js`（編譯後的 JavaScript）
+- **不是** `./src/main.ts`（TypeScript）
+
+#### 步驟 8：設定 npm scripts
+
+**修改 `package.json`，加入 scripts：**
+```json
+{
+  "name": "my-typescript-project",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+**💡 scripts 說明：**
+- `build`：編譯一次 TypeScript
+- `watch`：監聽檔案變更，自動編譯
+
+#### 步驟 9：編譯 TypeScript
+
+```bash
+# 編譯 TypeScript
+npm run build
+```
+
+**這會執行：**
+- `tsc`（TypeScript Compiler）
+- 讀取 `src/main.ts`
+- 轉換成 JavaScript
+- 輸出到 `dist/main.js`
+
+**✅ 成功標誌：**
+- 看到 `dist/` 資料夾被建立
+- `dist/main.js` 檔案存在
+- 沒有錯誤訊息
+
+---
+
+## 📝 查看原始 TypeScript 程式碼（現有範例）
+
+如果你想查看現有範例的程式碼，打開 `src/main.ts`，你會看到：
 
 打開 `src/main.ts`，你會看到：
 
@@ -78,24 +290,9 @@ greet('World');
 - `: void`：函數不回傳值
 - 這些是 TypeScript 的語法
 
-### 步驟 3：編譯 TypeScript
+### 步驟 10：查看編譯後的 JavaScript
 
-```bash
-npm run build
-```
-
-**這會執行：**
-- `tsc`（TypeScript Compiler）
-- 讀取 `src/main.ts`
-- 轉換成 JavaScript
-- 輸出到 `dist/main.js`
-
-**✅ 成功標誌：**
-- 看到 `dist/` 資料夾被建立
-- `dist/main.js` 檔案存在
-- 沒有錯誤訊息
-
-### 步驟 4：查看編譯後的 JavaScript
+編譯完成後，打開 `dist/main.js`，你會看到：
 
 打開 `dist/main.js`，你會看到：
 
@@ -128,7 +325,7 @@ greet('World');
 - 其他程式碼保持不變
 - 這就是「轉譯（Transpilation）」的過程
 
-### 步驟 5：在瀏覽器中執行
+### 步驟 11：在瀏覽器中執行
 
 **方法 1：直接開啟**
 ```bash
@@ -158,6 +355,51 @@ npm run serve
 - 瀏覽器執行的是 `dist/main.js`（JavaScript）
 - 瀏覽器**不執行** `src/main.ts`（TypeScript）
 - HTML 中引用的是：`<script src="./dist/main.js"></script>`
+
+---
+
+## 📋 完整建立流程總結
+
+讓我們回顧一下完整的建立流程：
+
+```
+1. 建立專案資料夾
+   mkdir my-typescript-project
+   ↓
+2. 初始化 npm
+   npm init -y
+   ↓
+3. 安裝 TypeScript
+   npm install -D typescript
+   ↓
+4. 建立專案結構
+   mkdir src dist
+   ↓
+5. 建立 tsconfig.json
+   npx tsc --init 或手動建立
+   ↓
+6. 寫 TypeScript 程式碼
+   建立 src/main.ts
+   ↓
+7. 建立 HTML 檔案
+   建立 index.html
+   ↓
+8. 設定 npm scripts
+   修改 package.json
+   ↓
+9. 編譯 TypeScript
+   npm run build
+   ↓
+10. 在瀏覽器中執行
+    打開 index.html
+```
+
+**💡 關鍵理解：**
+- 每個步驟都有其目的
+- `npm init` 建立專案配置
+- `npm install -D typescript` 安裝開發工具
+- `tsconfig.json` 告訴 TypeScript 如何編譯
+- `npm run build` 執行編譯
 
 ---
 

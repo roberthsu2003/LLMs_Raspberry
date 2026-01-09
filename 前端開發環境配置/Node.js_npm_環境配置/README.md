@@ -482,18 +482,6 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
-### Q4: 安裝速度很慢
-
-**解決方法**：
-```bash
-# 使用國內鏡像（例如淘寶鏡像）
-npm config set registry https://registry.npmmirror.com
-
-# 或使用 cnpm
-npm install -g cnpm --registry=https://registry.npmmirror.com
-cnpm install
-```
-
 ---
 
 ## 💡 最佳實踐

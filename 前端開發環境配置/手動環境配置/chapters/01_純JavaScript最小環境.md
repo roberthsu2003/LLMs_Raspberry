@@ -63,14 +63,19 @@ export const msg = 'Hello from module!';
 
 ## 📁 最小專案結構
 
+> 💡 **實際範例**：完整的範例專案請參考 [範例 A：純 JavaScript](../examples/A_js-basic/README.md)
+
 ### 範例 A：純 JavaScript（無任何工具）
 
 ```
 js-basic/
 ├── index.html
 ├── main.js
-└── msg.js
+├── msg.js
+└── utils.js
 ```
+
+**📂 完整範例專案：** [examples/A_js-basic](../examples/A_js-basic/)
 
 ### 檔案內容
 
@@ -406,7 +411,10 @@ python3 -m http.server 8000
    - 建立 3-5 個模組檔案
    - 使用 `import/export` 連接它們
    - 在瀏覽器中執行
+   - **推薦**：參考 [範例 A：純 JavaScript](../examples/A_js-basic/README.md)
 
 2. **思考題**：列出你目前專案中「瀏覽器原生能做到」和「需要工具才能做到」的功能
 
 3. **挑戰題**：試著在純 JavaScript 專案中使用一個 npm 套件（例如 lodash），看看會發生什麼錯誤
+
+**📂 完整範例專案：** [examples/A_js-basic](../examples/A_js-basic/)

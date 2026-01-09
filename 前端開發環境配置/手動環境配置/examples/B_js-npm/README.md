@@ -1,13 +1,20 @@
 # 範例 B：JavaScript + npm（不打包）
 
-## 教學重點
+> 💡 **學習目標**：體驗「npm 套件存在，但瀏覽器看不到」的問題，理解為什麼需要 Bundler。
+
+## 🎯 這個範例要教什麼？
 
 這個範例**故意失敗**，目的是：
-- 展示 npm 套件存在，但瀏覽器「看不到」
-- 理解 node_modules 是開發者的世界
-- 自然引出：「那中間誰來翻譯？」
+- ✅ 展示 npm 套件存在，但瀏覽器「看不到」
+- ✅ 理解 node_modules 是開發者的世界
+- ✅ 體驗瀏覽器無法直接使用 npm 套件的問題
+- ✅ 自然引出：「那中間誰來翻譯？」（Bundler）
 
-## 檔案結構
+**⚠️ 重要：這個範例會失敗，這是故意的！**
+
+---
+
+## 📂 檔案結構
 
 ```
 B_js-npm/
@@ -15,57 +22,155 @@ B_js-npm/
 ├── main.js             # 嘗試 import lodash（會失敗）
 ├── package.json        # npm 配置
 ├── node_modules/       # npm 安裝的套件（執行 npm install 後產生）
+│   └── lodash/         # lodash 套件
 └── README.md           # 本文件
 ```
 
-## 如何執行
+**💡 關鍵理解：**
+- `package.json`：記錄專案依賴
+- `node_modules/`：實際的套件檔案（npm 下載的）
+- 瀏覽器無法直接使用這些套件
+
+---
+
+## 🚀 快速開始（體驗失敗）
 
 ### 步驟 1：安裝依賴
 
 ```bash
+# 進入專案目錄
+cd examples/B_js-npm
+
+# 安裝 lodash
 npm install
 ```
 
-這會下載 lodash 到 `node_modules/` 資料夾。
+**這會：**
+- 下載 lodash 到 `node_modules/` 資料夾
+- 更新 `package.json`（如果還沒有的話）
 
-### 步驟 2：嘗試在瀏覽器中執行
+**✅ 成功標誌：**
+- 看到 `node_modules/` 資料夾被建立
+- `node_modules/lodash/` 存在
+- 沒有錯誤訊息
+
+### 步驟 2：查看程式碼
+
+**`package.json`** - npm 配置
+```json
+{
+  "name": "js-npm",
+  "version": "1.0.0",
+  "description": "JavaScript + npm 範例（故意失敗）",
+  "type": "module",
+  "scripts": {
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
+```
+
+**💡 關鍵點：**
+- `dependencies`：執行時需要的套件
+- `lodash` 已經列在依賴中
+
+**`main.js`** - 嘗試使用 lodash
+```javascript
+// ❌ 這樣不行！瀏覽器不認識 'lodash'
+// 這會導致錯誤：Failed to resolve module specifier "lodash"
+import _ from 'lodash';
+
+console.log('嘗試使用 lodash...');
+
+// 如果上面的 import 成功，這行才會執行
+const result = _.add(1, 2);
+console.log('1 + 2 =', result);
+
+document.querySelector('#app').textContent = 
+    '如果看到這行，表示 import 失敗了。請查看 Console 的錯誤訊息。';
+```
+
+**💡 關鍵點：**
+- 使用 `import _ from 'lodash'`（套件名稱）
+- 瀏覽器不認識 `'lodash'` 這個名稱
+
+**`index.html`** - HTML 入口
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript + npm 範例</title>
+</head>
+<body>
+    <h1>JavaScript + npm</h1>
+    <div id="app"></div>
+    
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
+```
+
+### 步驟 3：嘗試在瀏覽器中執行
 
 **方法 1：直接開啟**
-- 雙擊 `index.html`
-- 打開瀏覽器 Console（F12）
-- 觀察錯誤訊息
+```bash
+# 雙擊 index.html，或在瀏覽器中打開
+open index.html  # macOS
+start index.html  # Windows
+```
 
-**方法 2：使用本地伺服器**
+**方法 2：使用本地伺服器（推薦）**
 ```bash
 python3 -m http.server 8000
 ```
 
-然後訪問 `http://localhost:8000`
+然後訪問：`http://localhost:8000`
 
-### 步驟 3：觀察錯誤
+### 步驟 4：觀察錯誤 ✅
 
-打開瀏覽器 Console，你會看到：
+**打開瀏覽器 Console（F12），你會看到：**
 
 ```
 Failed to resolve module specifier "lodash". 
 Relative references must start with either "/", "./", or "../".
 ```
 
-## 為什麼會失敗？
+**頁面上顯示：**
+```
+如果看到這行，表示 import 失敗了。請查看 Console 的錯誤訊息。
+```
+
+**🔍 觀察重點：**
+- ❌ import 失敗了
+- ❌ lodash 無法使用
+- ✅ 錯誤訊息很清楚：瀏覽器不認識 `'lodash'`
+
+---
+
+## 🔍 深入理解：為什麼會失敗？
 
 ### 問題 1：瀏覽器不認識套件名稱
 
 ```javascript
-import _ from 'lodash';  // ❌ 瀏覽器不認識 'lodash'
+// ❌ 瀏覽器不認識 'lodash'
+import _ from 'lodash';
 ```
 
-瀏覽器只認識：
-- 相對路徑：`./main.js`、`../utils.js`
-- 絕對路徑：`/src/main.js`
-- URL：`https://cdn.example.com/lib.js`
+**瀏覽器只認識：**
+- ✅ 相對路徑：`./main.js`、`../utils.js`
+- ✅ 絕對路徑：`/src/main.js`
+- ✅ URL：`https://cdn.example.com/lib.js`
 
-瀏覽器**不認識**：
-- 套件名稱：`'lodash'`、`'react'`
+**瀏覽器不認識：**
+- ❌ 套件名稱：`'lodash'`、`'react'`、`'axios'`
+
+**類比：**
+- 就像你對外國人說「我要去7-11」，但他們不知道7-11在哪裡
+- 你需要說「我要去台北市信義區的7-11」（具體地址）
 
 ### 問題 2：node_modules 的位置
 
@@ -73,54 +178,304 @@ import _ from 'lodash';  // ❌ 瀏覽器不認識 'lodash'
 - `'lodash'` 對應到 `./node_modules/lodash/lodash.js`
 - 需要工具來「解析」套件名稱
 
-### 問題 3：模組格式
+**實際路徑：**
+```
+node_modules/
+└── lodash/
+    ├── package.json
+    ├── lodash.js
+    └── ...
+```
+
+**瀏覽器需要的：**
+```javascript
+// ✅ 瀏覽器認識這個
+import _ from './node_modules/lodash/lodash.js';
+```
+
+**但這樣寫很麻煩：**
+- 路徑很長
+- 如果套件移動位置，所有引用都要改
+- 不符合開發習慣
+
+### 問題 3：模組格式問題
 
 npm 套件可能是 CommonJS 格式：
 ```javascript
-module.exports = { ... };
+// CommonJS（Node.js 格式）
+module.exports = {
+    add: function(a, b) {
+        return a + b;
+    }
+};
 ```
 
 但瀏覽器需要 ES Module 格式：
 ```javascript
-export { ... };
+// ES Module（瀏覽器格式）
+export function add(a, b) {
+    return a + b;
+}
 ```
 
-## 教學重點
+**需要轉換：**
+- CommonJS → ES Module
+- 需要工具來處理
+
+---
+
+## 🎓 教學重點
 
 ### 1. npm 是開發階段工具
 
-- npm 幫你下載套件到 `node_modules/`
-- 但瀏覽器不認識 npm
-- 瀏覽器無法直接使用 `node_modules/`
+**npm 做了什麼：**
+- ✅ 下載套件到 `node_modules/`
+- ✅ 管理套件版本
+- ✅ 記錄依賴關係
 
-### 2. 需要 Bundler
+**npm 不做什麼：**
+- ❌ 不幫瀏覽器解析套件名稱
+- ❌ 不轉換模組格式
+- ❌ 不打包檔案
+
+**關鍵理解：**
+> **npm 是「開發階段工具」，瀏覽器根本不認識 npm**
+
+### 2. 瀏覽器 vs Node.js
+
+| 環境 | 能否直接使用 npm 套件？ | 為什麼？ |
+|------|----------------------|---------|
+| **Node.js** | ✅ 可以 | Node.js 知道如何解析 `node_modules/` |
+| **瀏覽器** | ❌ 不行 | 瀏覽器不認識套件名稱，只認識檔案路徑 |
+
+**Node.js 可以這樣寫：**
+```javascript
+// Node.js 環境
+const _ = require('lodash');  // ✅ 可以
+```
+
+**瀏覽器不行：**
+```javascript
+// 瀏覽器環境
+import _ from 'lodash';  // ❌ 不行
+```
+
+### 3. 需要 Bundler（打包工具）
 
 這就是為什麼需要打包工具（Bundler）：
-- 讀取 `import _ from 'lodash'`
-- 找到 lodash 在 `node_modules/` 中的位置
-- 轉換成瀏覽器能用的格式
-- 打包成一個檔案
+- 🔧 讀取 `import _ from 'lodash'`
+- 🔧 找到 lodash 在 `node_modules/` 中的位置
+- 🔧 轉換成瀏覽器能用的格式（ES Module）
+- 🔧 打包成一個（或幾個）檔案
+- 🔧 輸出到 `dist/` 或 `build/` 資料夾
 
-### 3. 這個錯誤是「故意的」
+**常見的 Bundler：**
+- **Vite**：新興工具，速度快，配置簡單（推薦）
+- **Webpack**：最流行，功能強大但配置複雜
+- **Rollup**：適合函式庫
+- **Parcel**：零配置
+
+### 4. 這個錯誤是「故意的」
 
 這個範例故意失敗，目的是：
-- 讓學生體驗問題
-- 理解為什麼需要工具
-- 自然引出解決方案
+- ✅ 讓學生體驗問題
+- ✅ 理解為什麼需要工具
+- ✅ 自然引出解決方案（Bundler）
 
-## 學習目標
+**學習流程：**
+```
+1. 嘗試使用 npm 套件
+   ↓
+2. 發現瀏覽器無法使用
+   ↓
+3. 理解問題所在
+   ↓
+4. 知道需要 Bundler
+   ↓
+5. 學習使用 Vite（下一章）
+```
 
-完成這個範例後，你應該能夠：
-- ✅ 理解 npm 的角色是「開發階段工具」
-- ✅ 知道瀏覽器無法直接使用 npm 套件
-- ✅ 理解為什麼需要 Bundler
+---
 
-## 延伸思考
+## 🎓 實際操作練習
 
-1. 為什麼 Node.js 可以直接使用 npm 套件，但瀏覽器不行？
-2. 如果我想使用 npm 套件，需要什麼工具？
-3. 這些工具做了什麼事？
+### 練習 1：查看 node_modules 結構
 
-## 對應章節
+1. **打開 `node_modules/lodash/` 資料夾**
+2. **查看 `package.json`：**
+   ```json
+   {
+     "name": "lodash",
+     "version": "4.17.21",
+     "main": "lodash.js",
+     ...
+   }
+   ```
+3. **思考：** 為什麼瀏覽器不知道 `'lodash'` 對應到這個檔案？
 
-👉 [第 2 章：JavaScript 與 npm](../../chapters/02_JavaScript與npm.md)
+### 練習 2：嘗試使用相對路徑
+
+1. **修改 `main.js`：**
+   ```javascript
+   // 嘗試使用相對路徑
+   import _ from './node_modules/lodash/lodash.js';
+   ```
+2. **重新載入瀏覽器**
+3. **觀察：** 可能還是會失敗（因為格式問題）
+
+### 練習 3：查看錯誤訊息
+
+1. **打開瀏覽器 Console**
+2. **仔細閱讀錯誤訊息：**
+   ```
+   Failed to resolve module specifier "lodash". 
+   Relative references must start with either "/", "./", or "../".
+   ```
+3. **理解：** 瀏覽器要求使用相對路徑
+
+### 練習 4：思考解決方案
+
+1. **列出問題：**
+   - 瀏覽器不認識套件名稱
+   - 需要轉換模組格式
+   - 需要打包檔案
+
+2. **思考：** 需要什麼工具來解決？
+
+---
+
+## 🔍 常見問題
+
+### Q1：為什麼 Node.js 可以直接使用 npm 套件？
+
+**A：** Node.js 內建了模組解析機制，知道如何找到 `node_modules/` 中的套件。
+
+**對比：**
+- **Node.js**：`require('lodash')` → 自動找到 `node_modules/lodash/`
+- **瀏覽器**：`import _ from 'lodash'` → 不知道 `lodash` 在哪裡
+
+### Q2：可以用相對路徑直接引用嗎？
+
+**A：** 理論上可以，但：
+- 路徑很長：`./node_modules/lodash/lodash.js`
+- 可能格式不對（CommonJS vs ES Module）
+- 不符合開發習慣
+
+**不推薦：**
+```javascript
+// ❌ 不推薦
+import _ from './node_modules/lodash/lodash.js';
+```
+
+### Q3：為什麼不直接把套件放在專案中？
+
+**A：** 可以，但不實用：
+- 檔案太多（lodash 有數百個檔案）
+- 版本管理困難
+- 無法自動更新
+
+**更好的方式：**
+- 使用 npm 管理
+- 使用 Bundler 處理
+
+### Q4：這個錯誤是 bug 嗎？
+
+**A：** 不是！這是**預期的行為**。
+
+瀏覽器設計就是這樣：
+- 只認識檔案路徑
+- 不認識套件名稱
+- 這是為了安全性和明確性
+
+### Q5：如何解決這個問題？
+
+**A：** 使用 Bundler（打包工具），例如：
+- Vite（推薦，簡單快速）
+- Webpack（功能強大）
+- Rollup（適合函式庫）
+
+**下一步：** 學習 [第 3 章：TypeScript 的本質](../../chapters/03_TypeScript的本質.md) 和 [第 4 章：為什麼需要 Vite](../../chapters/04_為什麼需要Vite.md)
+
+---
+
+## 📊 學習檢查清單
+
+完成這個範例後，請確認你理解：
+
+- [ ] npm 是開發階段工具，瀏覽器不認識
+- [ ] 瀏覽器無法直接使用 npm 套件
+- [ ] 瀏覽器只認識相對路徑，不認識套件名稱
+- [ ] node_modules 是開發者的世界，不是瀏覽器的世界
+- [ ] 需要 Bundler 來解決這個問題
+- [ ] 這個錯誤是故意的，目的是理解問題
+
+---
+
+## 🎯 關鍵理解總結
+
+### 1. npm 的角色
+
+> **npm 是「開發階段工具」，瀏覽器根本不認識 npm**
+
+- 開發階段：npm 幫你下載、管理套件
+- 執行階段：瀏覽器需要 Bundler 把套件轉換成可用格式
+
+### 2. 瀏覽器的限制
+
+瀏覽器只能：
+- ✅ 載入相對路徑的檔案（`./main.js`）
+- ❌ 無法直接使用 npm 套件（`'lodash'`）
+
+### 3. 需要 Bundler
+
+Bundler 的工作：
+1. 讀取你的程式碼（`import _ from 'lodash'`）
+2. 找到 lodash 在 `node_modules/` 中的位置
+3. 把 lodash 轉換成瀏覽器能用的格式
+4. 把所有檔案打包成一個（或幾個）檔案
+5. 輸出到 `dist/` 或 `build/` 資料夾
+
+---
+
+## 🚀 延伸學習
+
+### 下一步建議
+
+1. **學習 TypeScript**
+   - 了解為什麼需要編譯
+   - 學習型別系統
+   - 參考：[第 3 章：TypeScript 的本質](../../chapters/03_TypeScript的本質.md)
+
+2. **學習 Vite（Bundler）**
+   - 了解如何解決 npm 套件問題
+   - 學習開發伺服器
+   - 參考：[第 4 章：為什麼需要 Vite](../../chapters/04_為什麼需要Vite.md)
+
+3. **實際使用 Vite**
+   - 建立一個使用 Vite 的專案
+   - 成功使用 npm 套件
+   - 參考：[範例 D：TypeScript + Vite](../D_ts-vite/README.md)
+
+---
+
+## 📚 相關資源
+
+- [npm 官方文件](https://docs.npmjs.com/)
+- [ES Modules 說明](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Guide/Modules)
+- [第 2 章：JavaScript 與 npm](../../chapters/02_JavaScript與npm.md)
+
+---
+
+## 💪 練習題
+
+1. **實驗題**：嘗試在 `main.js` 中使用不同的 npm 套件（例如 `axios`），觀察錯誤訊息
+
+2. **研究題**：查看 `node_modules/lodash/package.json`，了解套件的結構和依賴
+
+3. **思考題**：列出你目前專案中使用的 npm 套件，思考它們是如何被瀏覽器使用的
+
+---
+
+**🎉 恭喜！你已經理解 npm 和瀏覽器的差異了！**
+
+下一步：學習 [第 3 章：TypeScript 的本質](../../chapters/03_TypeScript的本質.md)，了解編譯的概念。

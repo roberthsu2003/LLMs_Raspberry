@@ -188,6 +188,10 @@ function App() {
 
 ### 範例 E：React + JavaScript（最小可理解版）
 
+> 💡 **實際範例**：完整的範例專案請參考 [範例 E：React + JavaScript](../examples/E_react-js/README.md)
+
+**📂 完整範例專案：** [examples/E_react-js](../examples/E_react-js/)
+
 ```
 react-js/
 ├── index.html

@@ -56,13 +56,6 @@ sudo apt update
 # 升級系統套件
 sudo apt upgrade -y
 
-# 安裝必要的工具
-sudo apt install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release
 ```
 
 ### 2. 檢查系統架構

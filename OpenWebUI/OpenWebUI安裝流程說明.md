@@ -60,7 +60,7 @@ docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/da
 
 可以移除--restart always
 
-> 使用--add-host=host.docker.internal:host-gateway官方做法會失敗,無法連上ollama
+> 使用--add-host=host.docker.internal:host-gateway -> 會失敗(適合windows和mac,一般windows和mac不需要設定,預設就有了)
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
@@ -72,7 +72,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 
 可以移除--restart always
 
-> 1. 使用`--=network=host`官方備分作法,才可以連線上ollama  
+> 1. 使用`--network=host`官方備分作法,才可以連線上ollama  
 > 2. 連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
 > 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
 

@@ -252,9 +252,463 @@ node_modules/
 ### 常見的 Bundler
 
 - **Webpack**：最流行，功能強大但配置複雜
-- **Vite**：新興工具，速度快，配置簡單
+- **Vite**：新興工具，速度快，配置簡單（推薦初學者）
 - **Rollup**：適合函式庫
 - **Parcel**：零配置
+
+---
+
+## 🛠️ 實作：使用 Vite 解決問題
+
+> 💡 **學習目標**：實際使用 Bundler 解決「瀏覽器無法使用 npm 套件」的問題
+
+讓我們用 **Vite** 來實際解決這個問題。Vite 是目前最簡單、最快的 Bundler，非常適合初學者。
+
+### 情境：建立一個使用 lodash 的專案
+
+假設我們要建立一個計算器，使用 lodash 的數學函式。
+
+### 步驟 1：建立專案結構
+
+```bash
+# 建立專案資料夾
+mkdir my-calculator
+cd my-calculator
+
+# 初始化 npm
+npm init -y
+```
+
+### 步驟 2：安裝依賴套件
+
+```bash
+# 安裝 lodash（我們要使用的套件）
+npm install lodash
+
+# 安裝 Vite（開發工具，放在 devDependencies）
+npm install -D vite
+```
+
+**檢查 package.json：**
+```json
+{
+  "name": "my-calculator",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
+```
+
+### 步驟 3：建立專案檔案
+
+**index.html**
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>計算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .result {
+            font-size: 24px;
+            color: #667eea;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>🧮 數學計算器</h1>
+        <div class="result" id="result">結果會顯示在這裡</div>
+        <div>
+            <button onclick="calculateSum()">計算總和</button>
+            <button onclick="calculateMax()">找出最大值</button>
+            <button onclick="calculateAverage()">計算平均</button>
+            <button onclick="shuffleArray()">隨機排序</button>
+        </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
+```
+
+**main.js**
+```javascript
+// ✅ 現在可以正常使用 lodash 了！
+import _ from 'lodash';
+
+// 範例資料
+const numbers = [10, 5, 20, 15, 30, 25];
+
+// 計算總和
+window.calculateSum = function() {
+    const sum = _.sum(numbers);
+    document.getElementById('result').textContent = 
+        `總和：${sum} (數字：${numbers.join(', ')})`;
+};
+
+// 找出最大值
+window.calculateMax = function() {
+    const max = _.max(numbers);
+    document.getElementById('result').textContent = 
+        `最大值：${max} (數字：${numbers.join(', ')})`;
+};
+
+// 計算平均
+window.calculateAverage = function() {
+    const avg = _.mean(numbers);
+    document.getElementById('result').textContent = 
+        `平均值：${avg.toFixed(2)} (數字：${numbers.join(', ')})`;
+};
+
+// 隨機排序
+window.shuffleArray = function() {
+    const shuffled = _.shuffle(numbers);
+    document.getElementById('result').textContent = 
+        `隨機排序：${shuffled.join(', ')}`;
+};
+
+console.log('✅ lodash 載入成功！');
+console.log('可用的函式：', Object.keys(_).slice(0, 10));
+```
+
+### 步驟 4：設定 Vite
+
+**建立 vite.config.js**（可選，Vite 有預設設定）
+```javascript
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  // 專案根目錄
+  root: '.',
+  
+  // 開發伺服器設定
+  server: {
+    port: 3000,
+    open: true  // 自動打開瀏覽器
+  },
+  
+  // 建置設定
+  build: {
+    outDir: 'dist',  // 輸出目錄
+    sourcemap: true  // 產生 source map（方便除錯）
+  }
+});
+```
+
+### 步驟 5：設定 npm scripts
+
+**修改 package.json**，加入 scripts：
+```json
+{
+  "name": "my-calculator",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
+```
+
+### 步驟 6：啟動開發伺服器
+
+```bash
+npm run dev
+```
+
+**你會看到：**
+```
+  VITE v5.0.0  ready in 500 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+
+**在瀏覽器中打開：** `http://localhost:3000`
+
+**✅ 成功標誌：**
+- 網頁正常顯示
+- 點擊按鈕可以正常運作
+- 瀏覽器 Console 沒有錯誤
+- 可以看到 "✅ lodash 載入成功！" 的訊息
+
+### 步驟 7：建置生產版本
+
+```bash
+npm run build
+```
+
+**Vite 會：**
+1. 讀取所有檔案
+2. 解析 `import _ from 'lodash'`
+3. 找到 lodash 在 `node_modules` 中的位置
+4. 把 lodash 轉換成瀏覽器能用的格式
+5. 把所有程式碼打包並優化
+6. 輸出到 `dist/` 資料夾
+
+**查看建置結果：**
+```bash
+ls dist/
+# 應該看到：
+# index.html
+# assets/
+#   ├── index-[hash].js
+#   └── index-[hash].css
+```
+
+### 步驟 8：預覽生產版本
+
+```bash
+npm run preview
+```
+
+這會啟動一個本地伺服器，預覽建置後的結果。
+
+---
+
+## 🔍 深入理解：Vite 做了什麼？
+
+### 開發模式（`npm run dev`）
+
+當你執行 `npm run dev` 時：
+
+1. **Vite 啟動開發伺服器**
+   - 監聽檔案變更
+   - 提供熱模組替換（HMR）
+
+2. **處理 import 語句**
+   ```javascript
+   import _ from 'lodash';
+   ```
+   - Vite 看到 `'lodash'`
+   - 自動找到 `node_modules/lodash/` 
+   - 轉換成瀏覽器能理解的格式
+   - 即時提供給瀏覽器
+
+3. **瀏覽器收到的是轉換後的程式碼**
+   - 不再是 `import _ from 'lodash'`
+   - 而是實際的 lodash 程式碼（已經轉換成 ES Module）
+
+### 建置模式（`npm run build`）
+
+當你執行 `npm run build` 時：
+
+1. **讀取所有檔案**
+   - `index.html`
+   - `main.js`
+   - 所有 import 的套件
+
+2. **解析依賴關係**
+   ```
+   main.js
+   └── lodash (從 node_modules)
+       └── (lodash 的依賴，如果有)
+   ```
+
+3. **打包和優化**
+   - 合併多個檔案
+   - 移除未使用的程式碼（Tree Shaking）
+   - 壓縮程式碼
+   - 產生 source map
+
+4. **輸出到 dist/**
+   ```
+   dist/
+   ├── index.html
+   └── assets/
+       ├── index-abc123.js  (包含 main.js + lodash)
+       └── index-def456.css (如果有 CSS)
+   ```
+
+### 對比：沒有 Bundler vs 有 Bundler
+
+**❌ 沒有 Bundler（直接開啟 HTML）：**
+```html
+<script type="module" src="./main.js"></script>
+```
+- 瀏覽器看到 `import _ from 'lodash'`
+- 瀏覽器不知道 `'lodash'` 是什麼
+- **結果：錯誤**
+
+**✅ 有 Bundler（使用 Vite）：**
+```html
+<script type="module" src="./main.js"></script>
+```
+- Vite 在背後處理 `import _ from 'lodash'`
+- 轉換成實際的檔案路徑和程式碼
+- 瀏覽器收到的是可執行的程式碼
+- **結果：成功！**
+
+---
+
+## 📊 實際範例：比較不同情況
+
+### 範例 1：簡單的數學運算
+
+**main.js**
+```javascript
+import _ from 'lodash';
+
+// 使用 lodash 的數學函式
+const numbers = [1, 2, 3, 4, 5];
+
+console.log('總和：', _.sum(numbers));        // 15
+console.log('最大值：', _.max(numbers));       // 5
+console.log('最小值：', _.min(numbers));       // 1
+console.log('平均值：', _.mean(numbers));      // 3
+```
+
+**使用 Vite 後：**
+- ✅ 可以正常執行
+- ✅ 所有 lodash 函式都能使用
+- ✅ 瀏覽器 Console 顯示正確結果
+
+### 範例 2：陣列操作
+
+**main.js**
+```javascript
+import _ from 'lodash';
+
+const users = [
+  { name: 'Alice', age: 25 },
+  { name: 'Bob', age: 30 },
+  { name: 'Charlie', age: 20 }
+];
+
+// 找出年齡最大的使用者
+const oldest = _.maxBy(users, 'age');
+console.log('最年長：', oldest.name);  // Bob
+
+// 依年齡排序
+const sorted = _.sortBy(users, 'age');
+console.log('排序後：', sorted);
+
+// 取得所有名字
+const names = _.map(users, 'name');
+console.log('名字列表：', names);  // ['Alice', 'Bob', 'Charlie']
+```
+
+### 範例 3：字串處理
+
+**main.js**
+```javascript
+import _ from 'lodash';
+
+const text = '  hello world  ';
+
+// 移除前後空白
+const trimmed = _.trim(text);
+console.log(trimmed);  // 'hello world'
+
+// 轉換成駝峰式
+const camelCase = _.camelCase('hello world');
+console.log(camelCase);  // 'helloWorld'
+
+// 轉換成大寫
+const upper = _.upperCase('hello world');
+console.log(upper);  // 'HELLO WORLD'
+```
+
+---
+
+## 🎯 驗證學習成果
+
+完成以上步驟後，請確認：
+
+- [ ] 可以成功執行 `npm run dev`
+- [ ] 瀏覽器可以正常顯示網頁
+- [ ] lodash 的函式可以正常使用
+- [ ] 點擊按鈕可以正常運作
+- [ ] 瀏覽器 Console 沒有錯誤
+- [ ] 可以成功執行 `npm run build`
+- [ ] `dist/` 資料夾中有建置後的檔案
+- [ ] 理解 Vite 在開發和建置時的不同行為
+
+---
+
+## 💡 進階提示
+
+### 1. 查看打包後的程式碼
+
+建置後，打開 `dist/assets/index-xxx.js`，你會看到：
+- lodash 的程式碼已經被打包進去
+- 程式碼已經被壓縮和優化
+- 不再有 `import` 語句，而是實際的程式碼
+
+### 2. 使用其他 Bundler
+
+如果你想嘗試其他 Bundler：
+
+**Webpack：**
+```bash
+npm install -D webpack webpack-cli webpack-dev-server
+```
+
+**Parcel：**
+```bash
+npm install -D parcel
+```
+
+但對於初學者，**Vite 是最簡單的選擇**。
+
+### 3. 除錯技巧
+
+如果遇到問題：
+
+```bash
+# 清除快取
+rm -rf node_modules package-lock.json
+npm install
+
+# 檢查 Vite 版本
+npx vite --version
+
+# 查看詳細的建置資訊
+npm run build -- --debug
+```
 
 ---
 

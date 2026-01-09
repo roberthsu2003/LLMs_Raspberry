@@ -82,7 +82,6 @@ ghcr.io/open-webui/open-webui:main
 ```bash
 docker run -d \
 --network=host \
--p 8080:8080 \
 -v open-webui:/app/backend/data \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
 --name open-webui \
@@ -91,7 +90,7 @@ ghcr.io/open-webui/open-webui:main
 ```
 
 > 1. 使用`--network=host`官方備分作法,才可以連線上ollama  
-> 2. 連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
+> 2. 因為使用`--network=host`,`-p`是沒有做用的,連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
 > 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
 
 ### 第 2 步：連接到 Ollama

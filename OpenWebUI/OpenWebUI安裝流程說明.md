@@ -82,7 +82,7 @@ ghcr.io/open-webui/open-webui:main
 ```bash
 docker run -d \
 --network=host \
--p 3000:8080 \
+-p 8080:8080 \
 -v open-webui:/app/backend/data \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
 --name open-webui \

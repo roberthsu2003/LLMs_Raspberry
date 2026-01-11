@@ -67,25 +67,33 @@ RAG 測試用「使用者 Prompt ＋ 正確解答」
 	
 1. **測試精準數據提取**
 
-「SonicCloud 9 在開啟 ANC 的情況下，電池續航時間有多長？」
+```test
+SonicCloud 9 在開啟 ANC 的情況下，電池續航時間有多長？
+```
 
 （預期回答：30 小時）
 
 2. **測試跨文檔區分（避免混淆）**
 
-「SonicCloud 9 與 FloraGard Pro 上的閃爍紅燈分別代表什麼意思？」
+```test
+SonicCloud 9 與 FloraGard Pro 上的閃爍紅燈分別代表什麼意思？
+```
 
 （預期回答：耳機是低電量；植物監測器是水分嚴重不足。）
 
 3. **測試故障排除流程**
 
-「我的 BrewBot X1 顯示錯誤代碼 E02，我該怎麼辦？」
+```test
+我的 BrewBot X1 顯示錯誤代碼 E02，我該怎麼辦？
+```
 
 （預期回答：研磨機卡住，請清潔豆槽。）
 
 4. **測試缺失資訊（幻覺測試）**
 
-「BrewBot X1 是否支援 5GHz WiFi？」
+```test
+BrewBot X1 是否支援 5GHz WiFi？
+```
 
 （預期回答：不支援，僅支援 2.4GHz。）
 

@@ -4,33 +4,6 @@
 
 檢索增強生成（RAG）是一種人工智慧技術，它結合了檢索和生成兩種技術，以提高生成式人工智慧模型的準確性和相關性。
 
-## 什麼是embedding模型
-
-Embedding 模型是一種將文字轉換為向量表示的模型，可用於計算文字之間的相似度。
-
-> [介紹向量文字空間模型](https://ai4k12.org/word-embedding-demo/)
-
-### 目前遇到的問題
-
-- 中文文件的 embedding 模型速度慢、效果差。
-
-**解決方式**
-
-- 將中文文件全部轉換為英文，使用英文的 embedding 模型（預設的模型就很好用，它使用的是 Hugging Face 的模型，速度快、效果好）。
-
-### 如何使用embedding模型
-
-**英文版本的embedding:**
-- 嵌人模型引擎: 預設(SentenceTransformers)
-- 嵌入模型: sentence-transformers/all-MiniLM-L6-v2
-
-**繁體中文的embedding:**
-- 嵌人模型引擎: 預設(SentenceTransformers)
-- 嵌入模型: BAAI/bge-m3
-- 目前測試效果差,不建議使用
-
----
-
 ## RAG的流程
 
 ```
@@ -46,6 +19,26 @@ System Prompt 約束
  ↓
 模型生成答案
 ```
+
+## 什麼是embedding模型
+
+Embedding 模型是一種將文字轉換為向量表示的模型，可用於計算文字之間的相似度。
+
+> [介紹向量文字空間模型](https://ai4k12.org/word-embedding-demo/)
+
+### 目前遇到的問題
+
+- 中文文件的 embedding 模型速度慢、效果差。
+
+**解決方式**
+
+1. 將中文文件全部轉換為英文，使用英文的 embedding 模型（預設的模型就很好用，它使用的是 Hugging Face 的模型，速度快、效果好）。
+
+### [如何使用embedding模型](./跨語言的embedding模型.md)
+
+---
+
+
 
 ## RAG準確的關鍵技巧
 

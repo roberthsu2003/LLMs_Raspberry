@@ -141,5 +141,5 @@ sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 | 中文問中文          | multilingual-e5                           |
 | **中文問英文（你現在）** | **paraphrase-multilingual-MiniLM-L12-v2** |
 | 高精度法規          | mpnet-base-v2                             |
-
+| Raspberry | jinaai/jina-embeddings-v2-base-zh |
 ---

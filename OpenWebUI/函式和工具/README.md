@@ -1,7 +1,7 @@
 # 函式和工具-function calling
 open-webui有2種方式
 
-## 過濾
+## 函式(過濾)
 
 Open-WebUI 的 `Filter` 類別就像是聊天過程中的**「訊息加工廠」**，主要負責三個動作：
 
@@ -19,4 +19,4 @@ Open-WebUI 的 `Filter` 類別就像是聊天過程中的**「訊息加工廠」
 
 > [過濾的範例](./filter_example.md)
 
-## 建立給模型的工具
+## 工具(function-calling)

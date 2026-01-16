@@ -106,7 +106,7 @@ mkdir ~/pipeline
 docker run -d \
 --network=host \
 -v open-webui:/app/backend/data \
--v ~/pipeline:/app/backend/pipeline \
+-v /home/pi/pipeline:/app/backend/pipeline \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
 --name open-webui \
 --restart always \

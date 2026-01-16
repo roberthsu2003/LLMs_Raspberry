@@ -106,7 +106,7 @@ mkdir ~/pipeline
 docker run -d \
 --network=host \
 -v open-webui:/app/backend/data \
--v /home/pi/pipeline:/app/backend/pipeline \
+-v /home/pi/pipeline:/app/pipelines \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
 -e PIPELINES_DIR=/app/pipelines \
 --name open-webui \

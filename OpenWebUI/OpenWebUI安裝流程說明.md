@@ -108,6 +108,7 @@ docker run -d \
 -v open-webui:/app/backend/data \
 -v /home/pi/pipeline:/app/backend/pipeline \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
+-e PIPELINES_DIR=/app/pipelines \
 --name open-webui \
 --restart always \
 ghcr.io/open-webui/open-webui:main

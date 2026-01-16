@@ -46,6 +46,8 @@
 
 **重要:**必需使用ngrok,有https才可以使用
 
+[**ngrok設定**](../tunnel/ngrok_tunnel.md)
+
 > 設定位置: 管理員控制台 -> 設定 -> 音訊
 
 

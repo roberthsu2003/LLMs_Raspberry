@@ -92,31 +92,6 @@ ghcr.io/open-webui/open-webui:main
 > 2. 因為使用`--network=host`,`-p`是沒有做用的,連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
 > 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
   
----
-
-### 第 1 步：啟動 OpenWebUI 容器-適合raspberry,並且要建立*pipeline*功能
-
-- 可以移除--restart always
-
-```bash
-mkdir ~/pipeline
-```
-
-```
-docker run -d \
---network=host \
--v open-webui:/app/backend/data \
--v /home/pi/pipeline:/app/pipelines \
--e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
--e PIPELINES_DIR=/app/pipelines \
---name open-webui \
---restart always \
-ghcr.io/open-webui/open-webui:main
-```
-
-> 1. 使用`--network=host`官方備分作法,才可以連線上ollama  
-> 2. 因為使用`--network=host`,`-p`是沒有做用的,連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
-> 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
   
 ---
 

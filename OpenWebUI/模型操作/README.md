@@ -1,4 +1,4 @@
-# 模型操作
+# 連線操作
 
 **設定位置:** 管理員控制台 -> 設定 -> 連線
 
@@ -23,8 +23,10 @@
 
 - 使用 Open Router 運行模型
 > OpenRouter 官方 API 的 base URL 是：`https://openrouter.ai/api/v1`
+> 一定要設標籤:`openRouter`
 
 ---
 
 - 使用大模型API(GPT-4,GEMINI)
 > Google API 的 base URL 是：`https://generativelanguage.googleapis.com/v1beta/openai`
+> 一定要設標籤:`google`

@@ -78,7 +78,7 @@ dig NS your-domain.com
 * 輸入通道名稱，例如：`web`、`app`、`n8n`
 * 此名稱僅用於管理與識別，不影響實際對外網址。
 
-### 4. 選擇執行環境
+### 4. 選擇執行環境(建議先在Raspberry Pi OS上測試,最後再至Docker上測試)
 
 * 依實際主機作業系統選擇，例如：**Debian**、**Ubuntu**、**Raspberry Pi OS**
 

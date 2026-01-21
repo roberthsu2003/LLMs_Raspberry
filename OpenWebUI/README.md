@@ -60,7 +60,7 @@
 
 > 重要: 申請免費api後,後面的存取權限要設定好,否則無法使用
 > 建議設定:  
-> 文字轉語音 (TTS) 聲音:bhJUNIXWQQ94l8eI2VUf
+> 文字轉語音 (TTS) 聲音:bhJUNIXWQQ94l8eI2VUf  
 > 文字轉語音 (TTS) 模型:eleven_v3
 
 ```other

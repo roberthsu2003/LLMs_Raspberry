@@ -250,3 +250,171 @@ docker run -d \
 * `--network=host`：使用主機網路模式，讓容器可以直接存取 `localhost` 服務
 * `--restart unless-stopped`：設定容器自動重啟策略
 * `<TOKEN>`：替換為您在 Cloudflare Dashboard 中取得的 Tunnel Token
+
+### 步驟三：使用 Docker Compose 部署（進階方式）
+
+如果您希望使用 Docker Compose 來管理多個容器，可以使用以下方式統一部署 Open WebUI 和 Cloudflare Tunnel。
+
+#### 一、對照概念（建立正確心智模型）
+
+您目前的部署狀況：
+
+* **open-webui**
+  * 使用 `--network=host`
+  * 直接連線到 Raspberry Pi 的 `127.0.0.1:11434`（Ollama）
+* **cloudflared**
+  * 也使用 `--network=host`
+  * Tunnel 指向 Raspberry Pi 本機服務（例如 open-webui 的 port）
+
+👉 **所以在 docker-compose.yml 裡：**
+
+* 兩個 service **都必須使用** `network_mode: host`
+* **不能使用** `ports` 映射
+* **不能使用** 自訂 docker network
+
+---
+
+#### 二、建立 docker-compose.yml
+
+請在任意資料夾建立一個檔案：
+
+```
+docker-compose.yml
+```
+
+內容如下（可直接使用）：
+
+```yaml
+version: "3.9"
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    network_mode: host
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://127.0.0.1:11434
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    network_mode: host
+    command: tunnel run --token <TOKEN>
+
+volumes:
+  open-webui:
+```
+
+📌 **這個 compose 檔案的功能，與您原本的兩個 `docker run` 指令完全等價**
+
+---
+
+#### 三、啟動與管理方式
+
+**啟動服務：**
+
+```bash
+docker compose up -d
+```
+
+**檢查容器狀態：**
+
+```bash
+docker compose ps
+```
+
+**查看日誌（非常重要，用於排查問題）：**
+
+```bash
+docker compose logs -f cloudflared
+```
+
+---
+
+#### 四、為什麼一定要使用 network_mode: host？
+
+在 Raspberry Pi 上的網路架構：
+
+| 容器 | 您期待的 localhost |
+|------|-------------------|
+| open-webui | Pi 的 localhost |
+| cloudflared | Pi 的 localhost |
+| ollama | Pi 的 localhost |
+
+**只要三者需要共用 `127.0.0.1`，就一定要使用 `network_mode: host`**
+
+❌ **如果改成 bridge network：**
+
+* `127.0.0.1` 會變成「容器自己」
+* cloudflared 會找不到 open-webui
+* open-webui 會找不到 ollama
+
+---
+
+#### 五、Cloudflare Tunnel 與 Open WebUI 的關係圖
+
+```
+[ Internet ]
+     │
+     ▼
+Cloudflare Tunnel
+     │  (cloudflared container)
+     ▼
+Raspberry Pi localhost
+     │
+     ├── Open WebUI : http://127.0.0.1:3000
+     └── Ollama     : http://127.0.0.1:11434
+```
+
+👉 **重要觀念：**
+
+* Tunnel **不是連 Docker 容器**
+* Tunnel **是連 Pi 本機服務**
+
+---
+
+#### 六、進階優化建議（選用）
+
+等您熟悉基本操作後，可以考慮以下優化：
+
+**1. 使用環境變數檔案（.env）管理 Token**
+
+建立 `.env` 檔案：
+
+```
+CLOUDFLARE_TOKEN=xxxxx
+```
+
+在 `docker-compose.yml` 中使用：
+
+```yaml
+command: tunnel run --token ${CLOUDFLARE_TOKEN}
+```
+
+**2. 固定服務端口**
+
+如果未來不使用 host network，可以為 open-webui 固定端口。
+
+**3. 添加依賴關係**
+
+雖然 host network 模式下不強制，但可以加上 `depends_on` 來確保啟動順序。
+
+---
+
+#### 七、故障排查
+
+如果設定完成後仍然無法連線，請提供以下資訊以便診斷：
+
+* `docker compose ps` 的輸出結果
+* `docker compose logs cloudflared` 的日誌內容
+* 您在 Cloudflare Tunnel 設定的 **Public Hostname → Service URL**
+
+根據這些資訊，可以精準判斷問題出在哪一層：
+* DNS 設定
+* Tunnel 連線
+* Container 運行狀態
+* localhost 服務

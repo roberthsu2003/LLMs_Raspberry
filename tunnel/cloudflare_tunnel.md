@@ -59,34 +59,129 @@ dig NS your-domain.com
 
 ![設定Cloudflare_Tunnel](./images/設定Cloudflare_Tunnel.png)
 
-### 步驟一：建立 Tunnel
+## 步驟一：建立 Tunnel
 
-1.  在 Cloudflare 儀表板，導覽至 **`Zero Trust`**。
-2.  在左側選單中，選擇 **`網路 (Network) > 連接器`**。
-3.  點擊 **`建立 Tunnel (Create a Tunnel)`**，並為您的 Tunnel 設定一個易於識別的名稱。
+### 1. 進入 Cloudflare Zero Trust 儀表板
 
-### 步驟二：安裝並執行 Connector
+1. 在 Cloudflare 儀表板中，導覽至 **`Zero Trust`**。
+2. 在左側選單中，選擇 **`網路 (Network) > 連接器`**。
+3. 點擊 **`建立 Tunnel (Create a Tunnel)`**。
 
-Cloudflare 會提供對應您作業系統的安裝指令。安裝後，有兩種執行 `cloudflared` 的方式：
+### 2. 選擇通道類型
 
-*   **作為服務執行 (建議用於正式環境)**：
-    安裝並設定為系統服務，讓 `cloudflared` 能在開機時自動啟動，確保 Tunnel 連線持續在線。
-*   **手動執行 (適用於開發與測試)**：
-    直接在終端機中執行指令，Tunnel 將只在當前的終端機工作階段中運行，關閉即中斷。
+* 通道類型選擇 **Cloudflared**
 
-**連線驗證**：執行指令後，回到 Cloudflare 的 Tunnel 設定頁面，檢查下方的 **`Connectors`** 區塊是否出現新的連線紀錄，並顯示為健康狀態。
+  > Cloudflared 是 Cloudflare 提供的官方連接器，用來在本機與 Cloudflare 之間建立安全通道。
 
-### 步驟三：設定公開主機名稱 (Public Hostname)
+### 3. 為通道命名
 
-這是最後一步，將公開的網址指向您本機的服務。
+* 輸入通道名稱，例如：`web`、`app`、`n8n`
+* 此名稱僅用於管理與識別，不影響實際對外網址。
 
--   **主機名稱 (Hostname)**：設定您要公開的子網域 (subdomain)。例如，`open-webui.your-domain.com`。
--   **服務 (Service)**：選擇協定 (HTTP/HTTPS等) 並填寫本機服務的位址。例如，`http://localhost:8080`。
+### 4. 選擇執行環境
 
-儲存後，任何人即可透過您設定的主機名稱，安全地存取您本機的服務。
+* 依實際主機作業系統選擇，例如：**Debian**、**Ubuntu**、**Raspberry Pi OS**
 
-**完成**
+### 5. 安裝 cloudflared 應用程式
+
+* 依照 Cloudflare 提供的指令，在終端機中下載並安裝 `cloudflared`
+* 安裝完成後，即可使用 `cloudflared` 指令
+
+### 6. （建議）測試與服務安裝
+
+* 可先手動執行 Tunnel，確認可正常連線
+* 接著可將 `cloudflared` 安裝成系統服務（service），讓電腦或伺服器開機時自動啟動 Tunnel
+
+### 7. 確認連線狀態
+
+* 回到 Dashboard 確認連線狀態
+* 若連線成功，下方 **Connectors** 區域會顯示該主機為 **已連線（Connected）**
+
+### 8. 進入下一步
+
+* 確認無誤後，點選 **「下一步（Next）」**
+
+---
+
+## 步驟二：整合自己的 DNS（將網域指向 Tunnel）
+
+### 9. 進入 DNS 整合設定
+
+* 進入 **整合 DNS（Route Tunnel / Publish Application）** 步驟
+* 此步驟的目的，是將自己的網域名稱（DNS）指向剛建立的 Tunnel。
+
+### 10. 選擇應用程式類型
+
+* 選擇 **為 Web 新增已發佈的應用程式路由**
+
+  > 代表透過 Tunnel，將外部網域的請求安全地轉送到內部服務。
+
+### 11. 設定主機名稱（Hostname）
+
+* **子網域（Subdomain）**：
+  * 例如：`www`、`app`、`n8n`
+* **網域（Domain）**：
+  * 選擇已加入 Cloudflare 並由其管理 DNS 的網域
+* 組合後的對外網址例如：
+
+  ```
+  app.example.com
+  ```
+
+### 12. （選擇性）設定路徑（Path）
+
+* 若只想讓特定路徑走此 Tunnel，可設定如：
+
+  ```
+  /api
+  ```
+
+* 若整個網站或服務都使用 Tunnel，可留空。
+
+### 13. 設定服務（Service）
+
+* **類型（Type）**：
+  * 通常選擇 `HTTP` 或 `HTTPS`
+* **URL**：
+  * 輸入內部服務位址，例如：
+
+    ```
+    http://localhost:3000
+    ```
+
+    或
+
+    ```
+    http://127.0.0.1:5678
+    ```
+
+### 14. （進階）其他應用程式設定
+
+* 可依需求調整逾時、HTTP Host Header、TLS 等進階選項
+* 教學或初學情境可先維持預設值。
+
+### 15. 完成設定
+
+* 點選 **「完成設定（Finish）」**
+* Cloudflare 會自動建立對應的 DNS 紀錄，並將流量導向 Tunnel。
+
+### 16. 驗證設定結果
+
+* 在瀏覽器輸入設定的網域名稱
+* 若內部服務畫面可正常顯示，表示：
+  * DNS 設定成功
+  * Tunnel 連線成功
+  * 本機服務運作正常
+
+---
+
+## 完成設定
 
 ![the_full_journey](./images/the_full_journey.png)
 
-之後，您可以在 Cloudflare 的 Tunnel 設定頁面，透過 **通道名稱** 區塊的狀態來判斷連線是否成功。正常連線時會顯示 **`連線`**，若中斷則會顯示 **`關閉`**。
+### 檢查連線狀態
+
+之後，您可以在 Cloudflare 的 Tunnel 設定頁面，透過 **通道名稱** 區塊的狀態來判斷連線是否成功：
+
+* 正常連線時會顯示 **`連線`**
+* 若中斷則會顯示 **`關閉`**

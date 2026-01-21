@@ -206,7 +206,7 @@ docker run -d \
   ghcr.io/open-webui/open-webui:main
 ```
 
-### 步驟二：部署 Cloudflare Tunnel 容器
+### 步驟二：部署 Cloudflare Tunnel 容器(使用docker run指令)
 
 #### ⚠️ 重要提醒
 

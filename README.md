@@ -75,7 +75,7 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 > 📚 **SSH Tunnel**：[SSH Tunnel](./tunnel/ssh_tunnel.md)  
 > 📚 **Ngrok Tunnel**：[Ngrok Tunnel](./tunnel/ngrok_tunnel.md)   
 > ---
-> 📚GoDaddy 域名 + Cloudflare DNS 應用流程說明
+> 📚GoDaddy 域名 + Cloudflare DNS 應用流程說明  
 > 📚 **cloudflare Tunnel**：[cloudflare Tunnel](./tunnel/cloudflare_tunnel.md)  
 
 ---

@@ -185,3 +185,44 @@ dig NS your-domain.com
 
 * 正常連線時會顯示 **`連線`**
 * 若中斷則會顯示 **`關閉`**
+
+---
+
+## 使用Docker來設定Cloudflare Tunnel
+
+1. **第1個容器: open-webui server**
+
+```docker
+docker run -d \
+--network=host \
+-v open-webui:/app/backend/data \
+-e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
+--name open-webui \
+--restart always \
+ghcr.io/open-webui/open-webui:main
+```
+
+2. **第2個容器: cloudflare tunnel**
+
+> 注意: 不可以使用cloudflare建議的docker 指令來設定,否則會出現錯
+
+
+**下方是cloudflare建議的docker 指令,會出錯**
+
+```docker
+docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token <TOKEN>
+```
+
+> 原因: 沒有--network=host 參數,導致無法正常連線
+> 原因: 沒有 -d 參數,終端機關閉後,容器也會關閉
+
+**下方是正確的docker 指令**
+
+```docker
+docker run -d \
+  --name cloudflared \
+  --network=host \
+  --restart unless-stopped \
+  cloudflare/cloudflared:latest \
+  tunnel run --token <TOKEN>
+```

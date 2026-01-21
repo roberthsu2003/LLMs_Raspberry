@@ -1,5 +1,50 @@
 # Cloudflare Tunnel
 
+## 目錄
+
+- [前置作業：設定個人網域](#前置作業設定個人網域)
+  - [步驟一：註冊網域並更新名稱伺服器](#步驟一註冊網域並更新名稱伺服器)
+  - [步驟二：驗證網域設定](#步驟二驗證網域設定)
+- [設定 Cloudflare Tunnel](#設定-cloudflare-tunnel)
+- [步驟一：建立 Tunnel](#步驟一建立-tunnel)
+  - [1. 進入 Cloudflare Zero Trust 儀表板](#1-進入-cloudflare-zero-trust-儀表板)
+  - [2. 選擇通道類型](#2-選擇通道類型)
+  - [3. 為通道命名](#3-為通道命名)
+  - [4. 選擇執行環境](#4-選擇執行環境建議先在raspberry-pi-os上測試最後再至docker上測試)
+  - [5. 安裝 cloudflared 應用程式](#5-安裝-cloudflared-應用程式)
+  - [6. （建議）測試與服務安裝](#6-建議測試與服務安裝)
+  - [7. 確認連線狀態](#7-確認連線狀態)
+  - [8. 進入下一步](#8-進入下一步)
+- [步驟二：整合自己的 DNS（將網域指向 Tunnel）](#步驟二整合自己的-dns將網域指向-tunnel)
+  - [9. 進入 DNS 整合設定](#9-進入-dns-整合設定)
+  - [10. 選擇應用程式類型](#10-選擇應用程式類型)
+  - [11. 設定主機名稱（Hostname）](#11-設定主機名稱hostname)
+  - [12. （選擇性）設定路徑（Path）](#12-選擇性設定路徑path)
+  - [13. 設定服務（Service）](#13-設定服務service)
+  - [14. （進階）其他應用程式設定](#14-進階其他應用程式設定)
+  - [15. 完成設定](#15-完成設定)
+  - [16. 驗證設定結果](#16-驗證設定結果)
+- [完成設定](#完成設定)
+  - [檢查連線狀態](#檢查連線狀態)
+- [使用 Docker 來設定 Cloudflare Tunnel](#使用-docker-來設定-cloudflare-tunnel)
+  - [步驟一：部署 Open WebUI 容器](#步驟一部署-open-webui-容器)
+  - [步驟二：部署 Cloudflare Tunnel 容器(使用docker run指令)](#步驟二部署-cloudflare-tunnel-容器使用docker-run指令)
+    - [⚠️ 重要提醒](#️-重要提醒)
+    - [Cloudflare 官方建議的指令（會出錯）](#cloudflare-官方建議的指令會出錯)
+    - [為什麼會出錯？](#為什麼會出錯)
+    - [✅ 正確的 Docker 指令](#-正確的-docker-指令)
+    - [指令說明](#指令說明)
+  - [步驟三：使用 Docker Compose 部署（進階方式）](#步驟三使用-docker-compose-部署進階方式)
+    - [一、對照概念（建立正確心智模型）](#一對照概念建立正確心智模型)
+    - [二、建立 docker-compose.yml](#二建立-docker-composeyml)
+    - [三、啟動與管理方式](#三啟動與管理方式)
+    - [四、為什麼一定要使用 network_mode: host？](#四為什麼一定要使用-network_mode-host)
+    - [五、Cloudflare Tunnel 與 Open WebUI 的關係圖](#五cloudflare-tunnel-與-open-webui-的關係圖)
+    - [六、進階優化建議（選用）](#六進階優化建議選用)
+    - [七、故障排查](#七故障排查)
+
+---
+
 Cloudflare Tunnel 是一種能夠安全地將您的內部服務連接到 Cloudflare 全球網路的工具，而無需對外暴露公開的 IP 位址。它透過在您的伺服器上運行的輕量級代理程式 `cloudflared`，建立一個僅限對外的安全連線，讓內外部流量可以雙向傳輸。
 
 ## 前置作業：設定個人網域

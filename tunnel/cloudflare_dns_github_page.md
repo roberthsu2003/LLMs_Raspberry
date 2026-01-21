@@ -67,7 +67,7 @@
 
   * example.com → 15.xxx.xxx.xxx
 
-> 如何有example.com → 15.xxx.xxx.xxx,可以測試ping example.com 看是否能ping通
+> 如何有example.com → 15.xxx.xxx.xxx,可以測試ping example.com 看是否能ping通  
 > 沒有使用到A record, 可以刪除,使用ping example.com 看是否能ping通
 
 #### 2️⃣ CNAME Record

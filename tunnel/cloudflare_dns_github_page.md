@@ -103,6 +103,8 @@
 
 ## 七、GitHub Pages + Cloudflare CNAME 的整合應用
 
+![GitHub Pages + Cloudflare CNAME 的整合應用](./images/github_pages.png)
+
 這一章會把 GitHub Pages 與 Cloudflare 的 CNAME 設定 串在一起說，並同時解釋你在實作時最常看到、也最容易緊張的系統訊息。
 
 ### 7-1 為什麼 GitHub Pages 需要 CNAME？

@@ -91,7 +91,8 @@ ghcr.io/open-webui/open-webui:main
 > 1. 使用`--network=host`官方備分作法,才可以連線上ollama  
 > 2. 因為使用`--network=host`,`-p`是沒有做用的,連線進入open-webui必需使用port:8080--> `http://你的網址:8080`  
 > 3. 連線成功,設定ollama的連線要設成`http://127.0.0.1:11434`
-  
+> 4. 連線成功,不需要再做第2步驟的設定
+    
   
 ---
 

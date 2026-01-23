@@ -358,6 +358,7 @@ services:
 
 volumes:
   open-webui:
+    external: true
 ```
 
 📌 **這個 compose 檔案的功能，與您原本的兩個 `docker run` 指令完全等價**

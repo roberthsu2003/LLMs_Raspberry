@@ -59,6 +59,7 @@
 3.  **部署 OpenWebUI**：安裝並設定網頁使用者介面。
 
     > 📚 **詳細指南**：[OpenWebUI](./OpenWebUI)
+    > 📚 **OpenWebUI上課會使用的`過濾器程式碼`**：[過濾器程式碼](./OpenWebUI/過濾器程式碼.md)
 
 ---
 

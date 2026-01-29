@@ -1,5 +1,7 @@
 # GoDaddy 域名 + Cloudflare DNS 應用流程說明
 
+![](./images/網域管轄權的轉移.png)
+
 ## 一、整體架構概念
 
 * **域名（Domain）**：就像網站的「門牌號碼」，讓人可以找到你

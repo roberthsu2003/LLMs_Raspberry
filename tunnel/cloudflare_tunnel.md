@@ -11,9 +11,9 @@
   - [步驟二：建立 Tunnel](#步驟二建立-tunnel)
   - [步驟三：整合 DNS](#步驟三整合-dns)
   - [步驟四：驗證與檢查](#步驟四驗證與檢查)
-- [方式二：使用 Docker Run 部署（進階使用者）](#方式二使用-docker-部署進階使用者)
-  - [使用 docker run 指令](#使用-docker-run-指令)
-- 方式三:使用 Docker Compose 部署(進階使用者)
+- [方式二：使用 Docker 部署（進階使用者）](#方式二使用-docker-部署進階使用者)
+  - [使用 docker run 指令 -> network:host](#使用-docker-run-指令--networkhost)
+  - [使用 docker run 指令 -> network:bridge](#使用-docker-run-指令--networkbridge)
   - [使用 Docker Compose（推薦）](#使用-docker-compose推薦)
 - [故障排查](#故障排查)
 - [相關資源](#相關資源)
@@ -283,7 +283,7 @@ docker run -d \
 * `<TOKEN>`：請替換為您在 Cloudflare Dashboard 中取得的 Tunnel Token
 
 
-##### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
+#### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
 
 **服務設定為:http://localhost:8080**
 
@@ -309,21 +309,6 @@ ghcr.io/open-webui/open-webui:main
 
 #### 步驟二：部署 Cloudflare Tunnel 容器
 
-##### ⚠️ 重要提醒
-
-**請勿直接使用 Cloudflare 官方文件建議的 Docker 指令**，否則會出現連線問題。
-
-##### 為什麼會出錯？
-
-此指令缺少以下關鍵參數，會導致連線失敗：
-
-1. **缺少 `--network=host` 參數**
-   * 容器無法正常連線到本機服務（如 `localhost:3000`）
-   * Tunnel 無法將外部請求轉送到內部服務
-
-2. **缺少 `-d` 參數**
-   * 容器以前景模式執行，終端機關閉後容器也會停止
-   * 無法在背景持續運行
 
 ##### ✅ 正確的 Docker 指令
 
@@ -347,7 +332,7 @@ docker run -d \
 * `<TOKEN>`：請替換為您在 Cloudflare Dashboard 中取得的 Tunnel Token
 
 
-##### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
+#### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
 
 **服務設定為:http://localhost:3000**
 

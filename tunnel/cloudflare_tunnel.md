@@ -11,8 +11,9 @@
   - [步驟二：建立 Tunnel](#步驟二建立-tunnel)
   - [步驟三：整合 DNS](#步驟三整合-dns)
   - [步驟四：驗證與檢查](#步驟四驗證與檢查)
-- [方式二：使用 Docker 部署（進階使用者）](#方式二使用-docker-部署進階使用者)
+- [方式二：使用 Docker Run 部署（進階使用者）](#方式二使用-docker-部署進階使用者)
   - [使用 docker run 指令](#使用-docker-run-指令)
+- [方式三:使用 Docker Compose 部署(進階使用者)]
   - [使用 Docker Compose（推薦）](#使用-docker-compose推薦)
 - [故障排查](#故障排查)
 - [相關資源](#相關資源)

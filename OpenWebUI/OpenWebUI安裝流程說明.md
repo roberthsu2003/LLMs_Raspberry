@@ -11,8 +11,6 @@
 ---
 
 
----
-
 ## 2. 安裝(適合windows和mac)：連接到現有的 Ollama -> bridge
 
 > **注意**：此路徑適合已在我windows或mac主機上手動安裝並運行 Ollama 的使用者。  

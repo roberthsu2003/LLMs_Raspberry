@@ -13,7 +13,7 @@
   - [步驟四：驗證與檢查](#步驟四驗證與檢查)
 - [方式二：使用 Docker Run 部署（進階使用者）](#方式二使用-docker-部署進階使用者)
   - [使用 docker run 指令](#使用-docker-run-指令)
-- [方式三:使用 Docker Compose 部署(進階使用者)]
+- 方式三:使用 Docker Compose 部署(進階使用者)
   - [使用 Docker Compose（推薦）](#使用-docker-compose推薦)
 - [故障排查](#故障排查)
 - [相關資源](#相關資源)
@@ -227,7 +227,7 @@ dig NS your-domain.com
 
 本節說明如何在 Docker 環境中設定 Cloudflare Tunnel，適用於已使用 Docker 部署服務的場景。
 
-### 使用 docker run 指令
+### 使用 docker run 指令 -> network:host
 
 #### 步驟一：部署 Open WebUI 容器
 
@@ -248,12 +248,6 @@ docker run -d \
 ##### ⚠️ 重要提醒
 
 **請勿直接使用 Cloudflare 官方文件建議的 Docker 指令**，否則會出現連線問題。
-
-##### Cloudflare 官方建議的指令（會出錯）
-
-```docker
-docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token <TOKEN>
-```
 
 ##### 為什麼會出錯？
 
@@ -288,7 +282,79 @@ docker run -d \
 * `--restart unless-stopped`：設定容器自動重啟策略，除非手動停止否則會自動重啟
 * `<TOKEN>`：請替換為您在 Cloudflare Dashboard 中取得的 Tunnel Token
 
+
+##### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
+
+**服務設定為:http://localhost:8080**
+
+![](./images/pic1.png)
+
 ---
+
+### 使用 docker run 指令 -> network:bridge
+
+#### 步驟一：部署 Open WebUI 容器
+
+首先，建立 Open WebUI 服務容器：
+
+```docker
+docker run -d \
+-p 3000:8080 \
+-v open-webui:/app/backend/data \
+-e OLLAMA_BASE_URL=http://pi4Robert0301:11434 \
+--name open-webui \
+--restart always \
+ghcr.io/open-webui/open-webui:main
+```
+
+#### 步驟二：部署 Cloudflare Tunnel 容器
+
+##### ⚠️ 重要提醒
+
+**請勿直接使用 Cloudflare 官方文件建議的 Docker 指令**，否則會出現連線問題。
+
+##### 為什麼會出錯？
+
+此指令缺少以下關鍵參數，會導致連線失敗：
+
+1. **缺少 `--network=host` 參數**
+   * 容器無法正常連線到本機服務（如 `localhost:3000`）
+   * Tunnel 無法將外部請求轉送到內部服務
+
+2. **缺少 `-d` 參數**
+   * 容器以前景模式執行，終端機關閉後容器也會停止
+   * 無法在背景持續運行
+
+##### ✅ 正確的 Docker 指令
+
+使用以下指令可確保 Tunnel 正常運作：
+
+```docker
+docker run -d \
+  --name cloudflared \
+  --network=host \
+  --restart unless-stopped \
+  cloudflare/cloudflared:latest \
+  tunnel run --token <TOKEN>
+```
+
+##### 指令參數說明
+
+* `-d`：以後台模式（detached mode）執行容器
+* `--name cloudflared`：為容器命名，方便後續管理與操作
+* `--network=host`：使用主機網路模式，讓容器可以直接存取 `localhost` 服務
+* `--restart unless-stopped`：設定容器自動重啟策略，除非手動停止否則會自動重啟
+* `<TOKEN>`：請替換為您在 Cloudflare Dashboard 中取得的 Tunnel Token
+
+
+##### 步驟三：確認雲端Cloudflare Tunnel 已發佈的應用程式路由
+
+**服務設定為:http://localhost:3000**
+
+![](./images/pic2.png)
+
+---
+
 
 ### 使用 Docker Compose（推薦）
 

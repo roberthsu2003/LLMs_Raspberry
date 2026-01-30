@@ -165,6 +165,20 @@ done
 sudo chmod +x /usr/local/bin/hello-service.sh
 ```
 
+**先手動測試腳本是否正常**
+
+```bash
+/usr/local/bin/hello-service.sh
+```
+
+**停止**
+
+```bash
+Ctrl + C
+```
+
+
+
 **教學重點：**
 
 - 這就是一個「永遠不會結束的程式」

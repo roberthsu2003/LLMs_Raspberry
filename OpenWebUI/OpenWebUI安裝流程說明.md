@@ -1,7 +1,18 @@
-# OpenWebUI 安裝教學 (重構版)
+# OpenWebUI 安裝教學 
 
 這份文件旨在提供一份清晰、易於遵循的 OpenWebUI 安裝指南，特別為初學者優化了學習路徑。
 
+## 目錄
+
+- [1. 這是什麼？](#section-1)
+- [2. 安裝(適合windows和mac)：連接到現有的 Ollama -> bridge](#section-2)
+- [3. 安裝(適合raspberry)：連接到現有的 Ollama -> network:host](#section-3)
+- [4. 安裝(適合raspberry)：連接到現有的 Ollama -> network:bridge](#section-4)
+- [5. 管理與維護](#section-5)
+
+---
+
+<a id="section-1"></a>
 ## 1. 這是什麼？
 
 [OpenWebUI](https://github.com/open-webui/open-webui) 是一個功能強大、介面友善的網頁UI，可以讓你與在本機（例如你的電腦或 Raspberry Pi）上運行的 Ollama 大型語言模型進行互動。
@@ -10,7 +21,7 @@
 
 ---
 
-
+<a id="section-2"></a>
 ## 2. 安裝(適合windows和mac)：連接到現有的 Ollama -> bridge
 
 > **注意**：此路徑適合已在我windows或mac主機上手動安裝並運行 Ollama 的使用者。  
@@ -47,6 +58,7 @@ ghcr.io/open-webui/open-webui:main
 
 ---
 
+<a id="section-3"></a>
 ## 3. 安裝(適合raspberry)：連接到現有的 Ollama -> network:host
 
 > **注意**：此路徑適合已在 Raspberry Pi 上手動安裝並運行 Ollama 的使用者。   
@@ -81,6 +93,7 @@ ghcr.io/open-webui/open-webui:main
 
 ---
 
+<a id="section-4"></a>
 ## 4. 安裝(適合raspberry)：連接到現有的 Ollama -> network:bridge
 > **注意**：此路徑適合已在 Raspberry Pi 上手動安裝並運行 Ollama 的使用者。   
 > network:bridge 
@@ -100,8 +113,10 @@ docker run -d \
 ghcr.io/open-webui/open-webui:main
 ```
 
-> 注意:使用http://pi4Robert0301:11434 -> 做用主機名稱,可能不穩定,因為在家裏和在教室連線網路不同,最好使用ip地址
+> 注意:使用http://pi4Robert0301:11434 -> 做用主機名稱,可能不穩定,因為在家裏和在教室連線網路不同,最好使用ip地址  
+>   
 > 在raspberry內,使用hostname -I -> 查看ip地址  
+>    
 > 解法方式:  
 > 1. OLLAMA_BASE_URL參數直接改成ip地址  
 > 2. OLLAMA_BASE_URL參數使用主機名稱,等open-webui容器啟動後,再到連線內,手動設定OllAMA的ip地址  
@@ -121,6 +136,7 @@ ghcr.io/open-webui/open-webui:main
 
 
 
+<a id="section-5"></a>
 ## 5. 管理與維護
 
 ### 更新 OpenWebUI

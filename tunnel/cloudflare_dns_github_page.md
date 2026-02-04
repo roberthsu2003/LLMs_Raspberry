@@ -14,10 +14,10 @@
 
 ---
 
-## 二、整體流程一眼看懂
+## 二、整體流程
 
 1. 在 GoDaddy 購買域名
-2. 將域名 Nameserver 改為 Cloudflare
+2. 將域名 Nameserver 改為 Cloudflare 提供的Nameserver
 3. 在 Cloudflare 設定 DNS（A / CNAME / Proxy）
 4. 目標服務（如 GitHub Pages）完成驗證
 5. HTTPS 生效
@@ -36,7 +36,7 @@
 * ❌ 不負責 A / CNAME 設定（一旦交給 Cloudflare）
 * ❌ 不負責 HTTPS
 
-### 學生一定要記住
+### 一定要記住
 
 * 只要 **Nameserver 指向 Cloudflare**
 * GoDaddy 的 DNS 畫面之後可以「忽略」
@@ -52,7 +52,7 @@
 * 免費 HTTPS（Universal SSL）
 * 防 DDoS
 
-### 給學生的一句話重點
+### 一句話重點
 
 > Cloudflare = 「DNS 管理 + 防護 + HTTPS」
 
@@ -80,6 +80,37 @@
   * profile.example.com → username.github.io
 
   > 這個範例是指向github page的域名
+
+### 驗證 DNS 設定（dig 測試）
+
+除了用 `ping` 確認連線，用 **dig** 可以直接查詢 DNS 紀錄，確認 A、CNAME 是否正確指向。
+
+#### 如何安裝 dig
+
+* **Linux（Ubuntu / Debian）**：`sudo apt install dnsutils`
+
+#### 用 dig 測試 A Record
+
+```bash
+dig example.com
+```
+
+看輸出中的 **ANSWER SECTION**，應會看到 `example.com` 對應的 IP（例如 `185.xxx.xxx.xxx` 為 Cloudflare）。  
+若沒有 ANSWER SECTION 或 IP 不對，代表 A 紀錄尚未生效或設定錯誤。
+
+#### 用 dig 測試 CNAME Record（例如 GitHub Pages）
+
+```bash
+dig profile.example.com CNAME
+```
+
+看 **ANSWER SECTION** 是否出現 `profile.example.com` → `username.github.io`。  
+有正確 CNAME 且 GitHub Pages 已驗證，網站才會正常。
+
+#### 簡易解讀
+
+* `dig` 回傳的 **ANSWER SECTION** = 實際生效的 DNS 紀錄
+* 若查不到或還是舊紀錄，代表 DNS 尚未傳播完成，可過幾分鐘再查一次
 
 ---
 
@@ -181,6 +212,8 @@ DNS 設定完成後，不會立刻生效，這是正常現象。
 * 幾分鐘 ～ 10 分鐘（有時更快）
 * 最慢可能到 1～24 小時
 
+**如何確認 DNS 是否已生效？** 可用終端機執行 `dig 你的網域` 或 `dig 你的網域 CNAME`，看 **ANSWER SECTION** 是否已出現正確紀錄（詳見上方「驗證 DNS 設定（dig 測試）」）。
+
 👉 在這段時間內，你可能會看到：
 
 * 一下可以連
@@ -213,31 +246,4 @@ DNS 設定完成後，不會立刻生效，這是正常現象。
 * 用無痕視窗測試
 ---
 
-## 八、Tunnel 服務補充（進階）
 
-### 為什麼會看到「不是你設定的 IP」？
-
-* Cloudflare Tunnel
-* GitHub Pages
-* SaaS 平台
-
-> DNS 指到的是「服務入口」而不是你的主機
-
----
-
-## 九、一定要會的觀念
-
-* 域名 ≠ DNS ≠ 主機
-* Nameserver 決定誰管 DNS
-* Proxy 開啟 ≠ DNS 錯誤
-* HTTPS 需要 DNS 正確 + 驗證完成
-
----
-
-## 十、建議實作練習
-
-1. GoDaddy 買一個測試域名
-2. 接到 Cloudflare（Free）
-3. 設定 subdomain → GitHub Pages
-4. 觀察 Proxy 開 / 關差異
-5. 用 ping / dig 比對 IP

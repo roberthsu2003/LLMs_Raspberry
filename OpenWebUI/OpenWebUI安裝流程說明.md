@@ -100,6 +100,11 @@ docker run -d \
 ghcr.io/open-webui/open-webui:main
 ```
 
+> 注意:使用http://pi4Robert0301:11434 -> 做用主機名稱,可能不穩定,因為在家裏和在教室連線網路不同,最好使用ip地址
+> 在raspberry內,使用hostname -I -> 查看ip地址  
+> 解法方式:  
+> 1. OLLAMA_BASE_URL參數直接改成ip地址  
+> 2. OLLAMA_BASE_URL參數使用主機名稱,等open-webui容器啟動後,再到連線內,手動設定OllAMA的ip地址  
 
 ### 第4-2步：連接到 Ollama
 

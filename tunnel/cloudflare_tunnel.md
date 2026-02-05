@@ -15,8 +15,6 @@
   - [使用 docker run 指令 -> network:host](#使用-docker-run-指令--networkhost)
   - [使用 docker run 指令 -> network:bridge](#使用-docker-run-指令--networkbridge)
   
-- [故障排查](#故障排查)
-- [相關資源](#相關資源)
 
 ---
 

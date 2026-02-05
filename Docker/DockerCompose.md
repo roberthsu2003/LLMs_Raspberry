@@ -56,38 +56,42 @@ docker compose version
 ```
 如果看到版本號，代表您已經可以開始使用了。
 
+### 在樹莓派上使用
+
+本文件中的範例已選用 **ARM 架構相容** 的映像檔（如 `nginx:alpine`、`postgres:15-alpine`、`mariadb:10.11`、`wordpress:apache`），可直接在樹莓派上執行。若曾使用 `mysql:8.0` 等僅以 x86 為主的映像而出現錯誤，改為本文件內的寫法即可。
+
 ---
 
 ## 📄 Compose 檔案 (`compose.yaml`) 詳解
 
 Compose 檔案是一個 YAML 格式的文字檔，預設檔名為 `compose.yaml` 或 `docker-compose.yml`。
 
-一個基本的 `compose.yaml` 結構如下：
+一個基本的 `compose.yaml` 結構如下（使用現成映像檔，**樹莓派 / ARM 相容**）：
 ```yaml
 # 檔案的最頂層，定義了所有服務
 services:
-  # 服務 A 的定義 (例如：web server)
+  # 服務 A：Web 伺服器 (使用官方映像，無需 Dockerfile)
   web:
-    build: .
+    image: nginx:alpine
     ports:
       - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    # 可選：掛載自訂設定檔時，需先準備好 nginx.conf
 
-  # 服務 B 的定義 (例如：database)
+  # 服務 B：資料庫 (Alpine 版較小，適合樹莓派)
   db:
-    image: postgres:14-alpine
+    image: postgres:15-alpine
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
       - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 # 統一管理具名資料卷
 volumes:
   db-data:
 
-# 統一管理網路
+# 統一管理網路（可省略，Compose 會自動建立）
 networks:
   default:
     driver: bridge
@@ -148,38 +152,39 @@ networks:
 
 ## 🚀 實戰範例：使用 Compose 部署 WordPress 網站
 
-WordPress 是一個非常流行的內容管理系統，它需要一個 PHP 執行環境和一個 MySQL 資料庫。這正是 Docker Compose 的完美應用場景。
+WordPress 是一個非常流行的內容管理系統，它需要一個 PHP 執行環境和一個資料庫。這正是 Docker Compose 的完美應用場景。
+
+> **樹莓派說明**：以下範例使用 **MariaDB** 取代 MySQL，在 ARM 架構（樹莓派）上相容性更好、較不易出現映像檔或執行錯誤。WordPress 與 MariaDB 完全相容，使用方式相同。
 
 #### 步驟 1: 建立 `compose.yaml` 檔案
 ```yaml
 services:
-  # 資料庫服務
+  # 資料庫服務 (使用 MariaDB，樹莓派 / ARM 友善)
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: wordpress_db
-    # 使用具名資料卷來持久化資料庫檔案
     volumes:
       - db_data:/var/lib/mysql
-    # 設定資料庫環境變數 (請在生產環境中使用更安全的密碼)
     environment:
       MYSQL_ROOT_PASSWORD: somerootpassword
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpresspassword
     restart: unless-stopped
+    # 樹莓派記憶體較小時可加上資源限制，避免 OOM
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 512M
 
   # WordPress 服務
   wordpress:
-    # 依賴 db 服務，確保 db 先啟動
     depends_on:
       - db
-    image: wordpress:latest
+    image: wordpress:apache
     container_name: wordpress_web
-    # 將主機的 8080 連接埠映射到容器的 80 連接埠
     ports:
       - "8080:80"
-    # 設定 WordPress 連接資料庫所需的環境變數
-    # 注意：WORDPRESS_DB_HOST 的值是我們的資料庫服務名稱 "db"
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
@@ -187,7 +192,6 @@ services:
       WORDPRESS_DB_NAME: wordpress
     restart: unless-stopped
 
-# 在檔案最下方定義具名資料卷
 volumes:
   db_data:
 ```
@@ -198,7 +202,7 @@ volumes:
 docker compose up -d
 ```
 Compose 會自動：
-1.  拉取 `mysql:8.0` 和 `wordpress:latest` 映像檔。
+1.  拉取 `mariadb:10.11` 和 `wordpress:apache` 映像檔（皆支援樹莓派 ARM）。
 2.  建立一個名為 `db_data` 的具名資料卷。
 3.  建立一個專屬的網路，讓 `wordpress` 和 `db` 服務可以互相通訊。
 4.  先啟動 `db` 容器，再啟動 `wordpress` 容器。

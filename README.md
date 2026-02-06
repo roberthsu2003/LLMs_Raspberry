@@ -59,7 +59,7 @@
 3.  **部署 OpenWebUI**：安裝並設定網頁使用者介面。
 
     > 📚 **詳細指南**：[OpenWebUI](./OpenWebUI)  
-    > 📚 **OpenWebUI`工具介紹`**：[完整介紹](./OpenWebUI/工具.md)  
+    > 📚 **OpenWebUI`擴充套件`**：[完整介紹](./OpenWebUI/擴充套件.md)  
     > 📚 **OpenWebUI`過濾器程式碼`**：[過濾器程式碼](./OpenWebUI/過濾器程式碼.md)  
     > 📚 **OpenWebUI`工具(tools)`**：[工具](./OpenWebUI/過濾器程式碼.md)  
 

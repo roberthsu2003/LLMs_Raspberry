@@ -350,6 +350,31 @@ docker run -d -p 9099:9099 \
 * `--name pipelines`：給容器一個名字，方便管理
 * `--restart always`：容器自動重啟（重開機後也會自動啟動）
 
+**關於 `host-gateway` 在 Raspberry Pi 上的使用：**
+
+* ✅ **Docker 20.10+ 版本：** 完全支援 `host-gateway`，可以直接使用
+* ⚠️ **Docker 較舊版本：** 如果遇到問題，可以使用替代方案（見下方）
+
+**檢查 Docker 版本：**
+```bash
+docker --version
+```
+
+**如果 `host-gateway` 不支援的替代方案：**
+
+```bash
+# 先取得 Raspberry Pi 的 IP 地址
+hostname -I | awk '{print $1}'
+
+# 假設 IP 是 192.168.1.100，使用實際 IP 替代
+docker run -d -p 9099:9099 \
+  --add-host=host.docker.internal:192.168.1.100 \
+  -v pipelines:/app/pipelines \
+  --name pipelines \
+  --restart always \
+  ghcr.io/open-webui/pipelines:main
+```
+
 **老師說明：**  
 Named Volume 的資料由 Docker 管理，適合正式部署。  
 但對教學來說，我們更推薦方式 B。
@@ -387,6 +412,20 @@ docker run -d -p 9099:9099 \
 
 **老師提醒：**  
 `$(pwd)` 會自動取得當前目錄的路徑，所以記得先 `cd` 到你的專案目錄。
+
+**Raspberry Pi 特別注意：**  
+如果 `host-gateway` 在你的 Docker 版本不支援，可以用以下方式取得 Pi 的 IP：
+
+```bash
+# 方法 1：使用 hostname
+hostname -I | awk '{print $1}'
+
+# 方法 2：使用 ip 指令
+ip route get 1.1.1.1 | awk '{print $7}' | head -1
+
+# 然後用實際 IP 替代 host-gateway
+# --add-host=host.docker.internal:你的Pi_IP
+```
 
 ---
 
@@ -520,6 +559,20 @@ services:
 * `extra_hosts`：讓容器可以訪問主機服務
 * `restart: always`：自動重啟
 * `container_name`：容器名稱
+
+**Raspberry Pi 特別注意：**
+
+如果 `host-gateway` 在你的 Docker Compose 版本不支援，可以這樣修改：
+
+```yaml
+extra_hosts:
+  # 方法 1：使用 host-gateway（Docker 20.10+）
+  - "host.docker.internal:host-gateway"
+  
+  # 方法 2：如果 host-gateway 不支援，使用實際 IP
+  # 先執行 hostname -I 取得 IP，然後替換下面的 IP
+  # - "host.docker.internal:192.168.1.100"
+```
 
 **老師提醒：**  
 `./pipelines` 是相對路徑，會對應到專案目錄下的 `pipelines/` 資料夾。
@@ -966,6 +1019,49 @@ curl http://localhost:9099/health
 * 埠號被占用（改個埠號試試）
 * 權限問題（檢查檔案權限）
 * 路徑不存在（確認 `pipelines/` 目錄存在）
+* `host-gateway` 不支援（見下方 Q7）
+
+---
+
+### Q7: 在 Raspberry Pi 上 `host-gateway` 不支援怎麼辦？
+
+**A:** 這是因為 Docker 版本較舊（需要 Docker 20.10+）。
+
+**解決方法：**
+
+1. **檢查 Docker 版本：**
+   ```bash
+   docker --version
+   ```
+
+2. **如果版本太舊，升級 Docker：**
+   ```bash
+   # 更新套件列表
+   sudo apt update
+   
+   # 安裝最新版本的 Docker（建議）
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   ```
+
+3. **如果無法升級，使用實際 IP：**
+   ```bash
+   # 先取得 Raspberry Pi 的 IP
+   PI_IP=$(hostname -I | awk '{print $1}')
+   echo "你的 Pi IP: $PI_IP"
+   
+   # 使用實際 IP 替代 host-gateway
+   docker run -d -p 9099:9099 \
+     --add-host=host.docker.internal:$PI_IP \
+     -v $(pwd)/pipelines:/app/pipelines \
+     --name pipelines \
+     --restart always \
+     ghcr.io/open-webui/pipelines:main
+   ```
+
+**老師說明：**  
+`host-gateway` 是 Docker 20.10+ 才支援的功能，它會自動解析為主機的 IP。  
+如果 Docker 版本較舊，手動指定 IP 也能達到同樣的效果。
 
 ---
 

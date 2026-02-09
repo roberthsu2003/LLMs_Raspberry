@@ -1,81 +1,108 @@
 # OpenWebUI Pipeline 完整教學指南
 
+> **給同學們的話：**  
+> 這份講義是為 Raspberry Pi 教學環境設計的，我們會用 Docker 來實作 Pipeline Server。  
+> 如果你還沒學過 Docker，別擔心，我們會一步步帶你走過。  
+> 重點不是「記住指令」，而是「理解為什麼這樣做」。
+
+---
+
 ## 📋 目錄
-- [Pipeline Server 章節導入：什麼時候該用？](#pipeline-server-章節導入什麼時候該用)
-- [什麼是 Pipeline](#什麼是-pipeline)
+
+### 第一部分：理解 Pipeline Server
+- [為什麼需要 Pipeline Server？](#為什麼需要-pipeline-server)
+- [什麼是 Pipeline？](#什麼是-pipeline)
+- [教學環境設定：為什麼用 Docker？](#教學環境設定為什麼用-docker)
+
+### 第二部分：實作 Pipeline Server
 - [快速開始：使用 Docker Run](#快速開始使用-docker-run)
 - [進階部署：使用 Docker Compose](#進階部署使用-docker-compose)
 - [在 OpenWebUI 中連接 Pipelines](#在-openwebui-中連接-pipelines)
 - [管理與啟用 Pipeline](#管理與啟用-pipeline)
+
+### 第三部分：深入理解與實務
 - [重要觀念釐清](#重要觀念釐清)
 - [專案結構建議](#專案結構建議)
-- [常見問題](#常見問題)
-- [教學比喻](#教學比喻)
+- [常見問題與排錯](#常見問題與排錯)
+- [教學比喻與記憶法](#教學比喻與記憶法)
+
+### 第四部分：延伸學習
 - [參考資源](#參考資源)
-- [下一步](#下一步)
+- [下一步學習方向](#下一步學習方向)
 
 ---
 
-## Pipeline Server 章節導入：什麼時候該用？
+## 為什麼需要 Pipeline Server？
 
-### 本章目標
+### 學習目標
 
-在前面的章節中，你已經學會如何使用 **Open-WebUI 內建的 Filter 與 Tools** 來擴充模型能力。本章要回答一個實務上一定會遇到的問題：
+在開始之前，讓我們先回答一個關鍵問題：
 
-> **什麼情況下，內建 Filter / Tools 已經不夠，我應該改用 Pipeline Server？**
+> **什麼時候，Open-WebUI 內建的 Filter 和 Tools 已經不夠用了？**
 
-本章不急著寫程式，而是先建立「判斷時機」與「架構視角」，幫助你在對的時候選對工具。
+這不是技術問題，而是**架構設計**的問題。理解這個問題，你就能在對的時候選對工具。
 
 ---
 
 ### 先給結論：什麼情況需要 Pipeline Server？
 
-如果你遇到下面「任何一種」情況，就非常適合引入 Pipeline Server：
+同學們，如果你遇到下面**任何一種**情況，就該考慮使用 Pipeline Server 了：
 
-* 🔁 **流程不只一個步驟**，而是多步驟、可重組的處理流程
-* 🌐 **需要和 Open-WebUI 以外的系統共用**（API、n8n、後端服務）
-* 🧠 **模型前後都要動手腳**（前處理 + 後處理）
-* 🧩 **想把 AI 行為做成「一個服務」而不是「一個設定」**
+* 🔁 **流程不只一個步驟**  
+  你需要多步驟、可重組的處理流程，而不是單次操作
 
-如果你只是在「單一請求 → 單一回應」中加點邏輯，那 Filter / Tools 會更簡單；但只要你開始「設計流程」，Pipeline Server 就會變成主角。
+* 🌐 **需要和 Open-WebUI 以外的系統共用**  
+  你想把 AI 功能接給其他系統用（API、n8n、後端服務）
+
+* 🧠 **模型前後都要動手腳**  
+  你需要在模型推理前做前處理，推理後做後處理
+
+* 🧩 **想把 AI 行為做成「一個服務」**  
+  你不想每次都在 Open-WebUI 裡調設定，而是想建立一個可重複使用的服務
+
+**簡單判斷原則：**  
+如果你只是在「單一請求 → 單一回應」中加點邏輯，Filter / Tools 會更簡單。  
+但只要你開始「設計流程」，Pipeline Server 就會變成主角。
 
 ---
 
 ### 為什麼 Filter / Tools 會開始不夠用？
 
-#### 1️⃣ Filter：適合「輕量、就地修改」
+讓我們先理解現有工具的定位，這樣你才知道什麼時候該升級。
 
-Filter 非常適合：
+#### Filter：適合「輕量、就地修改」
 
-* 改 prompt
-* 加系統訊息
-* 做輸入／輸出的小調整
+**Filter 很適合做這些事：**
+* 修改 prompt
+* 加入系統訊息
+* 對輸入或輸出做小調整
 
-但它的限制也很明確：
-
-* 執行順序固定
-* 不適合複雜狀態管理
+**但 Filter 的限制也很明顯：**
+* 執行順序是固定的，很難改變
+* 不適合複雜的狀態管理
 * 很難拆成可重用的流程模組
 
-👉 **Filter 的角色是「即時加工」，不是「流程設計」**。
+**老師的建議：**  
+Filter 的角色是「即時加工」，不是「流程設計」。  
+當你開始需要「設計流程」時，就是該考慮 Pipeline Server 的時候了。
 
 ---
 
-#### 2️⃣ Tools：適合「單次能力擴充」
+#### Tools：適合「單次能力擴充」
 
-Tools 很適合：
-
+**Tools 很適合做這些事：**
 * 查資料
-* 呼叫 API
-* 做一次明確任務
+* 呼叫外部 API
+* 執行一次明確的任務
 
-但當你開始遇到這些需求時，Tools 就會變得卡手：
-
+**但當你遇到這些需求時，Tools 就會變得卡手：**
 * 一個回應需要呼叫多個工具
 * 工具之間有順序與條件判斷
 * 想控制「什麼情況一定要走某個流程」
 
-👉 **Tools 解決的是「會不會做」，不是「怎麼串」**。
+**老師的建議：**  
+Tools 解決的是「會不會做」，不是「怎麼串」。  
+當你需要「串流程」時，Pipeline Server 會是更好的選擇。
 
 ---
 
@@ -83,26 +110,31 @@ Tools 很適合：
 
 > **Pipeline Server = 把「和模型互動的整個流程」獨立成一個 API 服務**
 
-它讓你可以：
+**它讓你可以：**
 
-* **明確定義：**
+* **明確定義整個流程：**
   * 輸入怎麼處理
-  * prompt 怎麼組
-  * 模型怎麼選
+  * prompt 怎麼組裝
+  * 模型怎麼選擇
   * 輸出怎麼加工
-* **把這套邏輯：**
-  * 給 Open-WebUI 用
-  * 給其他系統用
+
+* **把這套邏輯分享給：**
+  * Open-WebUI 使用
+  * 其他系統使用
+  * 未來的專案使用
+
+**簡單說：**  
+Pipeline Server 讓你把 AI 邏輯從「設定」升級成「服務」。
 
 ---
 
-### 教學視角：什麼時候該教學生 Pipeline Server？
+### 教學視角：什麼時候該學 Pipeline Server？
 
-在課程設計上，Pipeline Server 非常適合放在：
+同學們，在課程設計上，Pipeline Server 非常適合放在：
 
-> **「學生開始想做自己的 AI 服務」的那一刻**
+> **「你開始想做自己的 AI 服務」的那一刻**
 
-典型的學員轉折點包括：
+**典型的學習轉折點包括：**
 
 * 「我不想每個專案都重寫 Filter / Tool」
 * 「我想把這個 AI 功能接給別人用」
@@ -112,36 +144,191 @@ Tools 很適合：
 
 ---
 
-## 什麼是 Pipeline
+## 什麼是 Pipeline？
 
-**Pipeline** 是一個**模組化、自訂的工作流程框架**，讓你可以把流程拆成步驟，擴展自訂邏輯，例如：
+### 定義
 
-- ✅ 自訂函數、外部 API 調用
-- ✅ 自訂訊息過濾器（例如內容過濾）
-- ✅ 整合 RAG、Langfuse、搜尋工具等
-- ✅ 利用 Python 庫做更複雜的處理流程
+**Pipeline** 是一個**模組化、可自訂的工作流程框架**，讓你可以：
 
+* ✅ 把複雜流程拆成多個步驟
+* ✅ 自訂函數、呼叫外部 API
+* ✅ 實作訊息過濾器（例如內容過濾）
+* ✅ 整合 RAG、Langfuse、搜尋工具等
+* ✅ 利用 Python 庫做更複雜的處理
+
+**最重要的特性：**  
 Pipeline 會提供一個 **OpenAI 相容的 API server**，所以 Open-WebUI 可以將它當成一個 API 來源來使用。
 
-**與 Filter / Tools 的關係：**
+---
 
-* Pipeline 可以**整合** Filter 和 Tools 的功能
-* Pipeline 提供**更完整的流程控制**能力
-* Pipeline 讓你的 AI 邏輯**獨立成服務**，可重複使用
+### Pipeline 與 Filter / Tools 的關係
+
+同學們常問：「那我之前學的 Filter 和 Tools 怎麼辦？」
+
+**答案是：** Pipeline 可以**整合** Filter 和 Tools 的功能，並且提供：
+
+* **更完整的流程控制**能力
+* **獨立成服務**，可重複使用
+* **更好的模組化**設計
+
+**簡單說：**  
+Filter / Tools 是「功能」，Pipeline 是「架構」。  
+你可以用 Pipeline 來組織和管理 Filter / Tools 的功能。
+
+---
+
+## 教學環境設定：為什麼用 Docker？
+
+### 本課程的實作環境
+
+同學們，在開始實作之前，我們先來理解為什麼選擇這個環境：
+
+* **硬體：** Raspberry Pi
+* **執行方式：** Docker Container
+* **角色定位：** Pipeline Server = 一個獨立的 API 服務
+
+**這個選擇不是為了炫技，而是為了讓大家建立正確的系統觀念。**
+
+---
+
+### 為什麼「一定要用 Docker」來教 Pipeline Server？
+
+#### 1️⃣ Pipeline Server 本質上就是一個 Server
+
+同學們，一旦進入 Pipeline Server 階段，你其實已經在做這件事：
+
+> **把 AI 流程，變成一個可以被呼叫的服務**
+
+這代表你必然會遇到：
+
+* **Port（埠號）**：服務要開在哪個埠？
+* **啟動 / 停止**：服務怎麼啟動和關閉？
+* **環境變數**：服務需要哪些設定？
+* **相依套件**：服務需要哪些 Python 套件？
+
+**老師的教學考量：**  
+用 Docker 教，可以一次把這些「Server 該有的概念」教對。  
+你不用先學一堆 Linux 服務管理的細節，就能理解 Server 的運作方式。
+
+---
+
+#### 2️⃣ Docker 讓 Raspberry Pi 的環境「可複製、可重現」
+
+同學們，在 Raspberry Pi 教學現場，老師最怕的是：
+
+* 套件版本不同
+* Python 環境亂掉
+* 一台可以跑，一台不能跑
+* 「老師，我的為什麼不行？」
+
+**Docker 可以解決這些問題：**
+
+* 不管哪一顆 Pi
+* 不管之前裝過什麼
+* 只要 `docker run` 或 `docker compose up`
+* 行為就一致
+
+**老師的教學考量：**  
+這是**教學穩定度**，而不是部署炫技。  
+我們希望每個同學都能成功，而不是花時間在環境問題上。
+
+---
+
+#### 3️⃣ Docker 幫你理解「Open-WebUI 與 Pipeline 是不同服務」
+
+同學們，很多初學者會混淆：
+
+* Open-WebUI 是什麼？
+* Pipeline Server 是什麼？
+* Ollama（模型）是什麼？
+
+**用 Docker 分開跑，你會很清楚看到：**
+
+* **Open-WebUI：**
+  * 負責 UI（使用者介面）
+  * 管理對話歷史
+  * 提供聊天介面
+
+* **Pipeline Server：**
+  * 提供 API 服務
+  * 處理流程控制
+  * 執行自訂邏輯
+
+* **Ollama：**
+  * 執行模型推論
+  * 提供模型能力
+
+**老師的教學考量：**  
+這一步是在教「系統邊界」，不是指令操作。  
+理解每個服務的職責，你才能設計出好的系統架構。
+
+---
+
+### 本章實作目標
+
+完成本章後，同學們應該能夠：
+
+* ✅ 用 Docker 啟動一個 Pipeline API Server
+* ✅ 理解這個 Server：
+  * 有自己的 Port（埠號）
+  * 有自己的 API endpoint（端點）
+* ✅ 讓 Open-WebUI 把請求「轉交」給這個 Pipeline Server
+* ✅ 理解「服務」和「設定」的差別
+
+**重點：**  
+不是只停留在「Open-WebUI 裡面調設定」，而是真的建立一個獨立的服務。
+
+---
+
+### 本章接下來會做什麼？
+
+接下來的內容，我們會：
+
+1. **建立一個最小 Pipeline Server**（使用官方映像）
+2. **用 `docker run` 啟動 Pipeline API**
+3. **從 Open-WebUI 指向這個 Pipeline Server**
+4. **理解服務之間的溝通方式**
+
+**整個流程的重點只有一個：**
+
+> **讓同學們親手做出「我真的有一個 AI API 服務」的感覺**
 
 ---
 
 ## 快速開始：使用 Docker Run
 
+### 學習目標
+
+在這個章節，我們會用最簡單的方式啟動 Pipeline Server。  
+重點是「理解流程」，而不是「記住指令」。
+
+---
+
 ### 步驟 1：拉取 Pipelines 映像
+
+首先，我們需要取得 Pipeline Server 的 Docker 映像：
 
 ```bash
 docker pull ghcr.io/open-webui/pipelines:main
 ```
 
-這是官方提供的 Pipeline 伺服器映像，可以直接啟動一個 OpenAI 規格的 API server。
+**老師說明：**  
+這是官方提供的 Pipeline 伺服器映像，已經幫你準備好：
+* Python 環境
+* Pipeline Server 程式
+* OpenAI 相容的 API 介面
+
+你不需要自己寫 Server 程式，直接用這個映像就可以了。
+
+**同學們可能會問：**  
+「為什麼要用 `main` 這個標籤？」  
+→ 這是開發版本，會持續更新。正式環境可以用特定版本號。
+
+---
 
 ### 步驟 2：啟動 Pipeline Docker 容器
+
+現在我們有兩種方式可以啟動容器，老師建議同學們先從**方式 B**開始。
 
 #### 方式 A：使用 Named Volume（適合正式部署）
 
@@ -154,13 +341,22 @@ docker run -d -p 9099:9099 \
   ghcr.io/open-webui/pipelines:main
 ```
 
-**說明：**
-- `-p 9099:9099`：將本機 9099 埠暴露出來做 API 存取
-- `--add-host=host.docker.internal:host-gateway`：允許容器訪問主機服務
-- `-v pipelines:/app/pipelines`：使用 named volume 存放 pipeline 設定與程式碼
-- `--restart always`：容器自動重啟
+**參數說明：**
 
-#### 方式 B：使用 Bind Mount（適合教學與開發）
+* `-d`：背景執行（detached mode）
+* `-p 9099:9099`：把容器的 9099 埠對應到主機的 9099 埠
+* `--add-host=host.docker.internal:host-gateway`：讓容器可以訪問主機上的服務（例如 Ollama）
+* `-v pipelines:/app/pipelines`：使用 named volume 存放 pipeline 程式碼
+* `--name pipelines`：給容器一個名字，方便管理
+* `--restart always`：容器自動重啟（重開機後也會自動啟動）
+
+**老師說明：**  
+Named Volume 的資料由 Docker 管理，適合正式部署。  
+但對教學來說，我們更推薦方式 B。
+
+---
+
+#### 方式 B：使用 Bind Mount（**推薦給同學們**）
 
 ```bash
 # 先建立 pipelines 目錄
@@ -175,27 +371,98 @@ docker run -d -p 9099:9099 \
   ghcr.io/open-webui/pipelines:main
 ```
 
-**優點：**
-- ✅ 可以直接用編輯器修改 pipeline 程式碼
-- ✅ 適合教學與開發階段
-- ✅ 樹莓派上更容易 debug
+**和方式 A 的差別：**  
+`-v $(pwd)/pipelines:/app/pipelines` 使用 bind mount，直接把主機的目錄掛載到容器裡。
+
+**為什麼推薦給同學們？**
+
+* ✅ **可以直接用編輯器修改程式碼**  
+  你不需要進入容器，直接用 VS Code 或其他編輯器就能改
+
+* ✅ **適合教學與開發階段**  
+  修改立即生效，不用重新建立容器
+
+* ✅ **樹莓派上更容易 debug**  
+  你可以直接看檔案，檢查程式碼
+
+**老師提醒：**  
+`$(pwd)` 會自動取得當前目錄的路徑，所以記得先 `cd` 到你的專案目錄。
+
+---
+
+### 步驟 3：確認容器正常運作
+
+啟動後，我們來確認一下容器是否正常：
+
+```bash
+# 查看容器狀態
+docker ps
+
+# 查看容器日誌
+docker logs pipelines
+```
+
+**應該會看到：**  
+Pipeline Server 啟動的訊息，通常會顯示 API 服務已經在 9099 埠上運行。
+
+**如果出問題：**  
+* 檢查日誌：`docker logs pipelines`
+* 檢查埠號是否被占用：`netstat -tuln | grep 9099`
+* 檢查容器狀態：`docker ps -a`
 
 ---
 
 ## 進階部署：使用 Docker Compose
 
+### 學習目標
+
+當你開始建立自己的 Pipeline 專案時，Docker Compose 會讓管理變得更簡單。  
+這個章節會教你如何用 `docker-compose.yml` 來管理整個專案。
+
+---
+
+### 為什麼要用 Docker Compose？
+
+**同學們可能會問：**  
+「我已經會用 `docker run` 了，為什麼還要學 Docker Compose？」
+
+**答案是：**
+
+* **管理更方便**：一個檔案就能管理整個專案
+* **設定更清楚**：所有參數都寫在 `docker-compose.yml` 裡
+* **擴展更容易**：未來要加其他服務（例如資料庫）很容易
+* **團隊協作**：其他人拿到你的 `docker-compose.yml` 就能直接跑
+
+**老師建議：**  
+小專案可以用 `docker run`，但正式專案建議用 Docker Compose。
+
+---
+
 ### 專案結構建議
+
+在開始之前，讓我們先建立一個清楚的專案結構：
 
 ```
 project/
-├── docker-compose.yml
-├── Dockerfile          # 如果需要自訂 Python 套件
-└── pipelines/
-    ├── my_pipeline.py
-    └── requirements.txt
+├── docker-compose.yml          # Docker Compose 設定
+├── Dockerfile                  # 自訂映像（如果需要安裝額外套件）
+└── pipelines/                  # Pipeline 程式碼目錄
+    ├── my_pipeline.py          # 你的 Pipeline 程式
+    └── requirements.txt        # Python 套件清單（如果需要）
 ```
 
+**老師說明：**  
+這個結構很清楚：
+* `docker-compose.yml`：服務設定
+* `Dockerfile`：如果需要自訂映像
+* `pipelines/`：你的程式碼
+
+---
+
 ### Dockerfile（如果需要安裝額外的 Python 套件）
+
+**什麼時候需要 Dockerfile？**  
+當你的 Pipeline 需要額外的 Python 套件時（例如 pandas、numpy）。
 
 ```dockerfile
 FROM ghcr.io/open-webui/pipelines:main
@@ -205,11 +472,20 @@ COPY pipelines/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 ```
 
-**重要觀念：**
-- Python 套件是裝在 **Docker image 裡**，不是放在 pipelines volume
-- pipelines 資料夾只存放**你的程式碼**（如 `my_pipeline.py`）
+**重要觀念（同學們一定要理解）：**
+
+* Python 套件是裝在 **Docker image 裡**，不是放在 pipelines volume
+* pipelines 資料夾只存放**你的程式碼**（如 `my_pipeline.py`）
+* `requirements.txt` 是在 **build 階段**使用的，不是執行階段
+
+**老師提醒：**  
+如果不需要額外套件，可以不用 Dockerfile，直接用官方映像。
+
+---
 
 ### docker-compose.yml
+
+這是整個專案的核心設定檔：
 
 ```yaml
 version: '3.8'
@@ -218,7 +494,7 @@ services:
   pipelines:
     # 如果有 Dockerfile，使用 build
     build: .
-    # 或直接使用官方映像
+    # 或直接使用官方映像（註解掉 build，取消註解下面這行）
     # image: ghcr.io/open-webui/pipelines:main
     
     ports:
@@ -236,59 +512,175 @@ services:
     container_name: pipelines
 ```
 
+**參數說明：**
+
+* `build: .`：使用當前目錄的 Dockerfile 建立映像
+* `ports`：埠號對應
+* `volumes`：資料卷掛載（bind mount）
+* `extra_hosts`：讓容器可以訪問主機服務
+* `restart: always`：自動重啟
+* `container_name`：容器名稱
+
+**老師提醒：**  
+`./pipelines` 是相對路徑，會對應到專案目錄下的 `pipelines/` 資料夾。
+
+---
+
 ### 啟動服務
+
+設定好後，啟動就變得很簡單：
 
 ```bash
 # 建立並啟動服務
 docker compose up -d --build
 
-# 查看日誌
+# 查看日誌（持續監看）
 docker compose logs -f pipelines
+
+# 查看日誌（只看一次）
+docker compose logs pipelines
 
 # 停止服務
 docker compose down
+
+# 停止服務並刪除 volume（小心使用）
+docker compose down -v
 ```
+
+**老師說明：**
+
+* `-d`：背景執行
+* `--build`：重新建立映像（如果修改了 Dockerfile）
+* `-f`：持續監看日誌（類似 `tail -f`）
+* `-v`：同時刪除 volume（資料會不見，要小心）
+
+**同學們常問：**  
+「什麼時候需要 `--build`？」  
+→ 只有修改 Dockerfile 或 requirements.txt 時才需要。
 
 ---
 
 ## 在 OpenWebUI 中連接 Pipelines
 
+### 學習目標
+
+這個章節會教你如何讓 Open-WebUI 和 Pipeline Server 溝通。  
+重點是理解「服務之間的連接方式」。
+
+---
+
 ### 步驟 1：登入 Open-WebUI 後台
 
-開啟瀏覽器，前往 Open-WebUI 介面（例如 `http://localhost:3000`）
+開啟瀏覽器，前往 Open-WebUI 介面（例如 `http://localhost:3000` 或你的樹莓派 IP）
+
+**老師提醒：**  
+如果 Open-WebUI 也在 Docker 裡，記得確認它已經啟動：
+```bash
+docker ps | grep open-webui
+```
+
+---
 
 ### 步驟 2：設定連線
 
 1. 前往 **Settings → Connections → OpenAI API**
-2. 新增一個連線，設定如下：
-   - **API URL:**
-     - 如果 Open-WebUI 與 Pipelines 都在 Docker 裡：`http://host.docker.internal:9099`
-     - 如果 Open-WebUI 在 Docker，Pipelines 在主機：`http://host.docker.internal:9099`
-     - 如果都在主機上：`http://localhost:9099`
-   - **API key:** `0p3n-w3bu!`（預設金鑰，可自訂）
-3. 儲存設定
+2. 點擊「新增連線」或「Add Connection」
+3. 設定如下：
+
+   **API URL：**  
+   根據你的部署方式選擇：
+   
+   * 如果 Open-WebUI 與 Pipelines **都在 Docker 裡**：  
+     `http://host.docker.internal:9099`
+   
+   * 如果 Open-WebUI **在 Docker**，Pipelines **在主機**：  
+     `http://host.docker.internal:9099`
+   
+   * 如果**都在主機上**：  
+     `http://localhost:9099`
+   
+   * 如果 Open-WebUI **在主機**，Pipelines **在 Docker**：  
+     `http://localhost:9099`
+
+   **API key：**  
+   `0p3n-w3bu!`（這是預設金鑰，可以自訂）
+
+4. 點擊「儲存」或「Save」
+
+**老師說明：**  
+`host.docker.internal` 是 Docker 提供的特殊主機名，讓容器可以訪問主機上的服務。  
+如果兩個容器在同一個 Docker network 裡，也可以用容器名稱。
+
+---
 
 ### 步驟 3：驗證連線
 
-若成功連線，Open-WebUI 會在 API Base URL 欄位顯示一個 **Pipelines 標識**。
+**成功連線的標誌：**
+
+* Open-WebUI 會在 API Base URL 欄位顯示一個 **Pipelines 標識**
+* 連線狀態顯示為「已連接」或「Connected」
+
+**如果連線失敗：**
+
+1. **檢查 Pipeline Server 是否運行：**
+   ```bash
+   docker ps | grep pipelines
+   curl http://localhost:9099/health
+   ```
+
+2. **檢查網路連線：**
+   * 確認埠號 9099 是否正確
+   * 確認防火牆設定
+
+3. **查看 Open-WebUI 日誌：**
+   ```bash
+   docker logs open-webui
+   ```
+
+**老師提醒：**  
+最常見的問題是 URL 設定錯誤，特別是 `host.docker.internal` 的使用時機。
 
 ---
 
 ## 管理與啟用 Pipeline
 
+### 學習目標
+
+連線設定完成後，我們來學習如何在 Open-WebUI 中管理 Pipeline。
+
+---
+
+### 在 Open-WebUI 中管理 Pipeline
+
 連線設定完成後，可以在 Open-WebUI 介面中：
 
-1. 前往 **Settings → Pipelines** 頁籤
-2. 查看已安裝的 pipelines
-3. 安裝或上傳你自己的 pipeline 程式
-   - 可以從 GitHub URL 安裝範例 pipeline
-   - 也可以直接上傳 Python 檔案
+1. **前往 Settings → Pipelines 頁籤**
+2. **查看已安裝的 pipelines**
+3. **安裝或上傳你自己的 pipeline 程式：**
+   * 可以從 GitHub URL 安裝範例 pipeline
+   * 也可以直接上傳 Python 檔案
+
+**老師說明：**  
+Pipeline 程式碼實際上是存放在 Pipeline Server 的 `/app/pipelines` 目錄裡。  
+Open-WebUI 只是提供一個管理介面，讓你可以方便地上傳和管理。
+
+**同學們可能會問：**  
+「我可不可以直接修改 `/app/pipelines` 裡的檔案？」  
+→ 可以！如果你用 bind mount，直接改主機上的檔案就可以了。
 
 ---
 
 ## 重要觀念釐清
 
+### 學習目標
+
+這個章節會釐清一些容易混淆的概念，幫助同學們建立正確的觀念。
+
+---
+
 ### Volume vs Python 環境
+
+這是同學們最常搞混的地方，讓我們用表格來釐清：
 
 | **項目** | **正確位置** | **說明** |
 |---------|------------|---------|
@@ -297,50 +689,76 @@ docker compose down
 | `pip install pandas` | Dockerfile | 套件安裝指令 |
 | Python runtime | Container image | Python 執行環境 |
 
-**關鍵觀念：**
-- 🔴 **pipelines volume 裡放的是「你的程式」**
-- 🔴 **Python 套件是「裝在容器 image 裡」**
-- 🔴 **Volume ≠ Python 環境**
+**關鍵觀念（同學們一定要記住）：**
+
+* 🔴 **pipelines volume 裡放的是「你的程式」**
+* 🔴 **Python 套件是「裝在容器 image 裡」**
+* 🔴 **Volume ≠ Python 環境**
+
+**老師的比喻：**  
+Volume 是「你的筆記本」（程式碼），  
+Image 是「裝好軟體的電腦」（Python 環境）。  
+你不能把軟體裝在筆記本裡，要把軟體裝在電腦裡。
+
+---
 
 ### Named Volume vs Bind Mount
+
+這是另一個重要的觀念，讓我們來比較兩種方式：
 
 #### Named Volume（適合正式部署）
 
 **優點：**
-- ✅ 資料由 Docker 管理，更安全
-- ✅ 適合正式部署環境
-- ✅ Pipeline 程式不常修改時使用
+* ✅ 資料由 Docker 管理，更安全
+* ✅ 適合正式部署環境
+* ✅ Pipeline 程式不常修改時使用
 
 **缺點：**
-- ❌ 不適合教學與開發
-- ❌ 需要進入容器才能修改檔案
-- ❌ 樹莓派上 debug 較困難
+* ❌ 不適合教學與開發
+* ❌ 需要進入容器才能修改檔案
+* ❌ 樹莓派上 debug 較困難
 
 **實體路徑：**
 ```bash
 /var/lib/docker/volumes/pipelines/_data
 ```
 
+**老師說明：**  
+Named Volume 的資料存在 Docker 管理的目錄裡，你通常不會直接去改它。  
+適合程式碼已經穩定，不需要頻繁修改的情況。
+
+---
+
 #### Bind Mount（適合教學與開發）
 
 **優點：**
-- ✅ 可以直接用編輯器修改程式碼
-- ✅ 適合教學與開發階段
-- ✅ 樹莓派上更容易 debug
-- ✅ 檔案修改立即生效
+* ✅ 可以直接用編輯器修改程式碼
+* ✅ 適合教學與開發階段
+* ✅ 樹莓派上更容易 debug
+* ✅ 檔案修改立即生效
 
 **缺點：**
-- ❌ 需要確保主機路徑存在
-- ❌ 權限設定需要注意
+* ❌ 需要確保主機路徑存在
+* ❌ 權限設定需要注意
 
 **使用方式：**
 ```bash
 -v $(pwd)/pipelines:/app/pipelines
 ```
 
+**老師建議：**  
+同學們在學習階段，**強烈建議使用 Bind Mount**。  
+這樣你可以直接看到和修改程式碼，學習效果會更好。
+
 ---
 
 ## 專案結構建議
+
+### 學習目標
+
+這個章節會教你如何組織一個 Pipeline 專案，讓程式碼更容易管理和維護。
+
+---
 
 ### 完整的教學專案結構
 
@@ -349,14 +767,22 @@ project/
 ├── docker-compose.yml          # Docker Compose 設定
 ├── Dockerfile                  # 自訂映像（如需安裝套件）
 ├── README.md                   # 專案說明
-└── pipelines/
+└── pipelines/                  # Pipeline 程式碼目錄
     ├── requirements.txt        # Python 套件清單
     ├── my_pipeline.py          # 你的 Pipeline 程式
     └── examples/               # 範例程式
         └── example_pipeline.py
 ```
 
+**老師說明：**  
+這個結構很清楚，每個檔案都有明確的用途。  
+`examples/` 目錄可以放一些範例程式，方便參考。
+
+---
+
 ### requirements.txt 範例
+
+如果你的 Pipeline 需要額外的 Python 套件：
 
 ```txt
 pandas
@@ -365,7 +791,16 @@ requests
 chromadb
 ```
 
+**老師提醒：**  
+* 每個套件一行
+* 可以指定版本：`pandas==2.0.0`
+* 不需要的套件不要加，會讓映像變大
+
+---
+
 ### Pipeline 程式範例
+
+一個最簡單的 Pipeline 程式範例：
 
 ```python
 # pipelines/my_pipeline.py
@@ -374,82 +809,250 @@ from typing import Dict, Any
 def process_message(message: Dict[str, Any]) -> Dict[str, Any]:
     """
     處理訊息的 Pipeline 函數
+    
+    這是 Pipeline Server 會呼叫的主要函數
+    你可以在這裡實作你的自訂邏輯
     """
     # 你的自訂邏輯
     processed = message.copy()
     processed['processed'] = True
+    
     return processed
 ```
 
+**老師說明：**  
+這是最基本的範例，實際的 Pipeline 會更複雜。  
+重點是理解「Pipeline Server 會呼叫這個函數」的概念。
+
 ---
 
-## 常見問題
+## 常見問題與排錯
+
+### 學習目標
+
+這個章節整理了同學們最常遇到的問題，幫助你快速排錯。
+
+---
 
 ### Q1: Pipeline reload 要不要重啟容器？
 
-**A:** 通常不需要。Pipeline 伺服器會自動偵測檔案變更並重新載入。如果沒有自動載入，可以重啟容器：
+**A:** 通常不需要。
+
+Pipeline 伺服器會自動偵測檔案變更並重新載入。  
+如果沒有自動載入，可以重啟容器：
 
 ```bash
 docker compose restart pipelines
+# 或
+docker restart pipelines
 ```
+
+**老師說明：**  
+這是 Pipeline Server 的貼心設計，讓開發更方便。  
+但如果修改了 `requirements.txt` 或 `Dockerfile`，就需要 rebuild。
+
+---
 
 ### Q2: Python 檔改了，需不需要 rebuild？
 
-**A:** 
-- 如果只修改 `pipelines/` 目錄下的 Python 檔案：**不需要 rebuild**
-- 如果修改了 `requirements.txt` 或 `Dockerfile`：**需要 rebuild**
+**A:** 看情況。
+
+* **如果只修改 `pipelines/` 目錄下的 Python 檔案：**  
+  **不需要 rebuild**，Pipeline Server 會自動重新載入
+
+* **如果修改了 `requirements.txt` 或 `Dockerfile`：**  
+  **需要 rebuild**，因為這些是在 build 階段處理的
 
 ```bash
 docker compose up -d --build
 ```
 
+**老師提醒：**  
+這是同學們最常搞混的地方。  
+記住：**程式碼改動不用 rebuild，環境改動才要 rebuild**。
+
+---
+
 ### Q3: 如何確認 Pipeline 是否正常運作？
 
-**A:** 檢查容器日誌：
+**A:** 有幾個方法可以檢查：
 
+**方法 1：檢查容器日誌**
 ```bash
 docker compose logs -f pipelines
+# 或
+docker logs pipelines
 ```
 
-或測試 API：
-
+**方法 2：測試 API**
 ```bash
 curl http://localhost:9099/health
 ```
 
-### Q4: 樹莓派上效能如何？
+**方法 3：在 Open-WebUI 中測試**
+* 建立一個新的對話
+* 選擇 Pipeline Server 作為模型來源
+* 發送一個測試訊息
 
-**A:** 
-- Pipeline 伺服器本身資源需求不高
-- 建議使用 bind mount 方便 debug
-- 如果 Pipeline 需要大量運算，考慮使用外部服務
-
-### Q5: 什麼時候該用 Pipeline，什麼時候用 Filter / Tools？
-
-**A:** 
-- **使用 Filter / Tools：** 單一請求的簡單調整、單次能力擴充
-- **使用 Pipeline：** 多步驟流程、需要流程控制、要獨立成服務、需要與其他系統整合
+**老師說明：**  
+如果 API 回應正常，但 Open-WebUI 連不上，通常是連線設定問題。
 
 ---
 
-## 教學比喻
+### Q4: 樹莓派上效能如何？
+
+**A:** Pipeline Server 本身資源需求不高。
+
+* Pipeline Server 主要是做流程控制，運算量不大
+* 建議使用 bind mount 方便 debug
+* 如果 Pipeline 需要大量運算（例如 RAG），考慮使用外部服務
+
+**老師建議：**  
+樹莓派上跑 Pipeline Server 沒問題，但要注意：
+* 如果同時跑 Open-WebUI、Ollama、Pipeline Server，記憶體可能會不夠
+* 建議至少 4GB RAM 的樹莓派
+
+---
+
+### Q5: 什麼時候該用 Pipeline，什麼時候用 Filter / Tools？
+
+**A:** 簡單判斷原則：
+
+* **使用 Filter / Tools：**
+  * 單一請求的簡單調整
+  * 單次能力擴充
+  * 不需要複雜流程控制
+
+* **使用 Pipeline：**
+  * 多步驟流程
+  * 需要流程控制
+  * 要獨立成服務
+  * 需要與其他系統整合
+
+**老師的建議：**  
+先從 Filter / Tools 開始，當你發現「不夠用」的時候，就是該用 Pipeline 的時候了。
+
+---
+
+### Q6: 容器啟動失敗怎麼辦？
+
+**A:** 按照以下步驟檢查：
+
+1. **查看容器日誌：**
+   ```bash
+   docker logs pipelines
+   ```
+
+2. **檢查埠號是否被占用：**
+   ```bash
+   netstat -tuln | grep 9099
+   # 或
+   lsof -i :9099
+   ```
+
+3. **檢查 Docker 是否正常：**
+   ```bash
+   docker ps
+   docker info
+   ```
+
+4. **檢查權限問題：**
+   ```bash
+   ls -la pipelines/
+   ```
+
+**老師提醒：**  
+最常見的問題是：
+* 埠號被占用（改個埠號試試）
+* 權限問題（檢查檔案權限）
+* 路徑不存在（確認 `pipelines/` 目錄存在）
+
+---
+
+## 教學比喻與記憶法
+
+### Docker Image vs Volume
 
 > **Docker image** 是「已裝好軟體的電腦」  
 > **pipelines 資料夾**是「我每天在改的程式碼」  
 > **套件裝在電腦裡，不是丟在程式碼資料夾」
 
+**老師的延伸比喻：**
+
+* **Docker Container** = 開機後的電腦
+* **Volume** = 外接硬碟（資料可以保留）
+* **Port** = 電腦的網路埠（讓別人可以連進來）
+
+---
+
+### Pipeline Server 的角色
+
+> **Open-WebUI** = 餐廳的服務生（接待客人）  
+> **Pipeline Server** = 廚師（處理食材，做菜）  
+> **Ollama** = 食材供應商（提供原料）
+
+**老師說明：**  
+服務生（Open-WebUI）接收客人的點單，  
+交給廚師（Pipeline Server）處理，  
+廚師需要時會向供應商（Ollama）要食材。
+
 ---
 
 ## 參考資源
 
-- [Open-WebUI Pipelines GitHub](https://github.com/open-webui/pipelines)
-- [Open-WebUI 官方文件](https://docs.openwebui.com/)
+### 官方資源
+
+* [Open-WebUI Pipelines GitHub](https://github.com/open-webui/pipelines)
+* [Open-WebUI 官方文件](https://docs.openwebui.com/)
+
+### 延伸學習
+
+* Docker 基礎教學
+* Python API 開發（FastAPI）
+* 微服務架構設計
 
 ---
 
-## 下一步
+## 下一步學習方向
 
-- 📝 建立你的第一個 Pipeline
-- 🔧 整合 RAG 功能
-- 🎯 實作自訂訊息過濾器
-- 🚀 部署到生產環境
+完成這個章節後，同學們可以：
+
+* 📝 **建立你的第一個 Pipeline**  
+  從簡單的訊息處理開始，逐步增加複雜度
+
+* 🔧 **整合 RAG 功能**  
+  讓 Pipeline 能夠檢索外部資料
+
+* 🎯 **實作自訂訊息過濾器**  
+  根據需求過濾或修改訊息
+
+* 🚀 **部署到生產環境**  
+  學習如何優化和部署 Pipeline Server
+
+* 🌐 **整合其他服務**  
+  讓 Pipeline 與其他系統（例如資料庫、API）整合
+
+**老師的建議：**  
+不要急著做複雜的功能，先把基礎打穩。  
+理解「為什麼這樣做」比「記住怎麼做」更重要。
+
+---
+
+## 給同學們的最後提醒
+
+1. **理解比記憶重要**  
+   不要只是記住指令，要理解為什麼這樣做
+
+2. **多動手實作**  
+   理論讀再多，不如實際做一次
+
+3. **遇到問題先思考**  
+   先理解問題，再找解決方法
+
+4. **善用日誌和錯誤訊息**  
+   大部分問題都可以從日誌中找到線索
+
+5. **不要害怕犯錯**  
+   錯誤是最好的學習機會
+
+**祝同學們學習順利！** 🎉

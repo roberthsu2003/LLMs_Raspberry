@@ -375,6 +375,61 @@ docker run -d -p 9099:9099 \
   ghcr.io/open-webui/pipelines:main
 ```
 
+**使用 Docker Compose（單一服務版本）：**
+
+如果你偏好使用 Docker Compose，可以建立一個 `docker-compose.yml` 檔案：
+
+```yaml
+version: '3.8'
+
+services:
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    
+    ports:
+      - "9099:9099"
+    
+    volumes:
+      # 使用 named volume
+      - pipelines:/app/pipelines
+    
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+    restart: always
+    
+    container_name: pipelines
+
+volumes:
+  pipelines:
+```
+
+**啟動方式：**
+
+```bash
+# 啟動服務
+docker compose up -d
+
+# 查看日誌
+docker compose logs -f pipelines
+
+# 停止服務
+docker compose down
+
+# 停止服務並刪除 volume（小心使用，會刪除資料）
+docker compose down -v
+```
+
+**Raspberry Pi 特別注意：**
+
+如果 `host-gateway` 不支援，可以這樣修改：
+
+```yaml
+extra_hosts:
+  # 使用實際 IP（先執行 hostname -I 取得 IP）
+  - "host.docker.internal:192.168.1.100"
+```
+
 **老師說明：**  
 Named Volume 的資料由 Docker 管理，適合正式部署。  
 但對教學來說，我們更推薦方式 B。
@@ -1152,3 +1207,4 @@ curl http://localhost:9099/health
    錯誤是最好的學習機會
 
 **祝同學們學習順利！** 🎉
+‌

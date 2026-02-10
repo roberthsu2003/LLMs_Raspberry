@@ -230,10 +230,6 @@ command: tunnel run --token ${CLOUDFLARE_TOKEN}
 docker compose up -d
 ```
 
-
-
-
-
 ## 2.open-webui, cloudflare tunnel 和 pipeline 部署
 ```bash
 docker compose up -d

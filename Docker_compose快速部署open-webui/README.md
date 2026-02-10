@@ -13,7 +13,7 @@
 
 ## 1.open-webui和 cloudflare tunnel 部署
 
-### 使用 Docker Compose - host network模式
+### 方法1:使用 Docker Compose - host network模式
 
 ![host network模式](./images/pic1.png)
 
@@ -124,7 +124,7 @@ command: tunnel run --token ${CLOUDFLARE_TOKEN}
 docker compose up -d
 ```
 
-### 使用 Docker Compose（推薦）- bridge network模式
+### 方法2:使用 Docker Compose(推薦) - bridge network模式
 
 如果您希望使用 Docker Compose 來管理多個容器，可以使用以下方式統一部署 Open WebUI 和 Cloudflare Tunnel。
 

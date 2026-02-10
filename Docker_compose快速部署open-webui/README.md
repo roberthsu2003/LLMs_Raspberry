@@ -232,12 +232,14 @@ docker compose up -d
 
 
 
-## 2.open-webui,cloudflare tunnel 和 MCPO 部署
+
+
+## 2.open-webui, cloudflare tunnel 和 pipeline 部署
 ```bash
 docker compose up -d
 ```
 
-## 3.open-webui, cloudflare tunnel 和 pipeline 部署
+## 3.open-webui,cloudflare tunnel 和 MCPO 部署
 ```bash
 docker compose up -d
 ```

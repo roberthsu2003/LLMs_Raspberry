@@ -202,7 +202,7 @@ docker compose ps
 docker compose logs -f cloudflared
 ```
 
-#### 進階優化建議（選用）
+#### 進階改良建議（選用）
 
 等您熟悉基本操作後，可以考慮以下優化：
 

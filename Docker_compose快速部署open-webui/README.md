@@ -34,16 +34,16 @@
 Cloudflare Tunnel
      │  (cloudflared container)
      ▼
-Raspberry Pi localhost
+host主機
      │
-     ├── Open WebUI : http://127.0.0.1:3000
+     ├── Open WebUI : http://127.0.0.1:8080
      └── Ollama     : http://127.0.0.1:11434
 ```
 
 👉 **重要觀念：**
 
-* Tunnel **不是連 Docker 容器**
-* Tunnel **是連 Pi 本機服務**
+* Tunnel **不是連 cloudflared container 容器**
+* Tunnel **是連 open-webui container**
 
 #### 建立 docker-compose.yml
 
@@ -75,7 +75,6 @@ volumes:
     external: true
 ```
 
-📌 **這個 compose 檔案的功能，與您原本的兩個 `docker run` 指令完全等價**
 
 #### 啟動與管理方式
 
@@ -97,7 +96,7 @@ docker compose ps
 docker compose logs -f cloudflared
 ```
 
-#### 進階優化建議（選用）
+#### 進階改良建議（選用）
 
 等您熟悉基本操作後，可以考慮以下優化：
 
@@ -115,11 +114,7 @@ CLOUDFLARE_TOKEN=xxxxx
 command: tunnel run --token ${CLOUDFLARE_TOKEN}
 ```
 
-**2. 固定服務端口**
-
-如果未來不使用 host network，可以為 open-webui 固定端口。
-
-**3. 添加依賴關係**
+**2. 添加依賴關係**
 
 雖然 host network 模式下不強制，但可以加上 `depends_on` 來確保啟動順序。
 
@@ -135,21 +130,7 @@ docker compose up -d
 
 #### 為什麼要使用 bridge network模式？
 
-**在 Raspberry Pi 上的網路架構：**
-
-| 容器 | 呼叫host主機 |
-|------|-------------------|
-| open-webui | http://host.docker.internal |
-| cloudflared | http://host.docker.internal |
-| ollama | ollama |
-
-**只要三者需要共用 `127.0.0.1`，使用 `network_mode: host`**
-
-❌ **如果改成 bridge network：**
-
-* `127.0.0.1` 會變成「容器自己」
-* cloudflared 會找不到 open-webui
-* open-webui 會找不到 ollama
+![bridge network模式](./images/pic2.png)
 
 **架構關係圖：**
 
@@ -160,16 +141,16 @@ docker compose up -d
 Cloudflare Tunnel
      │  (cloudflared container)
      ▼
-Raspberry Pi localhost
+host主機
      │
-     ├── Open WebUI : http://127.0.0.1:3000
+     ├── Open WebUI : http://127.0.0.1:8080
      └── Ollama     : http://127.0.0.1:11434
 ```
 
 👉 **重要觀念：**
 
-* Tunnel **不是連 Docker 容器**
-* Tunnel **是連 Pi 本機服務**
+* Tunnel **不是連 cloudflared container 容器**
+* Tunnel **是連 open-webui container**
 
 #### 建立 docker-compose.yml
 
@@ -201,7 +182,12 @@ volumes:
     external: true
 ```
 
-📌 **這個 compose 檔案的功能，與您原本的兩個 `docker run` 指令完全等價**
+#### cloudflared網站上的tunnel設定
+
+```
+http://127.0.0.1:8080
+```
+
 
 #### 啟動與管理方式
 
@@ -240,10 +226,6 @@ CLOUDFLARE_TOKEN=xxxxx
 ```yaml
 command: tunnel run --token ${CLOUDFLARE_TOKEN}
 ```
-
-**2. 固定服務端口**
-
-如果未來不使用 host network，可以為 open-webui 固定端口。
 
 **3. 添加依賴關係**
 

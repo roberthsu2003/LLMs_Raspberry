@@ -11,6 +11,7 @@
 
 ### 名詞解釋
 - [什麼是「符合 OpenAI 規格（OpenAI-compatible）」？](#什麼是符合-openai-規格openai-compatible)
+- [什麼是「符合 OpenAI 規格的模型（OpenAI-compatible models）」？](#什麼是符合-openai-規格的模型openai-compatible-models)
 
 ### 第一部分：理解 Pipeline Server
 - [為什麼需要 Pipeline Server？](#為什麼需要-pipeline-server)
@@ -178,6 +179,157 @@ choices[0].message.content
 > request JSON 與 response JSON 結構，  
 > 即使背後使用的是本地或自架模型，  
 > 仍可被 Open-WebUI 當作 OpenAI API 來使用。
+
+---
+
+## 什麼是「符合 OpenAI 規格的模型（OpenAI-compatible models）」？
+
+### 一、先破除一個最常見的誤會
+
+很多同學第一次看到這個名詞，會以為：
+
+> 「OpenAI-compatible models」  
+> 是不是指「OpenAI 做的模型」？
+
+👉 **這是錯的。**
+
+OpenAI-compatible 跟「模型是誰做的」沒有直接關係。
+
+---
+
+### 二、正確定義（請記住這一句）
+
+> 「模型符合 OpenAI 規格（OpenAI-compatible）」  
+> 指的是：模型服務提供的 API 介面，  
+> 是否遵守 OpenAI 所定義的 API 規格。
+
+重點有三個字一定要畫線：  
+👉 **API 規格**
+
+---
+
+### 三、為什麼要強調「API」，而不是「模型」？
+
+在實務上：
+- 我們的程式 **不是直接呼叫模型**
+- 而是 **呼叫一個「模型服務 API」**
+
+所以真正影響你程式能不能用的，不是：
+- 模型名稱
+- 模型參數
+- 模型公司
+
+而是：
+
+> 你送出的請求，  
+> 跟對方 API 要的格式，一不一樣
+
+---
+
+### 四、什麼叫「符合 OpenAI 規格」？（三個必要條件）
+
+一個模型服務 **同時符合以下三點**，  
+我們才稱它是 OpenAI-compatible。
+
+---
+
+#### ① Endpoint（網址）一樣
+
+OpenAI 最常見的聊天 API 路徑是：
+
+```
+POST /v1/chat/completions
+```
+
+如果一個服務也提供這個路徑，  
+第一關才算過。
+
+---
+
+#### ② Request JSON 結構一樣
+
+OpenAI 的典型請求格式是：
+
+```json
+{
+  "model": "模型名稱",
+  "messages": [
+    { "role": "system", "content": "你是助理" },
+    { "role": "user", "content": "你好" }
+  ]
+}
+```
+
+重點不是模型名稱，而是一定要有：
+- `messages`
+- `role`
+- `content`
+
+---
+
+#### ③ Response JSON 結構一樣（最重要）
+
+OpenAI 回傳資料的結構（簡化）：
+
+```json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "回覆內容"
+      }
+    }
+  ]
+}
+```
+
+只要你的程式 **可以用同一套方式解析回應**，  
+那就算相容。
+
+---
+
+### 五、所以「OpenAI-compatible models」真正的意思是什麼？
+
+正確理解是：
+
+> **「提供 OpenAI API 規格的模型服務」**
+
+而不是：
+- ❌ 模型能力等同 OpenAI
+- ❌ 模型一定是 GPT
+- ❌ 模型一定來自 OpenAI
+
+---
+
+### 六、為什麼大家都想「符合 OpenAI 規格」？
+
+因為 **工具生態系最大**。
+
+只要 API 相容，你就可以：
+- 不改程式碼
+- 不換 UI
+- 不改工作流程
+- 直接換模型
+
+這也是為什麼很多系統、平台、框架  
+都「以 OpenAI API 當標準介面」。
+
+---
+
+### 七、一個學生一定要懂的重點整理
+
+請牢記這三句話：
+1. OpenAI-compatible 描述的是 **API**，不是模型
+2. 模型可以不同，只要 **API 一樣就能互換**
+3. 能不能用 OpenAI API 語法，取決於服務是否相容
+
+---
+
+### 八、一句話總結（考試 / 面試 / 上課都好用）
+
+> OpenAI-compatible models 指的不是模型本身，  
+> 而是「模型服務是否遵守 OpenAI API 規格」。
 
 ---
 

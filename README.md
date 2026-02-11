@@ -62,7 +62,7 @@
     > 📚 **OpenWebUI`擴充套件`**：[完整介紹](./OpenWebUI/擴充套件.md)  
     > 📚 **OpenWebUI`過濾器程式碼`| 管理員控制台->函式**：[過濾器程式碼](./OpenWebUI/過濾器程式碼.md)  
     > 📚 **OpenWebUI`工具(tools)`| 工作區->工具**：[工具](./OpenWebUI/工具.md)   
-    > 📚 **OpenWebUI`MCP`| 工作區->設定->外部工具**：[MCP](./OpenWebUI/mcpo.md)   
+    > 📚 **OpenWebUI`MCP`| 工作區->設定->外部工具**：[MCP](./OpenWebUI/mcp)   
     > 📚 **OpenWebUI`pipeline`| 工作區->設定->pipeline**：[pipeline](./OpenWebUI/pipeline.md)  
     
 

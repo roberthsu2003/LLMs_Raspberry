@@ -1,6 +1,6 @@
-# MCP
+# open-webui如何使用和安裝MCP
 
-# **🧠 整體架構原理（從上到下）**
+## **🧠 整體架構原理（從上到下）**
 
 你現在的實際架構是：
 
@@ -20,13 +20,7 @@ mcp-server-time
 
 ---
 
-# **第一層：為什麼要 MCP_ENABLE=true？**
-
-Open-WebUI 內部其實有三種能力：
-
-1. 模型連線（OpenAI / Ollama）
-2. Pipeline
-3. MCP Client
+## **第一層：為什麼要 MCP_ENABLE=true？**
 
 MCP_ENABLE=true 的作用是：
 
@@ -38,6 +32,8 @@ MCP_ENABLE=true 的作用是：
 - WebUI 不會有 MCP 呼叫能力
 
 它只是「打開功能開關」。
+
+**docker compose內的設定必需增加環境變數: MCP_ENABLE=true**
 
 ---
 
@@ -94,49 +90,6 @@ http://mcpo:8000
 
 ---
 
-# **第四層：為什麼不能填 localhost？**
-
-在 container 裡：
-
-```other
-localhost = 自己
-```
-
-不是宿主機。
-
-所以：
-
-```other
-open-webui 裡的 localhost ≠ mcpo
-```
-
-這是很多人會卡住的地方。
-
----
-
-# **第五層：為什麼要選 OpenAPI？**
-
-因為 WebUI 有兩種 server：
-
-| **類型**            | **用途** |
-| ----------------- | ------ |
-| OpenAI-compatible | LLM    |
-| OpenAPI           | Tool   |
-
-mcpo 是工具。
-
-如果你填在 LLM 那邊，
-
-WebUI 會去找：
-
-```other
-GET /v1/models
-```
-
-當然會錯。
-
----
-
 # **第六層：為什麼模型會「自己決定」要用工具？**
 
 這是最核心原理。
@@ -174,31 +127,3 @@ GET /v1/models
 這是 Agent 的基礎。
 
 ---
-
-# **🎓 用教學角度總結**
-
-你可以這樣教學生：
-
-### **第一步**
-
-模型只能聊天
-
-### **第二步**
-
-模型透過 Tool 可以查時間
-
-### **第三步**
-
-模型透過 MCP 可以接任何外部系統
-
-這是從 LLM → Agent 的過程。
-
----
-
-# **🧠 最重要的一句話**
-
-Pipeline 是「你寫流程」
-
-MCP 是「模型決定要不要用工具」
-
-兩個哲學完全不同。

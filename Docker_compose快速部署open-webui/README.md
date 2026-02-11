@@ -1,29 +1,47 @@
-# 使用Docker compose,快速部署open-webui相關容器
+# 使用 Docker Compose 快速部署 Open-WebUI 相關容器
 
-## 以下docker是安裝在Raspberry Pi本機上
+## 📋 目錄
 
-> ollama是安裝在raspberry pi本機上
+- [前言](#前言)
+- [部署選項一覽](#部署選項一覽)
+- [選項 1：Open-WebUI + Cloudflare Tunnel](#選項-1open-webui--cloudflare-tunnel)
+- [選項 2：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-2open-webui--cloudflare-tunnel--mcpo)
+- [選項 3：Open-WebUI + Cloudflare Tunnel + Pipeline](#選項-3open-webui--cloudflare-tunnel--pipeline)
+- [選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO](#選項-4open-webui--cloudflare-tunnel--pipeline--mcpo)
 
-主要是以network bridge模式部署,可以快速部署open-webui,cloudflare tunnel,pipeline server,MCPO server等相關容器
+---
 
-- **1.open-webui和 cloudflare tunnel 部署**
-- **2.open-webui,cloudflare tunnel 和 MCPO 部署**
-- **3.open-webui, cloudflare tunnel 和 pipeline 部署**
-- **4.open-webui, cloudflare tunnel 和 pipeline 和 MCPO 部署**
+## 前言
 
-## 1.open-webui和 cloudflare tunnel 部署
+本教學假設 **Docker 與 Ollama 已安裝在 Raspberry Pi 本機**。
 
-### 方法1:使用 Docker Compose - host network模式
+採用 **bridge network** 模式為主，可快速部署以下組合：
 
-![host network模式](./images/pic1.png)
+- Open-WebUI
+- Cloudflare Tunnel（對外曝光服務）
+- Pipeline Server
+- MCPO Server
 
-如果您希望使用 Docker Compose 來管理多個容器，可以使用以下方式統一部署 Open WebUI 和 Cloudflare Tunnel。
+---
 
-#### 為什麼要使用 network_mode: host？
+## 部署選項一覽
 
+| 選項 | 包含服務 | 適用情境 |
+|------|----------|----------|
+| **1** | Open-WebUI + Cloudflare Tunnel | 基本部署，對外連線 |
+| **2** | Open-WebUI + Cloudflare Tunnel + MCPO | 需要 MCP 工具（如時間查詢） |
+| **3** | Open-WebUI + Cloudflare Tunnel + Pipeline | 需要自訂 Pipeline 流程 |
+| **4** | Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO | 完整功能一次部署 |
 
-**只要三者需要共用 `127.0.0.1`，使用 `network_mode: host`**
+---
 
+## 選項 1：Open-WebUI + Cloudflare Tunnel
+
+### 方法 A：Host Network 模式
+
+![host network 模式](./images/pic1.png)
+
+適合需要 **Open-WebUI、Cloudflare Tunnel、Ollama 共用 `127.0.0.1`** 的情境。
 
 **架構關係圖：**
 
@@ -31,23 +49,17 @@
 [ Internet ]
      │
      ▼
-Cloudflare Tunnel
-     │  (cloudflared container)
-     ▼
-host主機
+Cloudflare Tunnel (cloudflared)
      │
-     ├── Open WebUI : http://127.0.0.1:8080
+     ▼
+host 主機
+     ├── Open-WebUI : http://127.0.0.1:8080
      └── Ollama     : http://127.0.0.1:11434
 ```
 
-👉 **重要觀念：**
-
-* Tunnel **不是連 cloudflared container 容器**
-* Tunnel **是連 open-webui container**
+> **重要觀念：** Tunnel 連線目標是 **host 主機上的服務**，不是 cloudflared 容器本身。
 
 #### 建立 docker-compose.yml
-
-請在任意資料夾建立一個檔案 `docker-compose.yml`，內容如下：
 
 ```yaml
 version: "3.9"
@@ -68,47 +80,37 @@ services:
     container_name: cloudflared
     restart: unless-stopped
     network_mode: host
-    command: tunnel run --token <TOKEN>
+    command: tunnel run --token <YOUR_CLOUDFLARE_TOKEN>
 
 volumes:
   open-webui:
     external: true
 ```
 
-
-#### 啟動與管理方式
-
-**啟動服務：**
+#### 啟動與管理
 
 ```bash
+# 啟動
 docker compose up -d
-```
 
-**檢查容器狀態：**
-
-```bash
+# 檢查狀態
 docker compose ps
-```
 
-**查看日誌（非常重要，用於排查問題）：**
-
-```bash
+# 查看 cloudflared 日誌（排錯用）
 docker compose logs -f cloudflared
 ```
 
-#### 進階改良建議（選用）
+#### 進階建議（選用）
 
-等您熟悉基本操作後，可以考慮以下優化：
+**1. 使用 .env 管理 Token**
 
-**1. 使用環境變數檔案（.env）管理 Token**
-
-建立 `.env` 檔案：
+建立 `.env`：
 
 ```
-CLOUDFLARE_TOKEN=xxxxx
+CLOUDFLARE_TOKEN=your_token_here
 ```
 
-在 `docker-compose.yml` 中使用：
+在 docker-compose.yml 中改為：
 
 ```yaml
 command: tunnel run --token ${CLOUDFLARE_TOKEN}
@@ -116,26 +118,17 @@ command: tunnel run --token ${CLOUDFLARE_TOKEN}
 
 **2. 添加依賴關係**
 
-雖然 host network 模式下不強制，但可以加上 `depends_on` 來確保啟動順序。
+可加上 `depends_on` 確保啟動順序（host 模式下非必要）。
 
 ---
 
-```yaml
-docker compose up -d
-```
+### 方法 B：Bridge Network 模式（推薦）
 
-### 方法2:使用 Docker Compose(推薦) - bridge network模式
+![bridge network 模式](./images/pic2.png)
 
-如果您希望使用 Docker Compose 來管理多個容器，可以使用以下方式統一部署 Open WebUI 和 Cloudflare Tunnel。
-
-#### 為什麼要使用 bridge network模式？
-
-![bridge network模式](./images/pic2.png)
-
+容器各自有獨立網路命名空間，透過 Docker 網路互通。較易與其他服務（MCPO、Pipeline）整合。
 
 #### 建立 docker-compose.yml
-
-請在任意資料夾建立一個檔案 `docker-compose.yml`，內容如下：
 
 ```yaml
 version: "3.9"
@@ -148,13 +141,13 @@ services:
     networks:
       - webui-net
     ports:
-      - "8080:8080" # 宿主機可用 http://localhost:8080 存取
+      - "8080:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
       OLLAMA_BASE_URL: http://host.docker.internal:11434
     extra_hosts:
-      - "host.docker.internal:host-gateway" # Linux/Raspberry Pi 需要這行才能解析
+      - "host.docker.internal:host-gateway"
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -163,7 +156,6 @@ services:
     networks:
       - webui-net
     command: tunnel run --token ${CLOUDFLARE_TOKEN}
-    # cloudflared 指向 open-webui 的服務名稱與 port
 
 volumes:
   open-webui:
@@ -173,71 +165,123 @@ networks:
   webui-net:
     name: webui-net
     driver: bridge
-
 ```
 
-#### cloudflared網站上的tunnel設定
+#### Cloudflare Tunnel 設定
+
+在 Cloudflare Dashboard 的 Tunnel 設定中，將 Public Hostname 指向：
 
 ```
 http://open-webui:8080
 ```
 
-
-#### 啟動與管理方式
-
-**啟動服務：**
+#### 啟動與管理
 
 ```bash
 docker compose up -d
-```
-
-**檢查容器狀態：**
-
-```bash
 docker compose ps
-```
-
-**查看日誌（非常重要，用於排查問題）：**
-
-```bash
 docker compose logs -f cloudflared
 ```
 
-#### 進階改良建議（選用）
+---
 
-等您熟悉基本操作後，可以考慮以下優化：
+## 選項 2：Open-WebUI + Cloudflare Tunnel + MCPO
 
-**1. 使用環境變數檔案（.env）管理 Token**
-
-建立 `.env` 檔案：
+### 專案結構
 
 ```
-CLOUDFLARE_TOKEN=xxxxx
+mcpo-project/
+├── docker-compose.yml
+├── .env
+└── mcpo/
+    └── Dockerfile
 ```
 
-在 `docker-compose.yml` 中使用：
+### Dockerfile（mcpo/Dockerfile）
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir mcpo mcp-server-time
+
+EXPOSE 8000
+
+CMD ["mcpo", "--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/Taipei"]
+```
+
+### docker-compose.yml
 
 ```yaml
-command: tunnel run --token ${CLOUDFLARE_TOKEN}
+version: "3.9"
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MCP_ENABLE: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mcpo:
+    build: ./mcpo
+    container_name: mcpo
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8000:8000"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+
+volumes:
+  open-webui:
+    external: true
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
 ```
 
-**3. 添加依賴關係**
+### Cloudflare Tunnel 設定
 
-雖然 host network 模式下不強制，但可以加上 `depends_on` 來確保啟動順序。
+Public Hostname 指向：`http://open-webui:8080`
+
+### 啟動方式
+
+```bash
+docker compose up -d --build
+```
 
 ---
 
-```yaml
-docker compose up -d
-```
+## 選項 3：Open-WebUI + Cloudflare Tunnel + Pipeline
 
-## 2.open-webui, cloudflare tunnel 和 pipeline 部署
+> **注意：** 此設定**不**對外暴露 Pipeline 的 9099 埠，僅能透過 Docker 內部網路存取。
+> Open-WebUI 連接 Pipeline 時，請使用：`http://pipelines:9099`
 
-> 注意: pipeline 的ports: 9099:9099 被拿掉,代表無法透過raspberry連線到pipeline的容器, 只可以透過service name連線到pipeline的容器, `所以open-webui的連線pipeline的url需要改成http://pipelines:9099`
-
-> 注意: pipeline 的 extra_hosts:不可以拿掉, 因為pipeline的容器需要解析host.docker.internal的ip地址,`才可以連線raspberry內的ollama模型`
+> **注意：** Pipeline 的 `extra_hosts` 不可移除，否則無法解析 `host.docker.internal`，也就無法連線到 Raspberry Pi 上的 Ollama。
 
 ```yaml
+version: "3.9"
+
 services:
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -272,7 +316,6 @@ services:
     networks:
       - webui-net
     command: tunnel run --token ${CLOUDFLARE_TOKEN}
-    # Cloudflare Tunnel 會在 Cloudflare Dashboard 指向 open-webui:8080
 
 volumes:
   open-webui:
@@ -286,12 +329,104 @@ networks:
     driver: bridge
 ```
 
-## 3.open-webui,cloudflare tunnel 和 MCPO 部署
-```bash
-docker compose up -d
+### Open-WebUI Pipeline 設定
+
+在 Open-WebUI 管理員控制台 → Pipelines 中，將 Pipeline 的 URL 設為：
+
+```
+http://pipelines:9099
 ```
 
-## 4.open-webui, cloudflare tunnel 和 pipeline 和 MCPO 部署
-```bash
-docker compose up -d
+---
+
+## 選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO
+
+完整部署所有服務。
+
+### 專案結構
+
 ```
+full-project/
+├── docker-compose.yml
+├── .env
+└── mcpo/
+    └── Dockerfile
+```
+
+### docker-compose.yml
+
+```yaml
+version: "3.9"
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MCP_ENABLE: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pipelines
+    restart: always
+    networks:
+      - webui-net
+    volumes:
+      - pipelines:/app/pipelines
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mcpo:
+    build: ./mcpo
+    container_name: mcpo
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8000:8000"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+
+volumes:
+  open-webui:
+    external: true
+  pipelines:
+    external: true
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
+```
+
+### 設定重點
+
+| 項目 | 設定值 |
+|------|--------|
+| **Pipeline URL**（Open-WebUI 內） | `http://pipelines:9099` |
+| **MCP 工具 URL**（Open-WebUI 內） | `http://mcpo:8000` |
+| **Cloudflare Tunnel** | 指向 `http://open-webui:8080` |
+
+### 啟動方式
+
+```bash
+docker compose up -d --build
+```
+
+---

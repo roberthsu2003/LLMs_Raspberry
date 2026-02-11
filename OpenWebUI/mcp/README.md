@@ -9,4 +9,4 @@ MCP 是一種協定（Model Context Protocol）。
 
 ## 目錄
 - [open-webui如何使用MCP](./open-webui如何使用MCP.md)
-- [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md
+- [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md)

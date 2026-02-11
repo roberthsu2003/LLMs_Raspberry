@@ -153,43 +153,20 @@ docker ps
 - mcpo 會把 MCP 的 `mcp-server-time` 轉成 OpenAPI 格式，Swagger UI 就是這份 OpenAPI 的可視化介面
 - 若能看到這兩個 endpoint，代表 mcpo 已正確啟動，且 Open-WebUI 之後就能透過這些 API 呼叫時間相關工具
 
+---
 
+### 新增工具伺服器的URL
 
+**新增工具伺服器的URL** OpenWebUI -> 管理員控制台 -> 設定 -> 外部工具
 
-
-
-
-
-
-
-
-
-### 為什麼 URL 填 http://mcpo:8000？
-
-因為 Docker bridge network 的原理是：
-
-- 每個 container 都有 DNS 名稱
-- service name = hostname
-
-你兩個 container 都在：
-
-```other
-webui-net
-```
-
-所以：
-
-```other
-http://mcpo:8000
-```
-
-在 open-webui container 裡面可以直接解析。
-
-這是 Docker 內部 DNS 機制。
+**URL**: `http://mcpo:8000`
+**驗証**: 無
+**名稱**: 自訂(例如: mcp-time)
+**描述**: 自訂(例如: 取得目前時間)
 
 ---
 
-### 為什麼模型會「自己決定」要用工具？
+### 使用模型測試工具伺服器是否正常運行
 
 這是最核心原理。
 

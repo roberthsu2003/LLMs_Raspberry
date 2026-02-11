@@ -8,4 +8,4 @@ MCP 是一種協定（Model Context Protocol）。
 > 📚 **詳細介紹**：[MCP](https://docs.ollama.com/mcp)
 
 ## 目錄
-- [open-webui如何使用MCP](#open-webui如何使用MCP)
+- [open-webui如何使用MCP](./open-webui如何使用MCP.md)

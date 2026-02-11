@@ -100,7 +100,7 @@ MCP 協定
 
 ### 建立mcpo的工具伺服器
 
-**使用docker run命令建立mcpo的工具伺服器**
+#### 使用docker run命令建立mcpo的工具伺服器
 
 ```bash
 docker run -d \
@@ -125,6 +125,12 @@ docker run -d \
 | `sh -c "..."` | 在容器啟動時執行指令：先安裝 mcpo 與 mcp-server-time，再啟動服務 |
 | `mcpo --port 8000 -- mcp-server-time` | mcpo 在 8000 埠監聽，並將請求轉發給 mcp-server-time |
 | `--local-timezone=Asia/Taipei` | 設定 mcp-server-time 的時區為台北時間 |
+
+#### 使用Dockerfile建立mcpo的工具伺服器
+
+> 可先跳過,等建立好mcpo的工具伺服器後再回來看
+
+[請參考使用Dockerfile建立mcpo的工具伺服器的說明](./使用Dockerfile建立MCPO.md)
 
 
 ### 測試MCPO的工具伺服器是否正常運行

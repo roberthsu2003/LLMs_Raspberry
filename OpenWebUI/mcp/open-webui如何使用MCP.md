@@ -112,6 +112,7 @@ docker run -d \
          mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
 ```
 
+
 **參數說明：**
 
 | 參數 | 說明 |
@@ -124,6 +125,42 @@ docker run -d \
 | `sh -c "..."` | 在容器啟動時執行指令：先安裝 mcpo 與 mcp-server-time，再啟動服務 |
 | `mcpo --port 8000 -- mcp-server-time` | mcpo 在 8000 埠監聽，並將請求轉發給 mcp-server-time |
 | `--local-timezone=Asia/Taipei` | 設定 mcp-server-time 的時區為台北時間 |
+
+
+### 測試MCPO的工具伺服器是否正常運行
+
+**使用command查看mcpo的工具伺服器是否正常運行**
+
+```bash
+docker ps
+```
+
+**使用電腦的瀏覽器訪問 `http://<樹莓派ip地址>:8000/docs`**
+
+必須看到 Swagger UI 的介面，確認以下內容表示 mcpo 服務運作正常：
+
+#### 畫面說明
+
+| 區塊 | 說明 |
+|------|------|
+| **標題與版本** | 會顯示 `mcp-time`、版本號（如 1.26.0）、以及 `OAS 3.1`（表示符合 OpenAPI 規格） |
+| **Endpoints（default）** | 列出 mcpo 提供的兩個工具 API：<br>• `POST /get_current_time` — 取得目前時間<br>• `POST /convert_time` — 時間轉換 |
+| **Schemas** | 定義各 API 的請求／回應結構，例如 `Get_current_time_form_model`、`Convert_time_form_model` |
+| **/openapi.json** | 點擊可查看完整的 OpenAPI 規格檔，Open-WebUI 會使用這份規格來認識可呼叫的工具 |
+
+**為什麼要看這個畫面？**
+
+- mcpo 會把 MCP 的 `mcp-server-time` 轉成 OpenAPI 格式，Swagger UI 就是這份 OpenAPI 的可視化介面
+- 若能看到這兩個 endpoint，代表 mcpo 已正確啟動，且 Open-WebUI 之後就能透過這些 API 呼叫時間相關工具
+
+
+
+
+
+
+
+
+
 
 
 

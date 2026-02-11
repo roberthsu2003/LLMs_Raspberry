@@ -1,4 +1,4 @@
-# open-webui如何使用和安裝MCP
+# open-webui如何安裝和使用MCP工具
 
 ## 📋 目錄
 

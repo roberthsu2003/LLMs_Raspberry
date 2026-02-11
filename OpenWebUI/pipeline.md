@@ -634,9 +634,7 @@ docker pull ghcr.io/open-webui/pipelines:main
 
 ### 步驟 2：啟動 Pipeline Docker 容器
 
-現在我們有兩種方式可以啟動容器，老師建議同學們先從**方式 B**開始。
-
-#### 方式 A：使用 Named Volume（適合正式部署）
+我們使用 Named Volume 來啟動容器，這種方式適合正式部署。
 
 ```bash
 docker run -d -p 9099:9099 \
@@ -713,57 +711,8 @@ docker compose down
 docker compose down -v
 ```
 
-**說明：Named Volume 的資料由 Docker 管理，適合正式部署。  
-Named Volume 的資料由 Docker 管理，適合正式部署。 
-
-但對教學來說，我們更推薦方式 B。
----
-
-#### 方式 B：使用 Bind Mount（**推薦給同學們**）
-
-```bash
-# 先建立 pipelines 目錄
-mkdir -p pipelines
-
-# 啟動容器
-docker run -d -p 9099:9099 \
-  --add-host=host.docker.internal:host-gateway \
-  -v $(pwd)/pipelines:/app/pipelines \
-  --name pipelines \
-  --restart always \
-  ghcr.io/open-webui/pipelines:main
-```
-
-**和方式 A 的差別：**  
-`-v $(pwd)/pipelines:/app/pipelines` 使用 bind mount，直接把主機的目錄掛載到容器裡。
-
-**為什麼推薦給同學們？**
-
-* ✅ **可以直接用編輯器修改程式碼**  
-  你不需要進入容器，直接用 VS Code 或其他編輯器就能改
-
-* ✅ **適合教學與開發階段**  
-  修改立即生效，不用重新建立容器
-
-* ✅ **樹莓派上更容易 debug**  
-  你可以直接看檔案，檢查程式碼
-
-**老師提醒：**  
-`$(pwd)` 會自動取得當前目錄的路徑，所以記得先 `cd` 到你的專案目錄。
-
-**Raspberry Pi 特別注意：**  
-如果 `host-gateway` 在你的 Docker 版本不支援，可以用以下方式取得 Pi 的 IP：
-
-```bash
-# 方法 1：使用 hostname
-hostname -I | awk '{print $1}'
-
-# 方法 2：使用 ip 指令
-ip route get 1.1.1.1 | awk '{print $7}' | head -1
-
-# 然後用實際 IP 替代 host-gateway
-# --add-host=host.docker.internal:你的Pi_IP
-```
+**說明：**  
+Named Volume 的資料由 Docker 管理，適合正式部署。資料會儲存在 Docker 管理的位置，即使容器刪除也不會遺失。
 
 ---
 

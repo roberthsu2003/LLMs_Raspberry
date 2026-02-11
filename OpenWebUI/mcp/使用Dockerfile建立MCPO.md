@@ -1,5 +1,15 @@
 # 使用Dockerfile建立MCPO的工具伺服器
 
+```other
+docker run -d \
+  --name mcpo \
+  --network webui-net \
+  -p 8000:8000 \
+  python:3.11 \
+  sh -c "pip install --no-cache-dir mcpo mcp-server-time && \
+         mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
+```
+
 你這段 docker run 指令其實做了三件事：
 
 1. 使用 python:3.11

@@ -54,11 +54,10 @@ mcpo (MCP → OpenAPI 轉換器)
 mcp-server-time
 ```
 
-我們一層一層解釋。
 
 ---
 
-### **第一層：為什麼要 MCP_ENABLE=true？**
+### **為什麼要 MCP_ENABLE=true？**
 
 MCP_ENABLE=true 的作用是：
 
@@ -75,7 +74,7 @@ MCP_ENABLE=true 的作用是：
 
 ---
 
-### **第二層：為什麼要 mcpo？**
+### **為什麼要 mcpo？**
 
 MCP 是一種協定（Model Context Protocol）。
 
@@ -101,9 +100,40 @@ MCP 協定
 
 > 這是一個 OpenAPI 工具伺服器
 
+**設定的位置** OpenWebUI -> 管理員控制台 -> 設定 -> 外部工具
+
 ---
 
-### **第三層：為什麼 URL 填 http://mcpo:8000？**
+### 建立mcpo的工具伺服器
+
+**使用docker run命令建立mcpo的工具伺服器**
+
+```bash
+docker run -d \
+  --name mcpo \
+  --network webui-net \
+  -p 8000:8000 \
+  python:3.11 \
+  sh -c "pip install --no-cache-dir mcpo mcp-server-time && \
+         mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
+```
+
+**參數說明：**
+
+| 參數 | 說明 |
+|------|------|
+| `-d` | 背景執行（detached mode），容器啟動後在背景運行 |
+| `--name mcpo` | 將容器命名為 `mcpo`，Open-WebUI 透過此名稱在 webui-net 網路內解析 |
+| `--network webui-net` | 加入 webui-net 網路，與 Open-WebUI 同網段才能互通 |
+| `-p 8000:8000` | 將容器內的 8000 埠對應到主機的 8000 埠 |
+| `python:3.11` | 使用官方 Python 3.11 映像作為基礎 |
+| `sh -c "..."` | 在容器啟動時執行指令：先安裝 mcpo 與 mcp-server-time，再啟動服務 |
+| `mcpo --port 8000 -- mcp-server-time` | mcpo 在 8000 埠監聽，並將請求轉發給 mcp-server-time |
+| `--local-timezone=Asia/Taipei` | 設定 mcp-server-time 的時區為台北時間 |
+
+
+
+### 為什麼 URL 填 http://mcpo:8000？
 
 因為 Docker bridge network 的原理是：
 
@@ -128,7 +158,7 @@ http://mcpo:8000
 
 ---
 
-### **第四層：為什麼模型會「自己決定」要用工具？**
+### 為什麼模型會「自己決定」要用工具？
 
 這是最核心原理。
 
@@ -154,7 +184,7 @@ http://mcpo:8000
 
 ---
 
-### **🔥 真正的核心概念**
+### 🔥 真正的核心概念
 
 你現在完成的不是「接 API」。
 

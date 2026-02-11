@@ -274,6 +274,7 @@ volumes:
   open-webui:
     external: true
   pipelines:
+    external: true
 
 networks:
   webui-net:

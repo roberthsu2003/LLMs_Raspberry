@@ -232,7 +232,52 @@ docker compose up -d
 
 ## 2.open-webui, cloudflare tunnel 和 pipeline 部署
 ```bash
-docker compose up -d
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pipelines
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "9099:9099"
+    volumes:
+      - pipelines:/app/pipelines
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+    # Cloudflare Tunnel 會在 Cloudflare Dashboard 指向 open-webui:8080
+
+volumes:
+  open-webui:
+    external: true
+  pipelines:
+
+networks:
+  webui-net:
+    driver: bridge
 ```
 
 ## 3.open-webui,cloudflare tunnel 和 MCPO 部署

@@ -1,42 +1,49 @@
-# open-webui如何安裝和使用MCP工具
+# OpenWebUI 如何安裝與使用 MCP 工具
 
 ## 📋 目錄
 
+- [測試現在的模型（未啟用 MCP）](#測試現在的模型未啟用-mcp)
+- [透過 MCP 取得現在的時間](#透過-mcp-取得現在的時間)
+  - [整體架構原理](#整體架構原理從上到下)
+  - [為什麼要 MCP_ENABLE=true？](#為什麼要-mcp_enabletrue)
+  - [為什麼要 mcpo？](#為什麼要-mcpo)
+  - [建立 mcpo 工具伺服器](#建立-mcpo-工具伺服器)
+  - [測試 mcpo 是否正常運行](#測試-mcpo-工具伺服器是否正常運行)
+  - [在 OpenWebUI 新增工具伺服器](#新增工具伺服器的-url)
+  - [使用模型測試](#使用模型測試工具伺服器)
+  - [核心概念總結](#-真正的核心概念)
 
 ---
 
-## 測試現在的模型
+## 測試現在的模型（未啟用 MCP）
 
-詢問模型現在的時間
+在**未啟用 MCP 工具**的情況下，詢問模型：
+
 ```
 現在台北時間幾點？
 ```
 
-模型會回傳：
+模型可能會回覆類似以下內容（無法取得即時時間）：
 
 ```
-
-抱歉，作為一個語言模型，我沒有實時的時鐘資訊，無法直接告訴你「現在」台北的精確時間。不過你可以很方便地自己查詢：
-
-1. **手機或電腦**：大部分智慧型手機、筆電或桌機都會自動顯示正確的地理時區時間。只要確認你已設置「台北」或「台灣」的時區（UTC+8），就能看到即時時間。
-2. **網路搜尋**：在瀏覽器搜尋「台北現在時間」即可取得正確結果。
-3. **手動計算**  
-   - 先查到你所在地的時間與時區，例如若你在 **香港（UTC+8）**，則台北的時間與你相同。  
-   - 若你在 **紐約（UTC-4）**，台北時間比它快 12 小時；如果你在 **倫敦（UTC+0）**，台北時間比倫敦快 8 小時。  
-   - 記得夏令時間（DST）會影響你所在地的時區偏移。
-
-如果你想讓我幫忙計算某個已知時間點在台北的對應時間，歡迎告訴我（例如「2024 年 2 月 10 日 15:30（東京）換算成台北時間是？」）。祝你順利查到正確時間！
+抱歉，作為一個語言模型，我沒有實時的時鐘資訊，無法直接告訴你「現在」台北的精確時間...
 ```
+
+**這正是我們要透過 MCP 解決的問題。**
 
 ---
 
-## 透過MCP取得現在的時間
+## 透過 MCP 取得現在的時間
 
-### **🧠 整體架構原理（從上到下）**
+以下步驟說明如何設定 MCP，讓模型能呼叫外部工具取得即時時間。
 
-你現在的實際架構是：
+---
 
-```other
+### 🧠 整體架構原理（從上到下）
+
+實際的資料流架構是：
+
+```
 瀏覽器
    ↓
 Open-WebUI (LLM UI)
@@ -48,59 +55,50 @@ mcpo (MCP → OpenAPI 轉換器)
 mcp-server-time
 ```
 
+接下來我們一層一層說明。
 
 ---
 
-### **為什麼要 MCP_ENABLE=true？**
+### 為什麼要 MCP_ENABLE=true？
 
-MCP_ENABLE=true 的作用是：
+`MCP_ENABLE=true` 的作用是：
 
-> 啟用 MCP Client 模組
+> 啟用 Open-WebUI 內建的 MCP Client 模組
 
-如果沒開：
+若未設定此環境變數：
 
-- UI 不會出現「外部工具」
-- WebUI 不會有 MCP 呼叫能力
+- UI 不會出現「外部工具」選項
+- WebUI 無法呼叫 MCP 工具
 
-它只是「打開功能開關」。
-
-**docker compose內的設定必需增加環境變數: MCP_ENABLE=true**
+**設定方式：**  
+在 Docker Compose 的環境變數中新增 `MCP_ENABLE=true`。
 
 ---
 
-### **為什麼要 mcpo？**
+### 為什麼要 mcpo？
 
-MCP 是一種協定（Model Context Protocol）。
+MCP 是一種協定（Model Context Protocol），  
+但 Open-WebUI 的工具系統是**基於 OpenAPI**，兩者格式不同。
 
-但 Open-WebUI 的工具系統是：
+因此需要一個「翻譯器」：
 
-> 基於 OpenAPI
-
-兩種格式不同。
-
-所以需要一個「翻譯器」。
-
-mcpo 做的事就是：
-
-```other
+```
 MCP 協定
    ↓
-轉成 OpenAPI HTTP server
+mcpo 轉成 OpenAPI HTTP server
+   ↓
+Open-WebUI 可辨識並呼叫
 ```
 
-所以 WebUI 其實根本不知道 MCP 存在，
+WebUI 其實不知道 MCP 的存在，它只知道：**這是一個 OpenAPI 工具伺服器**。
 
-它只知道：
-
-> 這是一個 OpenAPI 工具伺服器
-
-**設定的位置** OpenWebUI -> 管理員控制台 -> 設定 -> 外部工具
+**設定位置：** OpenWebUI → 管理員控制台 → 設定 → 外部工具
 
 ---
 
-### 建立mcpo的工具伺服器
+### 建立 mcpo 工具伺服器
 
-#### 使用docker run命令建立mcpo的工具伺服器
+#### 方式一：使用 docker run 建立
 
 ```bash
 docker run -d \
@@ -111,7 +109,6 @@ docker run -d \
   sh -c "pip install --no-cache-dir mcpo mcp-server-time && \
          mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
 ```
-
 
 **參數說明：**
 
@@ -126,86 +123,79 @@ docker run -d \
 | `mcpo --port 8000 -- mcp-server-time` | mcpo 在 8000 埠監聽，並將請求轉發給 mcp-server-time |
 | `--local-timezone=Asia/Taipei` | 設定 mcp-server-time 的時區為台北時間 |
 
-#### 使用Dockerfile建立mcpo的工具伺服器
+#### 方式二：使用 Dockerfile 建立
 
-> 可先跳過,等建立好mcpo的工具伺服器後再回來看
+> 建議先完成方式一，確認 mcpo 可正常運作後，再參考此進階方式。
 
-[請參考使用Dockerfile建立mcpo的工具伺服器的說明](./使用Dockerfile建立MCPO.md)
+詳見：[使用 Dockerfile 建立 MCPO 工具伺服器](./使用Dockerfile建立MCPO.md)
 
+---
 
-### 測試MCPO的工具伺服器是否正常運行
+### 測試 mcpo 工具伺服器是否正常運行
 
-**使用command查看mcpo的工具伺服器是否正常運行**
+#### 步驟 1：檢查容器狀態
 
 ```bash
 docker ps
 ```
 
-**使用電腦的瀏覽器訪問 `http://<樹莓派ip地址>:8000/docs`**
+確認 `mcpo` 容器已啟動且狀態為 `Up`。
 
-必須看到 Swagger UI 的介面，確認以下內容表示 mcpo 服務運作正常：
+#### 步驟 2：使用瀏覽器驗證
 
-#### 畫面說明
+在電腦瀏覽器開啟：`http://<樹莓派IP>:8000/docs`
+
+必須看到 Swagger UI 介面，並確認以下內容表示 mcpo 運作正常：
 
 | 區塊 | 說明 |
 |------|------|
-| **標題與版本** | 會顯示 `mcp-time`、版本號（如 1.26.0）、以及 `OAS 3.1`（表示符合 OpenAPI 規格） |
-| **Endpoints（default）** | 列出 mcpo 提供的兩個工具 API：<br>• `POST /get_current_time` — 取得目前時間<br>• `POST /convert_time` — 時間轉換 |
-| **Schemas** | 定義各 API 的請求／回應結構，例如 `Get_current_time_form_model`、`Convert_time_form_model` |
-| **/openapi.json** | 點擊可查看完整的 OpenAPI 規格檔，Open-WebUI 會使用這份規格來認識可呼叫的工具 |
+| **標題與版本** | 顯示 `mcp-time`、版本號（如 1.26.0）、`OAS 3.1`（符合 OpenAPI 規格） |
+| **Endpoints（default）** | 兩個工具 API：`POST /get_current_time`、`POST /convert_time` |
+| **Schemas** | 定義各 API 的請求／回應結構 |
+| **/openapi.json** | 完整 OpenAPI 規格檔，Open-WebUI 會使用此規格認識可呼叫的工具 |
 
 **為什麼要看這個畫面？**
 
-- mcpo 會把 MCP 的 `mcp-server-time` 轉成 OpenAPI 格式，Swagger UI 就是這份 OpenAPI 的可視化介面
-- 若能看到這兩個 endpoint，代表 mcpo 已正確啟動，且 Open-WebUI 之後就能透過這些 API 呼叫時間相關工具
+mcpo 會把 MCP 的 `mcp-server-time` 轉成 OpenAPI 格式；Swagger UI 是這份 OpenAPI 的可視化介面。若能看到上述 endpoint，代表 mcpo 已正確啟動，Open-WebUI 即可透過這些 API 呼叫時間工具。
 
 ---
 
-### 新增工具伺服器的URL
+### 新增工具伺服器的 URL
 
-**新增工具伺服器的URL** OpenWebUI -> 管理員控制台 -> 設定 -> 外部工具
+**設定位置：** OpenWebUI → 管理員控制台 → 設定 → 外部工具
 
-**URL**: `http://mcpo:8000`
-**驗証**: 無
-**名稱**: 自訂(例如: mcp-time)
-**描述**: 自訂(例如: 取得目前時間)
+| 欄位 | 建議值 |
+|------|--------|
+| **URL** | `http://mcpo:8000` |
+| **驗證** | 無 |
+| **名稱** | 自訂（例如：mcp-time） |
+| **描述** | 自訂（例如：取得目前時間與時間轉換） |
+
+> **注意：** 使用 `http://mcpo:8000` 而非 `http://localhost:8000`，因為 Open-WebUI 與 mcpo 同屬 Docker 網路，需透過容器名稱 `mcpo` 互相解析。
 
 ---
 
-### 使用模型測試工具伺服器是否正常運行
+### 使用模型測試工具伺服器
 
-這是最核心原理。
+設定完成後，當模型支援 function calling 時，流程如下：
 
-當模型支援 function calling 時：
-
-1. WebUI 把 OpenAPI schema 傳給模型
-2. 模型看到可用工具：
-    - get_current_time
-    - convert_time
-1. 當你問：
-
-「現在台北時間幾點？」
-
-1. 模型判斷：
-
-→ 這需要呼叫工具
-
-1. 模型輸出 tool call
-2. WebUI 呼叫 mcpo
-3. mcpo 呼叫 mcp-server-time
-4. 回傳結果
-5. 模型生成自然語言回答
+1. **WebUI** 把 OpenAPI schema 傳給模型
+2. **模型** 辨識到可用工具：`get_current_time`、`convert_time`
+3. 當你問：「現在台北時間幾點？」
+4. **模型** 判斷需呼叫工具 → 輸出 tool call
+5. **WebUI** 呼叫 mcpo → mcpo 轉發給 mcp-server-time
+6. **回傳結果** → 模型生成自然語言回答
 
 ---
 
 ### 🔥 真正的核心概念
 
-你現在完成的不是「接 API」。
+你現在完成的不只是「接 API」。
 
 你完成的是：
 
-> 讓模型有「外部能力」
+> **讓模型具備「外部能力」**
 
-這是 Agent 的基礎。
+這就是 Agent 的基礎。
 
 ---

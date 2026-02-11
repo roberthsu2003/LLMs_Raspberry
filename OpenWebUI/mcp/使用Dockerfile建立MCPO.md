@@ -1,6 +1,19 @@
-# 使用Dockerfile建立MCPO的工具伺服器
+# 使用 Dockerfile 建立 MCPO 工具伺服器
 
-```other
+## 📋 目錄
+
+- [為什麼要用 Dockerfile？](#為什麼要用-dockerfile)
+- [一、撰寫 Dockerfile](#一撰寫-dockerfile)
+- [二、建置 Image](#二建置-image)
+- [三、執行 Container](#三執行-container)
+
+---
+
+## 前言：從 docker run 到 Dockerfile
+
+若你曾經用以下指令啟動 mcpo：
+
+```bash
 docker run -d \
   --name mcpo \
   --network webui-net \
@@ -10,59 +23,99 @@ docker run -d \
          mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
 ```
 
-你這段 docker run 指令其實做了三件事：
+這段指令其實做了三件事：
 
-1. 使用 python:3.11
-2. 安裝 mcpo 與 mcp-server-time
-3. 啟動 mcpo，並掛載 mcp-server-time
+1. 使用 `python:3.11` 作為基礎映像
+2. 在容器啟動時安裝 `mcpo` 與 `mcp-server-time`
+3. 啟動 mcpo，並掛載 `mcp-server-time` 作為 MCP Server
 
-我們把它改成「可重複建置」的 Dockerfile 方式，會更專業，也更適合教學。
+接下來我們把它改寫成 **Dockerfile** 的方式，方便版本控制與重複建置。
 
 ---
 
-# **一、改寫成 Dockerfile**
+## 為什麼要用 Dockerfile？
+
+| docker run | Dockerfile |
+|------------|------------|
+| 一次性執行，難以重現 | 可版本控制（如 Git） |
+| 無法重建相同環境 | 可重複建置相同映像 |
+| 指令長、不易閱讀 | 架構清晰，步驟分明 |
+| 難以維護與分享 | 可上傳 GitHub，方便協作 |
+
+---
+
+## 一、撰寫 Dockerfile
+
+### 步驟 1：建立專案目錄
 
 建立一個資料夾，例如：
 
-```other
+```
 mcpo-server/
- ├── Dockerfile
+ └── Dockerfile
 ```
 
----
+### 步驟 2：撰寫 Dockerfile 內容
 
-## **Dockerfile 內容**
-
-```other
+```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# 安裝套件
+# 安裝 mcpo 與 mcp-server-time
 RUN pip install --no-cache-dir mcpo mcp-server-time
 
-# 開放 8000 port
+# 對外開放 8000 埠
 EXPOSE 8000
 
-# 啟動指令
+# 啟動 mcpo，並掛載 mcp-server-time
 CMD ["mcpo", "--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/Taipei"]
 ```
 
+**說明：**
+
+- `python:3.11-slim` 比 `python:3.11` 體積更小，適合部署
+- `EXPOSE 8000` 標示此映像使用 8000 埠
+- `CMD` 使用 JSON 陣列格式，為 Docker 推薦的寫法
+
 ---
 
-# **二、建置 Image**
+## 二、建置 Image
 
-在該目錄執行：
+在 `mcpo-server` 目錄下執行：
 
-```other
+```bash
 docker build -t mcpo-server .
 ```
 
+**參數說明：**
+
+| 參數 | 說明 |
+|------|------|
+| `-t mcpo-server` | 指定映像名稱為 `mcpo-server` |
+| `.` | 指定 Dockerfile 所在目錄（當前目錄） |
+
 ---
 
-# **三、執行 Container**
+## 三、執行 Container
 
-```other
+### 步驟 1：確認網路存在
+
+確認 `webui-net` 網路是否存在（Open-WebUI 通常會建立此網路）：
+
+```bash
+docker network ls
+```
+
+若沒有 `webui-net`，請手動建立：
+
+```bash
+docker network create webui-net
+```
+
+### 步驟 2：啟動容器
+
+```bash
 docker run -d \
   --name mcpo \
   --network webui-net \
@@ -70,147 +123,16 @@ docker run -d \
   mcpo-server
 ```
 
----
+### 步驟 3：確認服務正常
 
-# **四、執行流程說明（教學重點）**
+**檢查容器狀態：**
 
-這段流程非常適合你在 MCP 課程中講解「容器啟動流程」👇
-
----
-
-## **Step 1：Docker 啟動 Container**
-
-Docker 讀取 image：
-
-```other
-mcpo-server
+```bash
+docker ps
 ```
 
----
+**使用瀏覽器驗證：**
 
-## **Step 2：執行 CMD**
-
-Docker 會執行：
-
-```other
-mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei
-```
+開啟 `http://<樹莓派IP>:8000/docs`，應能看到 Swagger UI 介面及 `/get_current_time`、`/convert_time` 兩個 endpoint。
 
 ---
-
-## **Step 3：mcpo 的角色**
-
-mcpo 是一個：
-
-👉 OpenAI-compatible wrapper
-
-👉 把 MCP server 包裝成 REST API
-
-流程是：
-
-```other
-HTTP Request
-   ↓
-mcpo
-   ↓
-MCP protocol
-   ↓
-mcp-server-time
-   ↓
-回傳 JSON
-```
-
----
-
-## **Step 4：Port 對應**
-
-```other
--p 8000:8000
-```
-
-代表：
-
-```other
-Host:8000  →  Container:8000
-```
-
----
-
-# **五、為什麼 Dockerfile 比 docker run 好？**
-
-| **docker run** | **Dockerfile** |
-| -------------- | -------------- |
-| 一次性            | 可版本控制          |
-| 不可重建           | 可重複建置          |
-| 不好教學           | 架構清楚           |
-| 不好維護           | 可上傳 GitHub     |
-
----
-
-# **六、如果你想更專業（進階版）**
-
-可以加上：
-
-```other
-ENV TZ=Asia/Taipei
-```
-
-或改成：
-
-```other
-FROM python:3.11-slim
-
-WORKDIR /app
-
-ENV TZ=Asia/Taipei
-
-RUN pip install --no-cache-dir mcpo mcp-server-time
-
-EXPOSE 8000
-
-ENTRYPOINT ["mcpo"]
-CMD ["--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/Taipei"]
-```
-
-這樣可以讓學生理解：
-
-- ENTRYPOINT 是主程式
-- CMD 是預設參數
-
----
-
-# **七、你課程可以這樣講（很有感）**
-
-你現在在教 MCP，這個範例其實可以變成：
-
-> 🔥「如何把一個 MCP Server 變成 OpenAI-compatible API」
-
-然後再接：
-
-- Open-WebUI 連線
-- Pipeline Server 連線
-- n8n 連線
-
-這會讓學生突然理解：
-
-> MCP ≠ API
-
-> mcpo = 協定轉換器
-
----
-
-如果你要，我可以幫你畫一張：
-
-```other
-Open-WebUI
-     ↓
-OpenAI API
-     ↓
-mcpo
-     ↓
-MCP
-     ↓
-mcp-server-time
-```
-
-這張圖超適合放講義。

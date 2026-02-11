@@ -234,7 +234,7 @@ docker compose up -d
 
 > 注意: pipeline 的ports: 9099:9099 被拿掉,代表無法透過raspberry連線到pipeline的容器, 只可以透過service name連線到pipeline的容器, `所以open-webui的連線pipeline的url需要改成http://pipelines:9099`
 
-> 注意: pipeline 的 extra_hosts:不可以拿掉, 因為pipeline的容器需要解析host.docker.internal的ip地址,才可以連線raspberry內的ollama模型
+> 注意: pipeline 的 extra_hosts:不可以拿掉, 因為pipeline的容器需要解析host.docker.internal的ip地址,`才可以連線raspberry內的ollama模型`
 
 ```yaml
 services:

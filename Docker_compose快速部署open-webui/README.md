@@ -171,6 +171,7 @@ volumes:
 
 networks:
   webui-net:
+    name: webui-net
     driver: bridge
 
 ```
@@ -281,6 +282,7 @@ volumes:
 
 networks:
   webui-net:
+    name: webui-net
     driver: bridge
 ```
 

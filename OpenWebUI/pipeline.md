@@ -9,6 +9,9 @@
 
 ## 📋 目錄
 
+### 名詞解釋
+- [什麼是「符合 OpenAI 規格（OpenAI-compatible）」？](#什麼是符合-openai-規格openai-compatible)
+
 ### 第一部分：理解 Pipeline Server
 - [為什麼需要 Pipeline Server？](#為什麼需要-pipeline-server)
 - [什麼是 Pipeline？](#什麼是-pipeline)
@@ -29,6 +32,152 @@
 ### 第四部分：延伸學習
 - [參考資源](#參考資源)
 - [下一步學習方向](#下一步學習方向)
+
+---
+
+## 什麼是「符合 OpenAI 規格（OpenAI-compatible）」？
+
+### 一、為什麼在 Open-WebUI 裡一直看到「符合 OpenAI 規格」？
+
+在使用 Open-WebUI 的過程中，我們常會看到文件、設定或教學提到：
+
+> This API is OpenAI-compatible  
+> 符合 OpenAI 規格
+
+這並不是指「一定要使用 OpenAI 的模型」，  
+而是指 API 的設計方式，遵循 OpenAI API 的介面規格。
+
+Open-WebUI 本身並不關心你「實際用的是哪個模型」，  
+它只關心一件事：
+
+> 我送出的請求，你聽不聽得懂？  
+> 你回來的結果，我解不解得開？
+
+---
+
+### 二、什麼叫「符合 OpenAI 規格」？
+
+在技術上，「符合 OpenAI 規格」只需要滿足 **三個條件**。
+
+#### 1️⃣ API endpoint 一樣
+
+例如常見的：
+
+```
+POST /v1/chat/completions
+GET  /v1/models
+```
+
+只要 Open-WebUI 發送請求的 URL 存在，  
+它就能正常與你的 API Server 溝通。
+
+---
+
+#### 2️⃣ Request JSON 結構一樣
+
+Open-WebUI 送給模型的資料格式，基本上長這樣：
+
+```json
+{
+  "model": "gpt-4",
+  "messages": [
+    { "role": "user", "content": "你好" }
+  ]
+}
+```
+
+重點不是模型名稱是不是 `gpt-4`，  
+而是：
+- 有 `model`
+- 有 `messages`
+- `messages` 裡有 `role` 與 `content`
+
+👉 **你的 API Server 必須能解析這種結構**
+
+---
+
+#### 3️⃣ Response JSON 結構一樣
+
+API 回傳的結果，必須長得像這樣（簡化版）：
+
+```json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "你好！"
+      }
+    }
+  ]
+}
+```
+
+Open-WebUI 只會從這個位置讀取模型輸出：
+
+```
+choices[0].message.content
+```
+
+👉 **只要回傳格式正確，內容來自誰都沒關係**
+
+---
+
+### 三、常見誤解澄清（非常重要）
+
+#### ❌ 錯誤理解
+- 一定要使用 OpenAI 的雲端模型
+- 一定要付費給 OpenAI
+- 一定要有 OpenAI API Key
+
+#### ✅ 正確理解
+- 只要 API 的「外觀」符合 OpenAI 規格即可
+- 背後可以是：
+  - 本地模型
+  - 校內伺服器
+  - 私有模型
+  - 自己寫的 API
+
+---
+
+### 四、為什麼 Open-WebUI 要用這種設計？
+
+這是一種非常聰明、也非常實務導向的設計。
+
+**好處包含：**
+1. 不被單一模型或廠商綁死
+2. 本地模型、私有模型都能接
+3. 教學只要教一套 API 規格，就能通用
+4. 學生未來換平台，也能快速上手
+
+從教學角度來看，這代表：
+
+> 你不是在教某一個模型，  
+> 而是在教一個「通用的 AI API 介面概念」。
+
+---
+
+### 五、生活化比喻：USB 插頭
+
+可以用這個比喻幫學生快速理解：
+- **Open-WebUI：**  
+  「我只插 USB-C」
+- **OpenAI API：**  
+  「我是 USB-C」
+- **其他模型或伺服器：**  
+  「我雖然不是原廠，但我也做成 USB-C」
+
+👉 **只要插得進去，就能用**
+
+---
+
+### 六、課堂重點一句話總結（考試版）
+
+> 所謂「符合 OpenAI 規格（OpenAI-compatible）」是指：  
+> 一個 API Server 只要提供與 OpenAI API 相同的 endpoint、  
+> request JSON 與 response JSON 結構，  
+> 即使背後使用的是本地或自架模型，  
+> 仍可被 Open-WebUI 當作 OpenAI API 來使用。
 
 ---
 
@@ -280,7 +429,7 @@ Filter / Tools 是「功能」，Pipeline 是「架構」。
 
 ---
 
-### 本章接下來會做什麼？
+### 下一個目標：建立一個最小 Pipeline Server
 
 接下來的內容，我們會：
 
@@ -288,6 +437,11 @@ Filter / Tools 是「功能」，Pipeline 是「架構」。
 2. **用 `docker run` 啟動 Pipeline API**
 3. **從 Open-WebUI 指向這個 Pipeline Server**
 4. **理解服務之間的溝通方式**
+5. **直接下載openwebui的wiki單一py檔範例**
+
+> 官網網址:  
+> `https://raw.githubusercontent.com/open-webui/pipelines/main/examples/pipelines/integrations/wikipedia_pipeline.py`  
+> [官方範例目錄 GitHub Repo](https://github.com/open-webui/pipelines/tree/main/examples)  
 
 **整個流程的重點只有一個：**
 
@@ -360,20 +514,7 @@ docker run -d -p 9099:9099 \
 docker --version
 ```
 
-**如果 `host-gateway` 不支援的替代方案：**
 
-```bash
-# 先取得 Raspberry Pi 的 IP 地址
-hostname -I | awk '{print $1}'
-
-# 假設 IP 是 192.168.1.100，使用實際 IP 替代
-docker run -d -p 9099:9099 \
-  --add-host=host.docker.internal:192.168.1.100 \
-  -v pipelines:/app/pipelines \
-  --name pipelines \
-  --restart always \
-  ghcr.io/open-webui/pipelines:main
-```
 
 **使用 Docker Compose（單一服務版本）：**
 
@@ -420,20 +561,10 @@ docker compose down
 docker compose down -v
 ```
 
-**Raspberry Pi 特別注意：**
+**說明：Named Volume 的資料由 Docker 管理，適合正式部署。  
+Named Volume 的資料由 Docker 管理，適合正式部署。 
 
-如果 `host-gateway` 不支援，可以這樣修改：
-
-```yaml
-extra_hosts:
-  # 使用實際 IP（先執行 hostname -I 取得 IP）
-  - "host.docker.internal:192.168.1.100"
-```
-
-**老師說明：**  
-Named Volume 的資料由 Docker 管理，適合正式部署。  
 但對教學來說，我們更推薦方式 B。
-
 ---
 
 #### 方式 B：使用 Bind Mount（**推薦給同學們**）

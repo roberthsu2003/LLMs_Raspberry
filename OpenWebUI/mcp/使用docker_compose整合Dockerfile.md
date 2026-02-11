@@ -1,22 +1,36 @@
-# 使用docker_compose整合Dockerfile
+# 使用 Docker Compose 整合 Dockerfile
 
-這一步就是把「單一容器」升級成「可管理的服務架構」。
+## 📋 目錄
 
-你現在已經有：
-
-- ✅ Dockerfile（mcpo-server）
-- ✅ 想要固定 network
-- ✅ 未來可能還要加 open-webui
-
-那就改用 docker-compose.yml 管理。
+- [前言](#前言)
+- [一、專案結構建議](#一專案結構建議)
+- [二、Dockerfile](#二dockerfile)
+- [三、docker-compose.yml](#三docker-composeyml)
+- [四、啟動方式](#四啟動方式)
+- [五、執行流程說明](#五執行流程說明)
+- [六、驗證服務](#六驗證服務)
 
 ---
 
-# **一、專案結構建議**
+## 前言
 
-建立一個資料夾，例如：
+這一步是把「單一容器」升級成「可管理的服務架構」。
 
-```other
+若你已經具備：
+
+- ✅ Dockerfile（mcpo-server）
+- ✅ 固定的 network（webui-net）
+- ✅ 未來可能還要加入 Open-WebUI
+
+建議改用 `docker-compose.yml` 統一管理。
+
+---
+
+## 一、專案結構建議
+
+建議的專案目錄結構：
+
+```
 mcpo-project/
 ├── docker-compose.yml
 └── mcpo/
@@ -25,9 +39,11 @@ mcpo-project/
 
 ---
 
-# **二、Dockerfile（放在 mcpo/ 內）**
+## 二、Dockerfile
 
-```other
+將 Dockerfile 放在 `mcpo/` 目錄內：
+
+```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -41,9 +57,11 @@ CMD ["mcpo", "--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/T
 
 ---
 
-# **三、docker-compose.yml**
+## 三、docker-compose.yml
 
-```other
+在專案根目錄建立 `docker-compose.yml`：
+
+```yaml
 version: "3.9"
 
 services:
@@ -57,148 +75,80 @@ services:
 
 networks:
   webui-net:
+    name: webui-net
     driver: bridge
 ```
 
+**說明：**
+
+- `build: ./mcpo`：指定 Dockerfile 所在目錄
+- `networks: webui-net`：與 Open-WebUI 使用相同網路，方便互通
+- `name: webui-net`：網路名稱固定為 `webui-net`，可與既有 Open-WebUI 共用
+
 ---
 
-# **四、啟動方式**
+## 四、啟動方式
 
 在專案根目錄執行：
 
-```other
+```bash
 docker compose up -d
 ```
 
-（新版 Docker 是 docker compose，不是 docker-compose）
+> **注意：** 新版 Docker 使用 `docker compose`（無連字號），而非 `docker-compose`。
 
----
+### 若已修改 Dockerfile，需要重新建置
 
-# **五、執行流程（這段超適合教學）**
+不需手動刪除映像，執行：
 
-當你執行：
-
-```other
-docker compose up -d
+```bash
+docker compose up -d --build
 ```
 
-Docker 會做：
+`--build` 會強制重新建置映像後再啟動。
 
 ---
 
-## **Step 1：建立 network（如果不存在）**
+## 五、執行流程說明
 
-```other
-webui-net
-```
+當你執行 `docker compose up -d` 時，Docker 會依序進行：
 
-👉 這就是你剛剛問的「如果有就不建立」
+### Step 1：建立或取得 network
 
-compose 會自動幫你處理。
+若 `webui-net` 不存在，Compose 會自動建立；若已存在（例如由 Open-WebUI 建立），則直接使用。
 
----
-
-## **Step 2：build image**
+### Step 2：Build image
 
 等同於：
 
-```other
-docker build -t mcpo-project-mcpo .
+```bash
+docker build -t mcpo-project-mcpo ./mcpo
 ```
 
----
-
-## **Step 3：建立 container**
+### Step 3：建立並啟動 container
 
 等同於：
 
-```other
-docker run ...
+```bash
+docker run -d --name mcpo --network webui-net -p 8000:8000 mcpo-project-mcpo
 ```
 
 ---
 
-# **六、如果未來加上 Open-WebUI**
+## 六、驗證服務
 
-你只要改成：
+### 檢查容器狀態
 
-```other
-version: "3.9"
-
-services:
-  mcpo:
-    build: ./mcpo
-    container_name: mcpo
-    ports:
-      - "8000:8000"
-    networks:
-      - webui-net
-
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
-    ports:
-      - "3000:8080"
-    networks:
-      - webui-net
-
-networks:
-  webui-net:
-    driver: bridge
+```bash
+docker ps
 ```
 
-然後在 Open-WebUI 內填：
+確認 `mcpo` 容器狀態為 `Up`。
 
-```other
-http://mcpo:8000
-```
+### 使用瀏覽器驗證 Swagger UI
 
-因為：
+開啟：`http://<樹莓派IP>:8000/docs`
 
-> 同一個 network → 可以用 service 名稱當 hostname
+應能看到 Swagger UI 介面，以及 `/get_current_time`、`/convert_time` 兩個 endpoint。
 
 ---
-
-# **七、為什麼你應該教 compose（對你課程超重要）**
-
-你現在在教 MCP 架構。
-
-docker compose 其實是在教：
-
-```other
-Infrastructure as Code
-```
-
-而且學生會開始理解：
-
-- service
-- network
-- container DNS
-- multi-service architecture
-
-這會讓 MCP 不再只是工具，而是架構思維。
-
----
-
-# **八、建議你在課程中這樣拆章節**
-
-1️⃣ 單容器 docker run
-
-2️⃣ 自己寫 Dockerfile
-
-3️⃣ 建立 network
-
-4️⃣ docker compose 管理
-
-5️⃣ 多服務整合
-
-學生會從「會跑」→「會架構」
-
----
-
-如果你願意，我可以幫你做一個：
-
-🔥「MCP + Open-WebUI + Pipeline Server」完整 docker-compose 架構圖
-
-那張圖會非常有教學震撼力。
-

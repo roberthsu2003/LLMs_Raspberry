@@ -4,8 +4,10 @@
 
 - [FastMCP 是什麼？](#fastmcp-是什麼)
 - [先理解：什麼是 MCP？](#先理解什麼是-mcp)
+- [為什麼 MCP 需要 WebSocket？](#為什麼-mcp-需要-websocket)
 - [FastMCP 在做什麼？](#fastmcp-在做什麼)
 - [沒有 FastMCP 會怎樣？](#沒有-fastmcp-會怎樣)
+- [FastMCP 幫你做了什麼？](#fastmcp-幫你做了什麼)
 - [使用 FastMCP 的好處](#使用-fastmcp-的好處)
 - [範例：最小 FastMCP Server](#範例最小-fastmcp-server)
 - [FastMCP 與 Pipeline 的差異](#fastmcp-與-pipeline-的差異)
@@ -41,6 +43,36 @@
 
 ---
 
+## 為什麼 MCP 需要 WebSocket？
+
+MCP 是**即時雙向通訊協定**。
+
+Client（例如 Open-WebUI、Claude Desktop）與 Server（你的 MCP Server）之間，不是「一次請求一次回應」而已，而是會**長時間保持連線，隨時雙向傳訊息**。這種模式最適合用 **WebSocket**。
+
+### HTTP 與 WebSocket 的差異
+
+| 模式 | 特性 |
+|------|------|
+| **HTTP** | Client → Request → Server → Response → 連線結束 |
+| **WebSocket** | Client ↔ Server 持續連線，可隨時互傳訊息，支援串流 |
+
+### MCP 實際需要的場景
+
+當模型決定呼叫工具、工具正在執行、或需要串流結果、多步驟互動時，需要：
+
+1. 即時回傳狀態
+2. 非同步回應
+3. 串流輸出
+4. Server 主動發訊息
+
+這些 HTTP 很難優雅處理，而 WebSocket 正是為此設計。
+
+### 教學金句
+
+> **HTTP 是問答式，WebSocket 是對話式。MCP 是讓模型和工具進行「對話」。**
+
+---
+
 ## FastMCP 在做什麼？
 
 FastMCP 幫你把這件事變得非常簡單。
@@ -58,15 +90,63 @@ FastMCP 幫你把這件事變得非常簡單。
 
 ## 沒有 FastMCP 會怎樣？
 
-如果不用 FastMCP，你要自己處理：
+如果不用 FastMCP，你要自己實作所有的底層機制：
 
-- WebSocket / HTTP Server
-- MCP 協定格式
-- JSON schema
-- Tool 註冊機制
-- Context 管理
+### ① WebSocket Server
 
-會非常麻煩。
+需自行處理：
+
+- 連線建立
+- 訊息格式解析
+- 關閉事件
+- 錯誤管理
+
+### ② MCP 訊息格式
+
+MCP 訊息不是隨便的 JSON，它有特定格式：
+
+- `initialize`
+- `list_tools`
+- `call_tool`
+- `response id`
+- `error` 格式
+
+全部要自己解析與實作。
+
+### ③ 工具註冊系統
+
+需自行維護工具對照表：
+
+```python
+tools = {
+    "add": add_function,
+    "query_db": query_function
+}
+```
+
+還要將每個工具轉成 JSON Schema 供模型辨識。
+
+---
+
+## FastMCP 幫你做了什麼？
+
+**重點：** 不是因為 FastMCP 才需要 WebSocket，而是 **MCP 協定本身就設計成即時雙向通訊**。FastMCP 只是幫你把這些底層全部包起來。
+
+它幫你：
+
+- 建立 WebSocket Server
+- 實作 MCP 協定
+- 自動產生 JSON Schema
+- 處理 tool 呼叫
+- 管理 context
+
+你只要寫：
+
+```python
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    return a + b
+```
 
 ---
 

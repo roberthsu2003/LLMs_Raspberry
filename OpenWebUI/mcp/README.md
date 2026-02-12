@@ -9,6 +9,15 @@ MCP 是一種協定（Model Context Protocol）。
 
 ## 目錄
 
+### 第一篇：使用現有 MCP（環境建置與入門）
+
+| 順序 | 主題 | 說明 |
+|------|------|------|
+| 1 | [open-webui如何使用MCP](./open-webui如何使用MCP.md) | MCP 工具在 Open-WebUI 的啟用與基本使用 |
+| 2 | [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md) | 建立 mcpo 映像與容器 |
+| 3 | [使用docker_compose整合Dockerfile](./使用docker_compose整合Dockerfile.md) | 以 docker-compose 管理 MCP 服務 |
+| 4 | [整合使用open-webui和cloudflare tunnel](./整合使用open-webui和cloudflare_tunnel.md) | 透過 Cloudflare Tunnel 對外曝光 |
+| 5 | [同時安裝多個MCP Server](./同時安裝多個MCP_Server.md) | 部署多個 MCP 工具（時間、天氣等） |
 
 ### 第二篇：自訂 MCP Server（由淺至深）
 

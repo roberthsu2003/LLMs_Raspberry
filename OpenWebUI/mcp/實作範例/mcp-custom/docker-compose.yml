@@ -1,0 +1,45 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MCP_ENABLE: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mcpo-custom:
+    build: ./mcpo
+    container_name: mcpo-custom
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8001:8000"
+    command: >
+      mcpo --port 8000 --
+      python server.py
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+
+volumes:
+  open-webui:
+    external: true
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge

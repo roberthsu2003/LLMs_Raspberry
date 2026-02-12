@@ -1,25 +1,24 @@
-# MCP
+# Open-WebUI 自訂 MCP Server 架構規劃
 
-## 名詞解釋：什麼是「MCP」？
-
-MCP 是一種協定（Model Context Protocol）。
-它是一種用於在模型和外部工具之間傳遞上下文的協定。
+> 本文檔整合「建立自訂的MCP_Server.md」內容，並依據現有專案結構規劃完整架構。
 
 ---
-## 目錄
 
-- [open-webui如何使用MCP](./open-webui如何使用MCP.md)
-- [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md)
-- [使用docker_compose整合Dockerfile](./使用docker_compose整合Dockerfile.md)
-- [整合使用open-webui和cloudflare tunnel](./整合使用open-webui和cloudflare_tunnel.md)
-- [同時安裝多個MCP Server](./同時安裝多個MCP_Server.md)
-- [建立自訂的MCP Server](./建立自訂的MCP_Server.md)
+## 📋 目錄
 
-## 架構規劃
+- [一、整體架構概覽](#一整體架構概覽)
+- [二、專案目錄結構](#二專案目錄結構)
+- [三、技術架構層級](#三技術架構層級)
+- [四、元件職責說明](#四元件職責說明)
+- [五、部署模式比較](#五部署模式比較)
+- [六、教學階段規劃](#六教學階段規劃)
+- [七、擴充與維運](#七擴充與維運)
 
-### 一、整體架構概覽
+---
 
-#### 1.1 系統關係圖
+## 一、整體架構概覽
+
+### 1.1 系統關係圖
 
 ```
                     ┌─────────────────────────────────────────────────┐
@@ -43,7 +42,7 @@ MCP 是一種協定（Model Context Protocol）。
                                     webui-net (bridge network)
 ```
 
-#### 1.2 核心概念
+### 1.2 核心概念
 
 | 概念 | 說明 |
 |------|------|
@@ -54,9 +53,9 @@ MCP 是一種協定（Model Context Protocol）。
 
 ---
 
-### 二、專案目錄結構
+## 二、專案目錄結構
 
-#### 2.1 建議的完整結構
+### 2.1 建議的完整結構
 
 ```
 LLMs_Raspberry/
@@ -79,11 +78,11 @@ LLMs_Raspberry/
 └── OpenWebUI/
     └── mcp/
         ├── 建立自訂的MCP_Server.md
-        ├── README.md
+        ├── MCP_Server_架構規劃.md   # 本文件
         └── ...
 ```
 
-#### 2.2 與現有專案的整合方式
+### 2.2 與現有專案的整合方式
 
 若你已有 `Docker_compose快速部署open-webui` 專案，有兩種整合策略：
 
@@ -96,9 +95,9 @@ LLMs_Raspberry/
 
 ---
 
-### 三、技術架構層級
+## 三、技術架構層級
 
-#### 3.1 三層架構
+### 3.1 三層架構
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -119,7 +118,7 @@ LLMs_Raspberry/
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### 3.2 資料流
+### 3.2 資料流
 
 ```
 使用者輸入：「台北現在幾點？」
@@ -142,9 +141,9 @@ mcpo 轉成 HTTP 回應 → Open-WebUI → 顯示給使用者
 
 ---
 
-### 四、元件職責說明
+## 四、元件職責說明
 
-#### 4.1 mcpo 映像（共用基礎）
+### 4.1 mcpo 映像（共用基礎）
 
 | 項目 | 內容 |
 |------|------|
@@ -152,7 +151,7 @@ mcpo 轉成 HTTP 回應 → Open-WebUI → 顯示給使用者
 | **角色** | 預裝 `mcpo`、`mcp-server-time`、`mcp_weather_server` 等套件 |
 | **自訂服務** | 透過 `command` 覆寫，執行 `python /custom/server.py` |
 
-#### 4.2 mcp-custom 專案
+### 4.2 mcp-custom 專案
 
 | 檔案 | 職責 |
 |------|------|
@@ -160,7 +159,7 @@ mcpo 轉成 HTTP 回應 → Open-WebUI → 顯示給使用者
 | **requirements.txt** | `mcp`（必需）、`requests`（若需呼叫 API） |
 | **Dockerfile** | 獨立建置時使用；或透過 volume 掛載到 mcpo 容器 |
 
-#### 4.3 docker-compose 整合
+### 4.3 docker-compose 整合
 
 ```yaml
 mcpo-custom:
@@ -182,9 +181,9 @@ mcpo-custom:
 
 ---
 
-### 五、部署模式比較
+## 五、部署模式比較
 
-#### 5.1 教學模式（stdio + mcpo）
+### 5.1 教學模式（stdio + mcpo）
 
 | 優點 | 說明 |
 |------|------|
@@ -194,7 +193,7 @@ mcpo-custom:
 
 **適用**：初學、教學、開發階段。
 
-#### 5.2 正式部署模式（HTTP transport）
+### 5.2 正式部署模式（HTTP transport）
 
 | 優點 | 說明 |
 |------|------|
@@ -213,9 +212,9 @@ mcp.run(transport="http")
 
 ---
 
-### 六、教學階段規劃
+## 六、教學階段規劃
 
-#### 階段一：靜態工具
+### 階段一：靜態工具（約 1–2 小時）
 
 | 目標 | 內容 |
 |------|------|
@@ -223,7 +222,7 @@ mcp.run(transport="http")
 | **學習重點** | FastMCP 基本用法、`@mcp.tool()` 裝飾器、參數型別 |
 | **驗證** | 「請幫我用工具加總 3 + 5」 |
 
-#### 階段二：外部 API 工具
+### 階段二：外部 API 工具（約 2–3 小時）
 
 | 目標 | 內容 |
 |------|------|
@@ -231,7 +230,7 @@ mcp.run(transport="http")
 | **學習重點** | `requests` 呼叫外部 API、錯誤處理、API Key 管理 |
 | **驗證** | 「台北明天天氣如何？」、「查詢台積電股價」 |
 
-#### 階段三：資料庫工具
+### 階段三：資料庫工具（約 2–3 小時）
 
 | 目標 | 內容 |
 |------|------|
@@ -241,16 +240,16 @@ mcp.run(transport="http")
 
 ---
 
-### 七、擴充與維運
+## 七、擴充與維運
 
-#### 7.1 新增自訂工具流程
+### 7.1 新增自訂工具流程
 
 1. 在 `server.py` 中新增 `@mcp.tool()` 函式
 2. 若需新套件，更新 `requirements.txt`
 3. 若有 volume 掛載：直接重啟容器即可
 4. 若無 volume：`docker compose up -d --build`
 
-#### 7.2 除錯建議
+### 7.2 除錯建議
 
 | 情境 | 方法 |
 |------|------|
@@ -258,7 +257,7 @@ mcp.run(transport="http")
 | 容器無法啟動 | `docker compose logs mcpo-custom` 檢查錯誤 |
 | 本機測試 | `cd mcp-custom && python server.py`（需手動用 stdio 測試，或先改成 HTTP 模式） |
 
-#### 7.3 埠號分配表
+### 7.3 埠號分配表
 
 | 服務 | 主機埠 | 容器埠 | Open-WebUI 設定 URL |
 |------|--------|--------|---------------------|
@@ -268,7 +267,7 @@ mcp.run(transport="http")
 
 ---
 
-### 附錄：快速檢查清單
+## 附錄：快速檢查清單
 
 建立自訂 MCP Server 時，確認以下項目：
 
@@ -281,4 +280,4 @@ mcp.run(transport="http")
 
 ---
 
-
+*本架構規劃可作為 6 小時 MCP Server 開發章節的藍圖，包含練習題、錯誤排除與架構圖可依此延伸。*

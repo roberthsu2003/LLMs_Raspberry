@@ -8,6 +8,7 @@
 - [三、整合 ChromaDB](#三整合-chromadb)
 - [四、RAG 整合概念](#四rag-整合概念)
 - [五、驗證與練習](#五驗證與練習)
+- [六、整合 mcpo 部署](#六整合-mcpo-部署)
 
 ---
 
@@ -153,6 +154,53 @@ MCP 在此扮演「讓 LLM 能存取外部資料」的橋樑。
 1. 使用 Open-WebUI 的 RAG 檔案上傳功能，建立知識庫，再透過 MCP 查詢。
 2. 設計 `search_products(keyword: str)` 工具，查詢 SQLite 產品表。
 3. 結合 ChromaDB 與 LLM，實作「先檢索、再生成」的 RAG 流程。
+
+---
+
+## 六、整合 mcpo 部署
+
+本階段使用 `chromadb`，mcpo 映像需額外安裝，並掛載資料目錄。
+
+### 6.1 mcpo/Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir mcpo mcp requests chromadb
+EXPOSE 8000
+```
+
+### 6.2 docker-compose.yml 新增服務
+
+```yaml
+mcpo-custom:
+  build: ./mcpo
+  container_name: mcpo-custom
+  restart: always
+  networks:
+    - webui-net
+  ports:
+    - "8003:8000"
+  command: >
+    mcpo --port 8000 --
+    python /custom/server.py
+  volumes:
+    - ./mcp-custom:/custom
+    - ./mcp-custom/data:/data
+```
+
+- `./mcp-custom:/custom`：掛載程式碼
+- `./mcp-custom/data:/data`：掛載 SQLite／ChromaDB 資料，`server.py` 中的 `db_path`、`chromadb path` 需對應 `/data`
+
+### 6.3 啟動與連線
+
+```bash
+docker compose up -d --build
+```
+
+**Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://mcpo-custom:8000`
+
+> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
 
 ---
 

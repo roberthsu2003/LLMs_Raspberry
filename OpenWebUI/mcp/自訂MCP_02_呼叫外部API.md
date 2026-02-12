@@ -9,6 +9,7 @@
 - [四、錯誤處理](#四錯誤處理)
 - [五、API Key 管理](#五api-key-管理)
 - [六、驗證與練習](#六驗證與練習)
+- [七、整合 mcpo 部署](#七整合-mcpo-部署)
 
 ---
 
@@ -158,6 +159,56 @@ mcpo-custom:
 1. 串接真實天氣 API（如 Open-Meteo 或 weatherapi.com）。
 2. 使用 `yfinance` 套件查詢真實股價。
 3. 新增 `get_exchange_rate(from_curr: str, to_curr: str)` 查詢匯率。
+
+---
+
+## 七、整合 mcpo 部署
+
+本階段使用 `requests`，mcpo 映像需額外安裝。
+
+### 7.1 mcpo/Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir mcpo mcp requests
+EXPOSE 8000
+```
+
+### 7.2 docker-compose.yml 新增服務
+
+```yaml
+mcpo-custom:
+  build: ./mcpo
+  container_name: mcpo-custom
+  restart: always
+  networks:
+    - webui-net
+  ports:
+    - "8003:8000"
+  command: >
+    mcpo --port 8000 --
+    python /custom/server.py
+  volumes:
+    - ./mcp-custom:/custom
+```
+
+若有 API Key，在 service 中新增：
+
+```yaml
+  environment:
+    - WEATHER_API_KEY=${WEATHER_API_KEY}
+```
+
+### 7.3 啟動與連線
+
+```bash
+docker compose up -d --build
+```
+
+**Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://mcpo-custom:8000`
+
+> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
 
 ---
 

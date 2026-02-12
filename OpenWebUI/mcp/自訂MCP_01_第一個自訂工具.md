@@ -8,6 +8,7 @@
 - [三、撰寫 server.py](#三撰寫-serverpy)
 - [四、本機測試](#四本機測試)
 - [五、驗證與練習](#五驗證與練習)
+- [六、整合 mcpo 部署](#六整合-mcpo-部署)
 
 ---
 
@@ -105,7 +106,7 @@ python server.py
 
 ## 五、驗證與練習
 
-完成本階段後，在 Open-WebUI 中測試（需先完成 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)）：
+完成本階段後，在 Open-WebUI 中測試（需先完成下方「整合 mcpo 部署」）：
 
 - 「請幫我用工具加總 3 + 5」
 - 「用 hello 工具跟小明打招呼」
@@ -114,6 +115,61 @@ python server.py
 
 1. 新增 `multiply(a: int, b: int)` 工具，回傳兩數相乘結果。
 2. 新增 `greet(name: str, language: str)` 工具，依 `language` 參數回傳不同語言的問候語。
+
+---
+
+## 六、整合 mcpo 部署
+
+將自訂 MCP Server 整合至 Docker 環境，讓 Open-WebUI 能呼叫。
+
+### 6.1 專案結構
+
+```
+Docker_compose快速部署open-webui/
+├── docker-compose.yml
+├── mcpo/
+│   └── Dockerfile
+└── mcp-custom/
+    ├── requirements.txt
+    └── server.py
+```
+
+### 6.2 mcpo/Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir mcpo mcp
+EXPOSE 8000
+```
+
+### 6.3 docker-compose.yml 新增服務
+
+```yaml
+mcpo-custom:
+  build: ./mcpo
+  container_name: mcpo-custom
+  restart: always
+  networks:
+    - webui-net
+  ports:
+    - "8003:8000"
+  command: >
+    mcpo --port 8000 --
+    python /custom/server.py
+  volumes:
+    - ./mcp-custom:/custom
+```
+
+### 6.4 啟動與連線
+
+```bash
+docker compose up -d --build
+```
+
+**Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://mcpo-custom:8000`
+
+> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
 
 ---
 

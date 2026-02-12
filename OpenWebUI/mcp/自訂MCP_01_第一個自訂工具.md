@@ -117,4 +117,5 @@ python server.py
 
 ---
 
-下一章：[自訂MCP_02_呼叫外部API](./自訂MCP_02_呼叫外部API.md)
+上一篇：[自訂MCP_00_認識FastMCP](./自訂MCP_00_認識FastMCP.md)  
+下一篇：[自訂MCP_02_呼叫外部API](./自訂MCP_02_呼叫外部API.md)

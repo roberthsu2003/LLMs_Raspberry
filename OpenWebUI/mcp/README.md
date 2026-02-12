@@ -19,7 +19,7 @@ MCP 是一種協定（Model Context Protocol）。
 | 4 | [整合使用open-webui和cloudflare tunnel](./整合使用open-webui和cloudflare_tunnel.md) | 透過 Cloudflare Tunnel 對外曝光 |
 | 5 | [同時安裝多個MCP Server](./同時安裝多個MCP_Server.md) | 部署多個 MCP 工具（時間、天氣等） |
 
-### 第二篇：自訂 MCP Server（由淺至深）
+### 第二篇：自訂 MCP Server
 
 | 階段 | 主題 | 說明 |
 |------|------|------|

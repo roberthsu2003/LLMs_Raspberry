@@ -7,8 +7,9 @@
 - [二、建立專案結構](#二建立專案結構)
 - [三、撰寫 server.py](#三撰寫-serverpy)
 - [四、本機測試](#四本機測試)
-- [五、驗證與練習](#五驗證與練習)
-- [六、整合 mcpo 部署](#六整合-mcpo-部署)
+- [五、Debug 與測試](#五debug-與測試)
+- [六、驗證與練習](#六驗證與練習)
+- [七、整合 mcpo 部署](#七整合-mcpo-部署)
 
 ---
 
@@ -103,11 +104,124 @@ pip install -r requirements.txt
 python server.py
 ```
 
-程式會以 stdio 模式運行，等待輸入。若要完整測試，需搭配 mcpo 或後續章節的部署方式。
+程式會以 stdio 模式運行，等待輸入。若要完整測試，需搭配 mcpo 或下方「Debug 與測試」的方式。
 
 ---
 
-## 五、驗證與練習
+## 五、Debug 與測試
+
+### 5.1 方法一：直接呼叫工具函式（最簡單）
+
+在開發時，可先獨立測試工具邏輯，不透過 MCP 層。建立 `test_tools.py`：
+
+```python
+# test_tools.py
+from server import add, hello
+
+print(add(3, 5))        # 應輸出 8
+print(hello("小明"))    # 應輸出 Hello 小明, 這是自訂 MCP Server
+```
+
+執行：
+
+```bash
+cd mcp-custom
+python test_tools.py
+```
+
+或使用單行：
+
+```bash
+python -c "from server import add, hello; print(add(3, 5)); print(hello('測試'))"
+```
+
+### 5.2 方法二：改用 HTTP transport 本機除錯
+
+將 `mcp.run()` 改為 HTTP 模式，Server 可直接對外提供 HTTP，方便用 curl 或 Postman 測試：
+
+```python
+# server.py 暫時改成
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
+```
+
+啟動後，Server 會監聽預設 port（依 mcp 套件版本而定）。若需指定 port，可查閱該版本的 `mcp.run()` 參數說明。
+
+> **注意**：使用 HTTP 模式時不需 mcpo；若要保持與 Open-WebUI 使用 stdio + mcpo 的部署方式一致，建議以方法三為主。
+
+### 5.3 方法三：透過 mcpo + Swagger UI（推薦）
+
+部署 mcpo 後，透過 Swagger 介面測試：
+
+```bash
+docker compose up -d --build
+```
+
+開啟：`http://localhost:8003/docs`
+
+可看到所有已註冊的工具，並直接呼叫測試，無需透過 Open-WebUI。
+
+### 5.4 方法四：加入 print 或 logging
+
+在工具內加入 log，方便追蹤執行流程：
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """將兩個整數相加。"""
+    logger.info(f"add 被呼叫: a={a}, b={b}")
+    result = a + b
+    logger.info(f"回傳: {result}")
+    return result
+```
+
+容器內執行時，用 `docker compose logs -f mcpo-custom` 查看輸出。
+
+### 5.5 方法五：用 MCP Client 寫測試腳本
+
+以 Python MCP Client 連到 stdio 模式的 server，程式化測試：
+
+```python
+# test_client.py
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+async def test_tools():
+    server_params = StdioServerParameters(
+        command="python",
+        args=["server.py"],
+    )
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            print("工具列表:", [t.name for t in tools.tools])
+            result = await session.call_tool("add", arguments={"a": 3, "b": 5})
+            print("add(3, 5) 結果:", result)
+
+asyncio.run(test_tools())
+```
+
+執行：`python test_client.py`（需在 `mcp-custom` 目錄且 server.py 在同一目錄）
+
+### 5.6 除錯建議整理
+
+| 情境 | 建議方式 |
+|------|----------|
+| 快速驗證工具邏輯 | 方法一：直接呼叫函式 |
+| 本機不開 Docker 測試 | 方法二：HTTP transport |
+| 完整流程測試 | 方法三：mcpo + Swagger UI |
+| 追蹤執行流程 | 方法四：print / logging |
+| 自動化測試 | 方法五：MCP Client 腳本 |
+
+---
+
+## 六、驗證與練習
 
 完成本階段後，在 Open-WebUI 中測試（需先完成下方「整合 mcpo 部署」）：
 
@@ -121,11 +235,11 @@ python server.py
 
 ---
 
-## 六、整合 mcpo 部署
+## 七、整合 mcpo 部署
 
 將自訂 MCP Server 整合至 Docker 環境，讓 Open-WebUI 能呼叫。
 
-### 6.1 專案結構
+### 7.1 專案結構
 
 ```
 Docker_compose快速部署open-webui/
@@ -137,7 +251,7 @@ Docker_compose快速部署open-webui/
     └── server.py
 ```
 
-### 6.2 mcpo/Dockerfile
+### 7.2 mcpo/Dockerfile
 
 ```dockerfile
 FROM python:3.11-slim
@@ -146,7 +260,7 @@ RUN pip install --no-cache-dir mcpo mcp
 EXPOSE 8000
 ```
 
-### 6.3 docker-compose.yml 新增服務
+### 7.3 docker-compose.yml 新增服務
 
 ```yaml
 mcpo-custom:
@@ -164,7 +278,7 @@ mcpo-custom:
     - ./mcp-custom:/custom
 ```
 
-### 6.4 啟動與連線
+### 7.4 啟動與連線
 
 ```bash
 docker compose up -d --build

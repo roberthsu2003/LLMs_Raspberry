@@ -129,27 +129,9 @@ cd mcp-custom
 python test_tools.py
 ```
 
-或使用單行：
 
-```bash
-python -c "from server import add, hello; print(add(3, 5)); print(hello('測試'))"
-```
 
-### 5.2 方法二：改用 HTTP transport 本機除錯
-
-將 `mcp.run()` 改為 HTTP 模式，Server 可直接對外提供 HTTP，方便用 curl 或 Postman 測試：
-
-```python
-# server.py 暫時改成
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
-```
-
-啟動後，Server 會監聽預設 port（依 mcp 套件版本而定）。若需指定 port，可查閱該版本的 `mcp.run()` 參數說明。
-
-> **注意**：使用 HTTP 模式時不需 mcpo；若要保持與 Open-WebUI 使用 stdio + mcpo 的部署方式一致，建議以方法三為主。
-
-### 5.3 方法三：透過 mcpo + Swagger UI（推薦）
+### 5.2 方法二：透過 mcpo + Swagger UI（推薦）
 
 部署 mcpo 後，透過 Swagger 介面測試：
 
@@ -161,7 +143,7 @@ docker compose up -d --build
 
 可看到所有已註冊的工具，並直接呼叫測試，無需透過 Open-WebUI。
 
-### 5.4 方法四：加入 print 或 logging
+### 5.3 方法三：加入 print 或 logging
 
 在工具內加入 log，方便追蹤執行流程：
 
@@ -181,7 +163,7 @@ def add(a: int, b: int) -> int:
 
 容器內執行時，用 `docker compose logs -f mcpo-custom` 查看輸出。
 
-### 5.5 方法五：用 MCP Client 寫測試腳本
+### 5.4 方法四：用 MCP Client 寫測試腳本
 
 以 Python MCP Client 連到 stdio 模式的 server，程式化測試：
 
@@ -209,16 +191,6 @@ asyncio.run(test_tools())
 
 執行：`python test_client.py`（需在 `mcp-custom` 目錄且 server.py 在同一目錄）
 
-### 5.6 除錯建議整理
-
-| 情境 | 建議方式 |
-|------|----------|
-| 快速驗證工具邏輯 | 方法一：直接呼叫函式 |
-| 本機不開 Docker 測試 | 方法二：HTTP transport |
-| 完整流程測試 | 方法三：mcpo + Swagger UI |
-| 追蹤執行流程 | 方法四：print / logging |
-| 自動化測試 | 方法五：MCP Client 腳本 |
-
 ---
 
 ## 六、驗證與練習
@@ -244,38 +216,79 @@ asyncio.run(test_tools())
 ```
 Docker_compose快速部署open-webui/
 ├── docker-compose.yml
-├── mcpo/
-│   └── Dockerfile
-└── mcp-custom/
+├── mcpo-tools/
+    |── Dockerfile
+    |── server.py
     ├── requirements.txt
-    └── server.py
+
 ```
 
 ### 7.2 mcpo/Dockerfile
 
 ```dockerfile
 FROM python:3.11-slim
+
 WORKDIR /app
-RUN pip install --no-cache-dir mcpo mcp
+
+COPY tools.py .
+
+RUN pip install --no-cache-dir \
+  mcpo \
+  requests
+
 EXPOSE 8000
+
 ```
 
 ### 7.3 docker-compose.yml 新增服務
 
 ```yaml
-mcpo-custom:
-  build: ./mcpo
-  container_name: mcpo-custom
-  restart: always
-  networks:
-    - webui-net
-  ports:
-    - "8003:8000"
-  command: >
-    mcpo --port 8000 --
-    python /custom/server.py
-  volumes:
-    - ./mcp-custom:/custom
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MCP_ENABLE: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mcpo-weather:
+    build: ./mcpo-tools
+    container_name: mcpo-weather
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8001:8000"
+    command: >
+      mcpo --port 8000 --
+      python tools.py
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+
+volumes:
+  open-webui:
+    external: true
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
+
 ```
 
 ### 7.4 啟動與連線

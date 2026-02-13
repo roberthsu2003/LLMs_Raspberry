@@ -44,49 +44,111 @@ ChromaDB / SQLite 查詢
 
 ---
 
-## 二、整合 SQLite
+## 二、整合 postgresSQL
 
-### 2.1 新增依賴
+你現在這個指令只有建立 container，**沒有掛載 volume**，所以資料會存在 container 裡。
 
-```
-mcp
-requests
-```
+如果你希望：
 
-（SQLite 為 Python 內建，無需額外安裝）
+- container 刪掉後資料還在
+- 或想清楚管理資料目錄
 
-### 2.2 範例：查詢 SQLite
+就需要加上 -v 參數。
 
-```python
-import sqlite3
+---
 
-@mcp.tool()
-def query_sqlite(query: str, db_path: str = "/data/sample.db") -> str:
-    """對 SQLite 資料庫執行查詢（僅支援 SELECT）。"""
-    if ";" in query and "SELECT" not in query.upper():
-        return "僅支援 SELECT 查詢"
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute(query)
-        rows = cur.fetchall()
-        conn.close()
-        
-        if not rows:
-            return "查詢結果為空"
-        # 轉成可讀格式
-        result = [dict(row) for row in rows]
-        return str(result[:10])  # 限制筆數
-    except sqlite3.Error as e:
-        return f"資料庫錯誤：{str(e)}"
+## **✅ 方法一：使用「命名 Volume」（建議）**
+
+```other
+docker run \
+  --name my-postgres \
+  -e POSTGRES_USER=myuser \
+  -e POSTGRES_PASSWORD=mypassword \
+  -e POSTGRES_DB=mydb \
+  -p 5432:5432 \
+  -v my-postgres-data:/var/lib/postgresql/data \
+  -d postgres
 ```
 
-### 2.3 注意事項
+### **🔎 重點說明**
 
--  production 環境應限制可執行的 SQL 類型，避免寫入或危險指令
-- 透過 volume 掛載資料庫檔案路徑
+| **參數**                                        | **說明**                             |
+| --------------------------------------------- | ---------------------------------- |
+| \-v my-postgres-data:/var/lib/postgresql/data | 建立一個叫做 my-postgres-data 的命名 volume |
+| /var/lib/postgresql/data                      | PostgreSQL 官方 image 的資料目錄          |
+
+Docker 會自動建立 my-postgres-data 這個 volume。
+
+---
+
+### **📌 查看 Volume**
+
+```other
+docker volume ls
+```
+
+```other
+docker volume inspect my-postgres-data
+```
+
+---
+
+## **✅ 方法二：綁定本機資料夾（Bind Mount）**
+
+如果你想讓資料直接存在本機資料夾：
+
+```other
+docker run \
+  --name my-postgres \
+  -e POSTGRES_PASSWORD=yourpassword \
+  -p 5432:5432 \
+  -v $(pwd)/pgdata:/var/lib/postgresql/data \
+  -d postgres
+```
+
+或指定絕對路徑：
+
+```other
+-v /Users/yourname/pgdata:/var/lib/postgresql/data
+```
+
+這樣資料會存在你的 Mac 本機資料夾。
+
+---
+
+## **🧠 教學角度補充（給學生）**
+
+你可以這樣講解：
+
+| **類型**       | **優點**    | **適合情境**   |
+| ------------ | --------- | ---------- |
+| Named Volume | Docker 管理 | 正式環境       |
+| Bind Mount   | 可直接看到檔案   | 教學 / Debug |
+
+---
+
+## **🚀 如果是用 docker-compose**
+
+```other
+services:
+  postgres:
+    image: postgres
+    container_name: my-postgres
+    environment:
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_USER: myuser
+    ports:
+      - "5432:5432"
+    volumes:
+      - my-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  my-postgres-data:
+```
+
+---
+
+
 
 ---
 

@@ -66,7 +66,7 @@ docker run \
   -e POSTGRES_PASSWORD=mypassword \
   -e POSTGRES_DB=mydb \
   -p 5432:5432 \
-  -v my-postgres-data:/var/lib/postgresql/data \
+  -v my-postgres-data:/var/lib/postgresql \
   -d postgres
 ```
 

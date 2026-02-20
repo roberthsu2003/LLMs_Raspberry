@@ -53,7 +53,7 @@
 
 1. **PATH 是一個路徑列表**，用冒號 (`:`) 分隔
 2. **系統會依序在這些路徑中搜尋**你要執行的指令
-3. **找到第一個符合的就執行**，找不到就報錯
+3. **找到第一個符合的就執行**，找不到就顯示錯誤訊息
 
 **範例：**
 
@@ -70,7 +70,41 @@ echo $PATH
 
 ### 為什麼有些指令找不到？
 
-如果你寫了一個自訂腳本 `my-script.sh`，放在 `/home/pi/my-tools/`，然後直接輸入：
+**動手做：建立一個最簡單的腳本**
+
+先建立目錄和腳本，讓學生實際體驗：
+
+```bash
+# 1. 建立目錄
+mkdir -p ~/my-tools
+
+# 2. 建立腳本（內容如下）
+cat > ~/my-tools/my-script.sh << 'EOF'
+#!/bin/bash
+echo "Hello! 我來自 my-tools 目錄"
+echo "這個腳本執行成功！"
+EOF
+
+# 3. 加上執行權限
+chmod +x ~/my-tools/my-script.sh
+```
+
+**語法說明：**
+
+| 符號 | 名稱 | 說明 |
+|------|------|------|
+| `>` | 輸出重導向 | 將左邊指令的輸出寫入右邊的檔案（會覆蓋原有內容） |
+| `<<` | Here Document（此處文件） | 從標準輸入讀取多行文字，直到遇到結束標記 |
+| `'EOF'` | 開始標記 | 告訴 shell「從下一行開始是輸入內容」，單引號 `'EOF'` 表示不解析變數 |
+| `EOF` | 結束標記 | 單獨一行的 `EOF` 表示輸入結束，必須與開始標記完全相同 |
+
+> 簡單說：`cat > 檔案 << 'EOF'` = 把 `EOF` 到 `EOF` 之間的內容寫入檔案。結束標記 `EOF` 可以改成其他名稱（如 `END`），但開始與結束必須一致。
+>
+> `~/my-tools` 等同於 `/home/pi/my-tools`（pi 為你的使用者名稱）
+
+---
+
+**情境：** 腳本放在 `~/my-tools/`，直接輸入檔名執行：
 
 ```bash
 my-script.sh
@@ -84,19 +118,32 @@ bash: my-script.sh: command not found
 
 **為什麼？**
 
-因為 `/home/pi/my-tools/` 不在 PATH 中，系統找不到這個指令！
+因為 `~/my-tools/` 不在 PATH 中，系統找不到這個指令！
+
+---
 
 **解決方法：**
 
 1. **使用完整路徑：**
    ```bash
+   ~/my-tools/my-script.sh
+   ```
+   或
+   ```bash
    /home/pi/my-tools/my-script.sh
+   ```
+   若執行成功，會看到：
+   ```
+   Hello! 我來自 my-tools 目錄
+   這個腳本執行成功！
    ```
 
 2. **將路徑加入 PATH（臨時）：**
    ```bash
-   export PATH=$PATH:/home/pi/my-tools
+   export PATH=$PATH:$HOME/my-tools
+   my-script.sh
    ```
+   加入後，直接輸入 `my-script.sh` 就能執行！
 
 3. **將路徑加入 PATH（永久）**：需要修改設定檔（後面會教）
 

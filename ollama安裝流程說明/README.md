@@ -148,6 +148,7 @@ Ollama 伺服器可透過**環境變數**進行設定。常見需求是讓 Ollam
    ```ini
    [Service]
    Environment="OLLAMA_HOST=0.0.0.0:11434"
+   Environment="OLLAMA_ORIGINS=*"
    ```
 
 3. **儲存並離開編輯器**（nano：`Ctrl+O` 儲存，`Ctrl+X` 離開）。

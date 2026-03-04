@@ -1,5 +1,7 @@
 # OpenWebUI 如何安裝與使用 MCP 工具
 
+![](./images/pic2.png)
+
 ## 📋 目錄
 
 - [測試現在的模型（未啟用 MCP）](#測試現在的模型未啟用-mcp)

@@ -98,6 +98,70 @@ ollama --help
 
 ---
 
+## 2.6 配置 Ollama Server（Configure Ollama Server）
+
+Ollama 伺服器可透過**環境變數**進行設定。常見需求是讓 Ollama 監聽所有網路介面（例如讓同一網路內的 Open-WebUI、其他裝置連線），需設定 `OLLAMA_HOST=0.0.0.0:11434`。
+
+### macOS 設定環境變數
+
+若 Ollama 是以 macOS 應用程式方式執行，需使用 `launchctl` 設定環境變數：
+
+1. **針對每個環境變數，執行 `launchctl setenv`：**
+   ```bash
+   launchctl setenv OLLAMA_HOST "0.0.0.0:11434"
+   ```
+
+2. **重新啟動 Ollama 應用程式**（從選單列退出後再開啟，或重開機）。
+
+### Windows 設定環境變數
+
+在 Windows 上，Ollama 會繼承使用者的使用者與系統環境變數。請依下列步驟設定：
+
+1. **先退出 Ollama**：在工作列點擊 Ollama 圖示，選擇退出。
+
+2. **開啟設定**：
+   - **Windows 11**：開啟「設定」，搜尋「環境變數」
+   - **Windows 10**：開啟「控制台」，搜尋「環境變數」
+
+3. **點擊「編輯您帳戶的環境變數」**。
+
+4. **編輯或新增變數**：為您的使用者帳戶新增或編輯 `OLLAMA_HOST`、`OLLAMA_MODELS` 等變數。
+   - 變數名稱：`OLLAMA_HOST`
+   - 變數值：`0.0.0.0:11434`（若需讓其他裝置連線）
+
+5. **點擊「確定」或「套用」儲存**。
+
+6. **從 Windows 開始選單重新啟動 Ollama 應用程式**。
+
+> 環境變數需在 Ollama 啟動前設定，因此務必先退出 Ollama 再修改，修改完成後重新啟動。
+
+### Linux / Raspberry Pi 設定環境變數
+
+若 Ollama 是以 systemd 服務方式執行，需使用 `systemctl` 編輯服務設定：
+
+1. **編輯 systemd 服務**（會開啟預設編輯器）：
+   ```bash
+   sudo systemctl edit ollama.service
+   ```
+
+2. **在 `[Service]` 區段下新增 `Environment` 行**：
+   ```ini
+   [Service]
+   Environment="OLLAMA_HOST=0.0.0.0:11434"
+   ```
+
+3. **儲存並離開編輯器**（nano：`Ctrl+O` 儲存，`Ctrl+X` 離開）。
+
+4. **重新載入 systemd 並重啟 Ollama**：
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart ollama
+   ```
+
+> **說明**：`OLLAMA_HOST=0.0.0.0:11434` 表示 Ollama 監聽所有網路介面（預設 11434 埠），預設僅監聽 `127.0.0.1`，僅本機可連線。
+
+---
+
 ## 3. 熱門模型介紹
 
 Ollama 支援數百種來自不同開發者的開源模型。以下是一些熱門且實用的模型，您可以根據需求選擇使用。

@@ -4,7 +4,11 @@
 
 **MCP（Model Context Protocol）** 是一種協定，用於在模型和外部工具之間傳遞上下文。它讓 LLM 可以標準化地呼叫外部 API、查詢資料庫、存取本地檔案等。
 
+![](./images/mcp流程概念圖.jpg)
+
 ---
+
+## 注意:OpenWebUI 沒有MCP Client的功能
 
 ## 📋 目錄
 

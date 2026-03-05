@@ -50,7 +50,7 @@
    ↓
 Open-WebUI (LLM UI)
    ↓
-MCP Client (內建於 WebUI)
+open-WebUI (工具伺服器)
    ↓
 mcpo (MCP → OpenAPI 轉換器)
    ↓

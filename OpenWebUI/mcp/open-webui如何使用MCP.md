@@ -18,6 +18,12 @@
 ---
 ## 上課前docker必需先前的準備
 
+- 選擇**選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式**
+
+[Docker_compose快速部署open-webui](../Docker_compose快速部署open-webui/README.md)
+
+
+
 ## 測試現在的模型（未啟用 MCP）
 
 在**未啟用 MCP 工具**的情況下，詢問模型：

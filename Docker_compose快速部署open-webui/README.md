@@ -4,10 +4,11 @@
 
 - [前言](#前言)
 - [部署選項一覽](#部署選項一覽)
-- [選項 1：Open-WebUI + Cloudflare Tunnel](#選項-1open-webui--cloudflare-tunnel)
-- [選項 2：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-2open-webui--cloudflare-tunnel--mcpo)
-- [選項 3：Open-WebUI + Cloudflare Tunnel + Pipeline](#選項-3open-webui--cloudflare-tunnel--pipeline)
-- [選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO](#選項-4open-webui--cloudflare-tunnel--pipeline--mcpo)
+- [選項 1：Open-WebUI + Cloudflare Tunnel-Host Network 模式](#選項-1open-webui--cloudflare-tunnel-host-network-模式)
+- [選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式](#選項-1open-webui--cloudflare-tunnel-bridge-network-模式)
+- [選項 3：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-2open-webui--cloudflare-tunnel--mcpo)
+- [選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline](#選項-3open-webui--cloudflare-tunnel--pipeline)
+- [選項 5：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO](#選項-4open-webui--cloudflare-tunnel--pipeline--mcpo)
 
 ---
 
@@ -28,10 +29,11 @@
 
 | 選項 | 包含服務 | 適用情境 |
 |------|----------|----------|
-| **1** | Open-WebUI + Cloudflare Tunnel | 基本部署，對外連線 |
-| **2** | Open-WebUI + Cloudflare Tunnel + MCPO | 需要 MCP 工具（如時間查詢） |
-| **3** | Open-WebUI + Cloudflare Tunnel + Pipeline | 需要自訂 Pipeline 流程 |
-| **4** | Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO | 完整功能一次部署 |
+| **1** | Open-WebUI + Cloudflare Tunnel (Host Network) | 基本部署，Ollama 與 Open-WebUI 共用 `127.0.0.1` |
+| **2** | Open-WebUI + Cloudflare Tunnel (Bridge Network) | 基本部署，推薦，易與 MCPO、Pipeline 等服務整合 |
+| **3** | Open-WebUI + Cloudflare Tunnel + MCPO | 需要 MCP 工具（如時間查詢） |
+| **4** | Open-WebUI + Cloudflare Tunnel + Pipeline | 需要自訂 Pipeline 流程 |
+| **5** | Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO | 完整功能一次部署 |
 
 ---
 
@@ -42,6 +44,8 @@
 ![host network 模式](./images/pic1.png)
 
 適合需要 **Open-WebUI、Cloudflare Tunnel、Ollama 共用 `127.0.0.1`** 的情境。
+
+**實作專案目錄檔案結構**
 
 **架構關係圖：**
 

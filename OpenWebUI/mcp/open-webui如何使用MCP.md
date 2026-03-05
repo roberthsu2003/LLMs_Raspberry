@@ -120,6 +120,9 @@ docker run -d \
   sh -c "pip install --no-cache-dir mcpo mcp-server-time && \
          mcpo --port 8000 -- mcp-server-time --local-timezone=Asia/Taipei"
 ```
+**圖片說明**
+
+![](./images/pic3.png)
 
 **參數說明：**
 

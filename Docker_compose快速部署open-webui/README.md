@@ -5,10 +5,10 @@
 - [前言](#前言)
 - [部署選項一覽](#部署選項一覽)
 - [選項 1：Open-WebUI + Cloudflare Tunnel-Host Network 模式](#選項-1open-webui--cloudflare-tunnel-host-network-模式)
-- [選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式](#選項-1open-webui--cloudflare-tunnel-bridge-network-模式)
-- [選項 3：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-2open-webui--cloudflare-tunnel--mcpo)
-- [選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline](#選項-3open-webui--cloudflare-tunnel--pipeline)
-- [選項 5：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO](#選項-4open-webui--cloudflare-tunnel--pipeline--mcpo)
+- [選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式](#選項-2open-webui--cloudflare-tunnel-bridge-network-模式)
+- [選項 3：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-3open-webui--cloudflare-tunnel--mcpo)
+- [選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline](#選項-4open-webui--cloudflare-tunnel--pipeline)
+- [選項 5：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO](#選項-5open-webui--cloudflare-tunnel--pipeline--mcpo)
 
 ---
 
@@ -37,15 +37,15 @@
 
 ---
 
-## 選項 1：Open-WebUI + Cloudflare Tunnel
-
-### 方法 A：Host Network 模式
+## 選項 1：Open-WebUI + Cloudflare Tunnel-Host Network 模式
 
 ![host network 模式](./images/pic1.png)
 
 適合需要 **Open-WebUI、Cloudflare Tunnel、Ollama 共用 `127.0.0.1`** 的情境。
 
 **實作專案目錄檔案結構**
+
+[實作專案目錄檔案結構](./實作專案內容/選項1)
 
 **架構關係圖：**
 
@@ -126,7 +126,7 @@ command: tunnel run --token ${CLOUDFLARE_TOKEN}
 
 ---
 
-### 方法 B：Bridge Network 模式（推薦）
+## 選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式
 
 ![bridge network 模式](./images/pic2.png)
 
@@ -189,7 +189,7 @@ docker compose logs -f cloudflared
 
 ---
 
-## 選項 2：Open-WebUI + Cloudflare Tunnel + MCPO
+## 選項 3：Open-WebUI + Cloudflare Tunnel + MCPO
 
 ### 專案結構
 
@@ -276,7 +276,7 @@ docker compose up -d --build
 
 ---
 
-## 選項 3：Open-WebUI + Cloudflare Tunnel + Pipeline
+## 選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline
 
 > **注意：** 此設定**不**對外暴露 Pipeline 的 9099 埠，僅能透過 Docker 內部網路存取。
 > Open-WebUI 連接 Pipeline 時，請使用：`http://pipelines:9099`
@@ -343,7 +343,7 @@ http://pipelines:9099
 
 ---
 
-## 選項 4：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO
+## 選項 5：Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO
 
 完整部署所有服務。
 

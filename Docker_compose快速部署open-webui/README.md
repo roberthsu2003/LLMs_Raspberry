@@ -104,7 +104,7 @@ docker compose ps
 docker compose logs -f cloudflared
 ```
 
-#### 進階建議（選用）
+#### .env 設定
 
 **1. 使用 .env 管理 Token**
 
@@ -131,6 +131,10 @@ command: tunnel run --token ${CLOUDFLARE_TOKEN}
 ![bridge network 模式](./images/pic2.png)
 
 容器各自有獨立網路命名空間，透過 Docker 網路互通。較易與其他服務（MCPO、Pipeline）整合。
+
+**實作專案目錄檔案結構**
+
+[實作專案目錄檔案結構](./實作專案內容/選項2)
 
 #### 建立 docker-compose.yml
 

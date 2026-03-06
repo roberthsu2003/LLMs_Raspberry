@@ -16,11 +16,11 @@
 
 | 順序 | 主題 | 說明 |
 |------|------|------|
-| 1 | [open-webui如何使用MCP](./open-webui如何使用MCP.md) | MCP 工具在 Open-WebUI 的啟用與基本使用 **學習用** |
-| 2 | [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md) | 建立 mcpo 映像與容器 **學習用** |
-| 3 | [使用docker_compose整合Dockerfile](./使用docker_compose整合Dockerfile.md) | 以 docker-compose 管理 MCP 服務 **推薦用** |
-| 4 | [整合使用open-webui和cloudflare tunnel](./整合使用open-webui和cloudflare_tunnel.md) | 透過 Cloudflare Tunnel 對外曝光 **推薦用** |
-| 5 | [同時安裝多個MCP Server](./同時安裝多個MCP_Server.md) | 部署多個 MCP 工具（時間、天氣等） **推薦用** |
+| 1 | [open-webui如何使用MCP](./open-webui如何使用MCP.md) | MCP 工具在 Open-WebUI 的啟用與基本使用 **<學習用>** |
+| 2 | [使用Dockerfile建立MCPO](./使用Dockerfile建立MCPO.md) | 建立 mcpo 映像與容器 **<學習用>** |
+| 3 | [使用docker_compose整合Dockerfile](./使用docker_compose整合Dockerfile.md) | 以 docker-compose 管理 MCP 服務 **<推薦用>** |
+| 4 | [整合使用open-webui和cloudflare tunnel](./整合使用open-webui和cloudflare_tunnel.md) | 透過 Cloudflare Tunnel 對外曝光 **<推薦用>** |
+| 5 | [同時安裝多個MCP Server](./同時安裝多個MCP_Server.md) | 部署多個 MCP 工具（時間、天氣等） **<推薦用>** |
 
 ---
 

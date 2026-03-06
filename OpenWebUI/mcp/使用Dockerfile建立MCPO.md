@@ -42,6 +42,8 @@ docker run -d \
 | 指令長、不易閱讀 | 架構清晰，步驟分明 |
 | 難以維護與分享 | 可上傳 GitHub，方便協作 |
 
+![](./images/pic4.png)
+
 ---
 
 ## 一、撰寫 Dockerfile

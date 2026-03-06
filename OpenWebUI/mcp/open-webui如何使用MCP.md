@@ -18,7 +18,7 @@
 ---
 ## 上課前docker必需先前的準備
 
-- 選擇**選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式**
+- 使用下面連結並選擇**選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式**
 
 [Docker_compose快速部署open-webui](../../Docker_compose快速部署open-webui/README.md)
 

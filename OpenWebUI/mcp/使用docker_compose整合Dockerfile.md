@@ -57,7 +57,7 @@ CMD ["mcpo", "--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/T
 
 ---
 
-## 三、docker-compose.yml
+## 三、docker-compose.yml(單獨建立mcpo容器)
 
 在專案根目錄建立 `docker-compose.yml`：
 
@@ -86,6 +86,53 @@ networks:
 - `name: webui-net`：網路名稱固定為 `webui-net`，可與既有 Open-WebUI 共用
 
 ---
+
+## 三、docker-compose.yml(整合open-webui,mcpo容器,cloudflare tunnel)
+
+```yaml
+services:
+  mcpo:
+    build: ./mcpo
+    container_name: mcpo
+    ports:
+      - "8000:8000"
+    networks:
+      - webui-net
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080" # 宿主機可用 http://localhost:8080 存取
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux/Raspberry Pi 需要這行才能解析
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+    # cloudflared 指向 open-webui 的服務名稱與 port
+
+volumes:
+  open-webui:
+    external: true
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
+
+```
 
 ## 四、啟動方式
 

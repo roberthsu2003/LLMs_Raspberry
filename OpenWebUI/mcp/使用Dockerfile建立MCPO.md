@@ -137,6 +137,16 @@ docker run -d \
 docker ps
 ```
 
+### 使用docker exec 驗証是否有建立/app目錄
+
+```bash
+docker exec -it mcpo /bin/bash
+```
+
+```bash
+ls /app
+```
+
 **使用瀏覽器驗證：**
 
 開啟 `http://<樹莓派IP>:8000/docs`，應能看到 Swagger UI 介面及 `/get_current_time`、`/convert_time` 兩個 endpoint。

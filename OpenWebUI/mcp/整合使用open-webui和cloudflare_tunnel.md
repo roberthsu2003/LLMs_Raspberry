@@ -161,39 +161,5 @@ expose 代表：
 
 這樣更乾淨。
 
----
 
-# **🧠 你可以在課堂這樣講**
-
-docker-compose 做的事情是：
-
-- 建 network
-- build image
-- 建 container
-- 建立內部 DNS
-- 定義服務依賴
-
-這其實已經是：
-
-> 微服務架構雛形
-
----
-
-# **🎓 如果你願意**
-
-我可以幫你畫一張：
-
-```other
-Internet
-   ↓
-Cloudflare
-   ↓
-Open-WebUI
-   ↓
-mcpo
-   ↓
-MCP Server
-```
-
-這張圖放在「MCP 架構總覽」章節，學生會瞬間理解整個技術棧。
 

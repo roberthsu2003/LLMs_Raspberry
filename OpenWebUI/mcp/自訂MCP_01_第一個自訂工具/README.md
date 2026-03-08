@@ -219,6 +219,7 @@ services:
 
   mcpo-custom:
     build: ./mcpo-custom
+    image: mcpo-custom
     container_name: mcpo-custom
     restart: always
     networks:

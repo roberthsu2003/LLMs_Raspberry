@@ -2,6 +2,7 @@
 
 ## 📋 目錄
 
+- [範例檔](#範例檔)
 - [前言](#前言)
 - [一、環境準備](#一環境準備)
 - [二、建立專案結構](#二建立專案結構)
@@ -13,8 +14,31 @@
 
 ---
 
-## 範例目錄: [mcp-custom](../實作範例/mcp-custom)
+## 範例檔
 
+本範例完整檔案位於 [範例檔](./範例檔/) 資料夾，**架構與主專案一致**：
+
+```
+範例檔/
+├── docker-compose.yml
+└── mcpo-custom/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── server.py
+    └── test_tools.py
+```
+
+| 檔案 | 說明 |
+|------|------|
+| [docker-compose.yml](./範例檔/docker-compose.yml) | 整合 open-webui、mcpo-custom、cloudflared |
+| [mcpo-custom/requirements.txt](./範例檔/mcpo-custom/requirements.txt) | Python 依賴（mcp、mcpo） |
+| [mcpo-custom/server.py](./範例檔/mcpo-custom/server.py) | MCP Server 主程式（hello、add 工具） |
+| [mcpo-custom/Dockerfile](./範例檔/mcpo-custom/Dockerfile) | mcpo 部署用映像 |
+| [mcpo-custom/test_tools.py](./範例檔/mcpo-custom/test_tools.py) | 本機測試腳本 |
+
+> 可直接複製 `範例檔/` 至你的 `Docker_compose快速部署open-webui/` 專案，或將 `mcpo-custom/` 與 `docker-compose.yml` 合併至既有專案。
+
+---
 
 ## 前言
 
@@ -234,14 +258,13 @@ WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir mcpo
 
 COPY server.py .
 
 EXPOSE 8000
 ```
 
-> **說明：** `requirements.txt` 含 `mcp`，`mcpo` 需額外安裝以提供 HTTP 橋接。啟動指令放在 docker-compose 的 `command`，方便之後覆寫或切換不同腳本，無需重建映像。
+> **說明：** `requirements.txt` 含 `mcp`（FastMCP）與 `mcpo`（HTTP 橋接），所有依賴統一管理。啟動指令放在 docker-compose 的 `command`，方便之後覆寫或切換不同腳本，無需重建映像。
 
 ### 7.3 docker-compose.yml 新增服務
 
@@ -297,6 +320,24 @@ networks:
 |------|------|
 | `command` 在 yaml | 啟動指令放 compose，修改後重啟即可，無需 `docker build` |
 | `mcpo-custom` | 與第一章「自訂工具」對應，與第二章 `mcpo-weather` 區分 |
+
+#### `command: >` 是什麼？
+
+`command: >` 是 **YAML 的折疊區塊（folded block）** 語法：
+
+| 符號 | 名稱 | 作用 |
+|------|------|------|
+| `>` | Folded block | 多行會合併成一行，換行變成空格 |
+
+範例：
+
+```yaml
+command: >
+  mcpo --port 8000 --
+  python server.py
+```
+
+等同於 `command: "mcpo --port 8000 -- python server.py"`，多行會合併成一個字串，中間以空格連接。這樣寫可讓較長的指令更易閱讀。
 
 #### 為什麼啟動指令放在 docker-compose 比較好？
 

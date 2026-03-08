@@ -1,3 +1,0 @@
-mcpo
-mcp
-psycopg2-binary

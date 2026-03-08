@@ -36,16 +36,6 @@
 
 ---
 
-### 實作範例
-
-| 範例 | 對應章節 | 說明 |
-|------|----------|------|
-| [mcp-custom](./實作範例/mcp-custom) | 自訂 MCP 01 | 第一個自訂工具（hello、add） |
-| [mcpo-api](./實作範例/mcpo-api) | 自訂 MCP 02 | 天氣查詢（Open-Meteo API） |
-| [mcpo-sql](./實作範例/mcpo-sql) | 自訂 MCP 03 | COVID-19 資料查詢（PostgreSQL） |
-
----
-
 ### 參考文件
 
 | 文件 | 說明 |

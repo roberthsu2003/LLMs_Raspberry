@@ -29,10 +29,10 @@
 | 階段 | 主題 | 說明 |
 |------|------|------|
 | 0 | [認識 FastMCP](./自訂MCP_00_認識FastMCP.md) | 什麼是 FastMCP、MCP 協定、與 Pipeline 的差異 |
-| 1 | [撰寫第一個自訂工具](./自訂MCP_01_第一個自訂工具.md) | FastMCP 入門、`hello`、`add` 等靜態工具 |
-| 2 | [呼叫外部 API](./自訂MCP_02_呼叫外部API.md) | `get_weather` 天氣查詢、錯誤處理、API Key 管理 |
-| 3 | [整合資料庫](./自訂MCP_03_整合資料庫.md) | PostgreSQL 查詢、COVID-19 資料、mcpo-sql 範例 |
-| 4 | [整合 mcpo 部署](./自訂MCP_04_整合mcpo部署.md) | docker-compose 設定、volume 掛載、Open-WebUI 連線驗證 |
+| 1 | [撰寫第一個自訂工具](./自訂MCP_01_第一個自訂工具/README.md) | FastMCP 入門、`hello`、`add` 等靜態工具 |
+| 2 | [呼叫外部 API](./自訂MCP_02_呼叫外部API/README.md) | `get_weather` 天氣查詢、錯誤處理、API Key 管理 |
+| 3 | [整合資料庫](./自訂MCP_03_整合資料庫/README.md) | PostgreSQL 查詢、COVID-19 資料、mcpo-sql 範例 |
+| 4 | [整合 mcpo 部署](./自訂MCP_04_整合mcpo部署/README.md) | docker-compose 設定、volume 掛載、Open-WebUI 連線驗證 |
 
 ---
 

@@ -13,7 +13,7 @@
 
 ---
 
-## 範例目錄: [mcp-custom1](./實作範例/mcp-custom)
+## 範例目錄: [mcp-custom](../實作範例/mcp-custom)
 
 
 ## 前言
@@ -299,9 +299,9 @@ docker compose up -d --build
 
 **Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://mcpo-custom:8000`
 
-> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
+> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)。
 
 ---
 
-上一篇：[自訂MCP_00_認識FastMCP](./自訂MCP_00_認識FastMCP.md)  
-下一篇：[自訂MCP_02_呼叫外部API](./自訂MCP_02_呼叫外部API.md)
+上一篇：[自訂MCP_00_認識FastMCP](../自訂MCP_00_認識FastMCP.md)  
+下一篇：[自訂MCP_02_呼叫外部API](../自訂MCP_02_呼叫外部API/README.md)

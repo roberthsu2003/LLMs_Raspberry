@@ -186,5 +186,5 @@ docker compose restart mcpo-custom
 
 ---
 
-上一篇：[自訂MCP_03_整合資料庫](./自訂MCP_03_整合資料庫.md)  
-回目錄：[MCP README](./README.md)
+上一篇：[自訂MCP_03_整合資料庫](../自訂MCP_03_整合資料庫/README.md)  
+回目錄：[MCP README](../README.md)

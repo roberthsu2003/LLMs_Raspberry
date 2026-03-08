@@ -13,7 +13,7 @@
 
 ---
 
-## 範例檔案：[mcpo-api](./實作範例/mcpo-api)
+## 範例檔案：[mcpo-api](../實作範例/mcpo-api)
 
 ## 前言
 
@@ -290,7 +290,7 @@ docker compose up -d --build
 
 **Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://mcpo-weather:8000`
 
-> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
+> 完整說明與常見問題請參考 [自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)。
 
 ---
 
@@ -303,5 +303,5 @@ docker compose up -d --build
 
 ---
 
-上一篇：[自訂MCP_01_第一個自訂工具](./自訂MCP_01_第一個自訂工具.md)  
-下一篇：[自訂MCP_03_整合資料庫](./自訂MCP_03_整合資料庫.md)
+上一篇：[自訂MCP_01_第一個自訂工具](../自訂MCP_01_第一個自訂工具/README.md)  
+下一篇：[自訂MCP_03_整合資料庫](../自訂MCP_03_整合資料庫/README.md)

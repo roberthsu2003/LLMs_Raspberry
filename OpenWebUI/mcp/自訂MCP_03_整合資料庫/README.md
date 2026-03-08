@@ -12,7 +12,7 @@
 
 ---
 
-## 範例檔案：[mcpo-sql](./實作範例/mcpo-sql)
+## 範例檔案：[mcpo-sql](../實作範例/mcpo-sql)
 
 ## 前言
 
@@ -259,7 +259,7 @@ DATABASE_URI=postgresql://pi:raspberry@<樹莓派IP>:5432/mydb python mcpo/tools
 
 MCP Server 透過 `DATABASE_URI` 連線至同一網路內的 `postgres` 服務。
 
-詳細 MCPO 設定與 Open WebUI 連線方式，請參考 [自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)。
+詳細 MCPO 設定與 Open WebUI 連線方式，請參考 [自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)。
 
 ---
 
@@ -267,9 +267,9 @@ MCP Server 透過 `DATABASE_URI` 連線至同一網路內的 `postgres` 服務�
 
 - [PostgreSQL 官方文件](https://www.postgresql.org/docs/)
 - [FastMCP 文件](https://github.com/jlowin/fastmcp)
-- [MCPO 部署說明](./自訂MCP_04_整合mcpo部署.md)
+- [MCPO 部署說明](../自訂MCP_04_整合mcpo部署/README.md)
 
 ---
 
-上一篇：[自訂MCP_02_呼叫外部API](./自訂MCP_02_呼叫外部API.md)  
-下一篇：[自訂MCP_04_整合mcpo部署](./自訂MCP_04_整合mcpo部署.md)
+上一篇：[自訂MCP_02_呼叫外部API](../自訂MCP_02_呼叫外部API/README.md)  
+下一篇：[自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)

@@ -1,5 +1,9 @@
 # pipeline程式碼實作
 
+> **此內容已整合至 [Pipeline_03_程式碼實作](./Pipeline_03_程式碼實作/README.md)**
+
+---
+
 ## 1. 下載openwebui的wiki單一py檔範例
 
 ```bash

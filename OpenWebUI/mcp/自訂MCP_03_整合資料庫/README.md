@@ -2,17 +2,45 @@
 
 ## 📋 目錄
 
+- [範例檔](#範例檔)
 - [前言](#前言)
 - [一、核心概念](#一核心概念)
 - [二、實作範例：COVID-19 資料查詢](#二實作範例covid-19-資料查詢)
 - [三、整合 PostgreSQL](#三整合-postgresql)
+- [uv 開發環境](#uv-開發環境)
 - [四、驗證與測試](#四驗證與測試)
+- [Debug 與測試](#debug-與測試)
 - [五、整合 mcpo 部署](#五整合-mcpo-部署)
 - [六、延伸閱讀](#六延伸閱讀)
 
 ---
 
-## 範例檔案：[mcpo-sql](../實作範例/mcpo-sql)
+## 範例檔
+
+本範例完整檔案位於 [範例檔](./範例檔/) 資料夾，**架構與主專案一致**：
+
+```
+範例檔/
+├── docker-compose.yml
+├── .env
+└── mcpo-custom/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── server.py
+    └── test_tools.py
+```
+
+| 檔案 | 說明 |
+|------|------|
+| [docker-compose.yml](./範例檔/docker-compose.yml) | 整合 open-webui、postgres、postgres-mcp、cloudflared |
+| [mcpo-custom/requirements.txt](./範例檔/mcpo-custom/requirements.txt) | Python 依賴（mcp、mcpo、psycopg2-binary） |
+| [mcpo-custom/server.py](./範例檔/mcpo-custom/server.py) | MCP Server 主程式（COVID-19 查詢工具） |
+| [mcpo-custom/Dockerfile](./範例檔/mcpo-custom/Dockerfile) | mcpo 部署用映像 |
+| [mcpo-custom/test_tools.py](./範例檔/mcpo-custom/test_tools.py) | 本機測試腳本 |
+
+> 可直接複製 `範例檔/` 至你的 `Docker_compose快速部署open-webui/` 專案，或將 `mcpo-custom/` 與 `docker-compose.yml` 合併至既有專案。**注意：** 需先建立 `world` 資料表並匯入 COVID-19 資料。
+
+---
 
 ## 前言
 
@@ -51,13 +79,13 @@ PostgreSQL 查詢 world 資料表
 ### 2.1 專案結構
 
 ```
-mcpo-sql/
+範例檔/
 ├── docker-compose.yml    # 整合 open-webui、postgres、postgres-mcp、cloudflared
-└── mcpo/
+└── mcpo-custom/
     ├── Dockerfile        # 建置 MCPO + 自訂 tools
-    ├── requirements.txt # mcpo, mcp, psycopg2-binary
-    ├── tools.py         # MCP 工具（查詢 COVID-19 資料）
-    └── tools_test.py    # 測試腳本
+    ├── requirements.txt  # mcp, mcpo, psycopg2-binary
+    ├── server.py        # MCP 工具（查詢 COVID-19 資料）
+    └── test_tools.py    # 測試腳本
 ```
 
 ### 2.2 資料表結構（world）
@@ -70,7 +98,7 @@ mcpo-sql/
 | 總死亡數 | 累計死亡人數 |
 | 解除隔離數 | 康復人數 |
 
-> 若你的資料表欄位不同，可執行 `python tools_test.py --schema-only` 取得實際欄位清單，並更新 `tools.py` 的 `SCHEMA` 設定。
+> 若你的資料表欄位不同，可執行 `python test_tools.py --schema-only` 取得實際欄位清單，並更新 `server.py` 的 `SCHEMA` 設定。
 
 ### 2.3 MCP 工具一覽
 
@@ -218,14 +246,24 @@ docker volume inspect my-postgres-data
 
 ---
 
+## uv 開發環境
+
+若使用 **uv** 建立虛擬環境進行本機開發，可參考：[uv 開發環境](./uv開發環境.md)
+
+該文件包含：uv 安裝、建立 `.venv`、安裝依賴、PostgreSQL 連線設定等完整步驟。
+
+---
+
 ## 四、驗證與測試
+
+除錯與測試方式（Docker 內測試、本機測試、mcpo + Swagger UI）請參考：[Debug 與測試](./Debug與測試.md)
 
 ### 4.1 在 Docker 內測試（推薦）
 
 ```bash
-cd 實作範例/mcpo-sql
+cd 範例檔
 docker compose up -d postgres
-docker compose run --rm postgres-mcp python tools_test.py
+docker compose run --rm postgres-mcp python test_tools.py
 ```
 
 ### 4.2 僅檢查資料表欄位
@@ -233,7 +271,7 @@ docker compose run --rm postgres-mcp python tools_test.py
 若需確認 `world` 資料表實際欄位，以更新 `SCHEMA`：
 
 ```bash
-docker compose run --rm postgres-mcp python tools_test.py --schema-only
+docker compose run --rm postgres-mcp python test_tools.py --schema-only
 ```
 
 ### 4.3 本機測試（PostgreSQL 在遠端）
@@ -241,14 +279,14 @@ docker compose run --rm postgres-mcp python tools_test.py --schema-only
 若 PostgreSQL 在樹莓派或其他主機：
 
 ```bash
-DATABASE_URI=postgresql://pi:raspberry@<樹莓派IP>:5432/mydb python mcpo/tools_test.py
+DATABASE_URI=postgresql://pi:raspberry@<樹莓派IP>:5432/mydb python 範例檔/mcpo-custom/test_tools.py
 ```
 
 ---
 
 ## 五、整合 mcpo 部署
 
-`mcpo-sql` 範例已整合 MCPO 部署，`docker-compose.yml` 包含：
+將自訂 MCP Server 整合至 Docker 環境，專案結構請參考上方 [範例檔](#範例檔)。`docker-compose.yml` 包含：
 
 | 服務 | 說明 |
 |------|------|
@@ -258,6 +296,15 @@ DATABASE_URI=postgresql://pi:raspberry@<樹莓派IP>:5432/mydb python mcpo/tools
 | cloudflared | Cloudflare Tunnel（可選） |
 
 MCP Server 透過 `DATABASE_URI` 連線至同一網路內的 `postgres` 服務。
+
+**啟動與連線：**
+
+```bash
+cd 範例檔
+docker compose up -d --build
+```
+
+**Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://postgres-mcp:8000`
 
 詳細 MCPO 設定與 Open WebUI 連線方式，請參考 [自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)。
 

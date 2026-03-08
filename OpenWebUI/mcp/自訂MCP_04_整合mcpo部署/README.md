@@ -2,13 +2,43 @@
 
 ## 📋 目錄
 
+- [範例檔](#範例檔)
 - [前言](#前言)
 - [一、專案結構](#一專案結構)
 - [二、mcpo Dockerfile](#二mcpo-dockerfile)
 - [三、docker-compose 設定](#三docker-compose-設定)
+- [uv 開發環境](#uv-開發環境)
 - [四、啟動與驗證](#四啟動與驗證)
 - [五、Open-WebUI 連線設定](#五open-webui-連線設定)
+- [Debug 與測試](#debug-與測試)
 - [六、常見問題](#六常見問題)
+
+---
+
+## 範例檔
+
+本範例完整檔案位於 [範例檔](./範例檔/) 資料夾，**架構與主專案一致**：
+
+```
+範例檔/
+├── docker-compose.yml
+├── .env
+└── mcpo-custom/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── server.py
+    └── test_tools.py
+```
+
+| 檔案 | 說明 |
+|------|------|
+| [docker-compose.yml](./範例檔/docker-compose.yml) | 整合 open-webui、mcpo-custom、cloudflared |
+| [mcpo-custom/requirements.txt](./範例檔/mcpo-custom/requirements.txt) | Python 依賴（mcp、mcpo） |
+| [mcpo-custom/server.py](./範例檔/mcpo-custom/server.py) | MCP Server 主程式（hello、add 工具） |
+| [mcpo-custom/Dockerfile](./範例檔/mcpo-custom/Dockerfile) | mcpo 部署用映像 |
+| [mcpo-custom/test_tools.py](./範例檔/mcpo-custom/test_tools.py) | 本機測試腳本 |
+
+> 可直接複製 `範例檔/` 至你的 `Docker_compose快速部署open-webui/` 專案，或將 `mcpo-custom/` 與 `docker-compose.yml` 合併至既有專案。
 
 ---
 
@@ -19,7 +49,7 @@
 關鍵指令：
 
 ```
-mcpo --port 8000 -- python /custom/server.py
+mcpo --port 8000 -- python server.py
 ```
 
 mcpo 會以 stdio 模式啟動你的 MCP Server，並將其轉成 HTTP 服務。
@@ -29,41 +59,45 @@ mcpo 會以 stdio 模式啟動你的 MCP Server，並將其轉成 HTTP 服務。
 ## 一、專案結構
 
 ```
-Docker_compose快速部署open-webui/
+範例檔/
 ├── docker-compose.yml
 ├── .env
-├── mcpo/
-│   └── Dockerfile
-└── mcp-custom/
+└── mcpo-custom/
+    ├── Dockerfile
     ├── requirements.txt
-    └── server.py
+    ├── server.py
+    └── test_tools.py
 ```
 
 ---
 
 ## 二、mcpo Dockerfile
 
-`mcpo/Dockerfile` 需安裝 `mcpo` 與 Python 環境，自訂程式透過 volume 掛載：
+`mcpo-custom/Dockerfile` 套件從 `requirements.txt` 安裝，映像內不含啟動指令（由 docker-compose 的 `command` 覆寫）：
 
 ```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir mcpo mcp
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY server.py .
 
 EXPOSE 8000
 ```
 
 ### 進階：若完成階段二、三，需額外套件
 
-若 `server.py` 有使用 `requests`、`chromadb` 等，可擴充 Dockerfile：
+若 `server.py` 有使用 `requests`、`psycopg2-binary` 等，請在 `requirements.txt` 加入對應套件：
 
-```dockerfile
-RUN pip install --no-cache-dir mcpo mcp requests chromadb
 ```
-
-或改為在啟動時安裝 `mcp-custom` 的依賴（需調整 `command` 或使用 entrypoint 腳本）。
+mcp
+mcpo
+requests
+psycopg2-binary
+```
 
 ---
 
@@ -73,7 +107,8 @@ RUN pip install --no-cache-dir mcpo mcp requests chromadb
 
 ```yaml
 mcpo-custom:
-  build: ./mcpo
+  build: ./mcpo-custom
+  image: mcpo-custom
   container_name: mcpo-custom
   restart: always
   networks:
@@ -82,19 +117,26 @@ mcpo-custom:
     - "8003:8000"
   command: >
     mcpo --port 8000 --
-    python /custom/server.py
-  volumes:
-    - ./mcp-custom:/custom
+    python server.py
 ```
 
 ### 說明
 
 | 項目 | 說明 |
 |------|------|
-| `build: ./mcpo` | 使用 mcpo 的 Dockerfile |
+| `build: ./mcpo-custom` | 以 mcpo-custom 目錄建置映像 |
 | `ports: 8003:8000` | 主機 8003 對應容器 8000 |
-| `command` | mcpo 以 stdio 模式執行 `python /custom/server.py` |
-| `volumes` | 將 `mcp-custom` 掛載到 `/custom`，修改程式後重啟即可生效 |
+| `command` | mcpo 以 stdio 模式執行 `python server.py` |
+
+> **進階：** 若希望修改程式後重啟即可生效（無需重建映像），可加入 volume 掛載：`volumes: - ./mcpo-custom:/app`
+
+---
+
+## uv 開發環境
+
+若使用 **uv** 建立虛擬環境進行本機開發，可參考：[uv 開發環境](./uv開發環境.md)
+
+該文件包含：uv 安裝、建立 `.venv`、安裝依賴、啟動與驗證等完整步驟。
 
 ---
 
@@ -103,6 +145,7 @@ mcpo-custom:
 ### 4.1 啟動服務
 
 ```bash
+cd 範例檔
 docker compose up -d --build
 ```
 
@@ -163,6 +206,12 @@ docker compose logs mcpo-custom
 
 ### 修改 server.py 後無效
 
+若無 volume 掛載，需重建映像：
+
+```bash
+docker compose up -d --build
+```
+
 若有 volume 掛載，重啟容器即可：
 
 ```bash
@@ -175,12 +224,18 @@ docker compose restart mcpo-custom
 
 ---
 
+## Debug 與測試
+
+四種除錯與測試方式（直接呼叫工具、mcpo + Swagger UI、logging、MCP Client）請參考：[Debug 與測試](./Debug與測試.md)
+
+---
+
 ## 快速檢查清單
 
-- [ ] `mcp-custom/server.py` 含 `@mcp.tool()` 與 `mcp.run()`
-- [ ] `mcp-custom/requirements.txt` 至少包含 `mcp`
-- [ ] `mcpo/Dockerfile` 已安裝 `mcpo`
-- [ ] docker-compose 中 `command` 為 `mcpo --port 8000 -- python /custom/server.py`
+- [ ] `mcpo-custom/server.py` 含 `@mcp.tool()` 與 `mcp.run()`
+- [ ] `mcpo-custom/requirements.txt` 至少包含 `mcp`、`mcpo`
+- [ ] `mcpo-custom/Dockerfile` 已安裝依賴
+- [ ] docker-compose 中 `command` 為 `mcpo --port 8000 -- python server.py`
 - [ ] `mcpo-custom` 加入 `webui-net`
 - [ ] Open-WebUI 新增外部工具 `http://mcpo-custom:8000`
 

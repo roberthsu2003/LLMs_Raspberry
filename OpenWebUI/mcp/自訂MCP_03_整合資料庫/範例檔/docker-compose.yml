@@ -1,0 +1,63 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MCP_ENABLE: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pi
+      POSTGRES_PASSWORD: raspberry
+      POSTGRES_DB: mydb
+    volumes:
+      - my-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - webui-net
+
+  postgres-mcp:
+    build: ./mcpo-custom
+    image: postgres-mcp
+    container_name: postgres-mcp
+    restart: always
+    environment:
+      DATABASE_URI: "postgresql://pi:raspberry@postgres:5432/mydb"
+    networks:
+      - webui-net
+    ports:
+      - "8002:8000"
+    command: >
+      mcpo --port 8000 --
+      python server.py
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - webui-net
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+
+volumes:
+  open-webui:
+    external: true
+  my-postgres-data:
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge

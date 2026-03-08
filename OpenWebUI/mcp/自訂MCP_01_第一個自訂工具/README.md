@@ -170,6 +170,7 @@ python server.py
 ```
 Docker_compose快速部署open-webui/
 ├── docker-compose.yml
+├── .env
 ├── mcpo-custom/
 │   ├── Dockerfile
 │   ├── requirements.txt

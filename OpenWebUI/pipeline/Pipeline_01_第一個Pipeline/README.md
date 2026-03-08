@@ -7,6 +7,7 @@
 - [進階部署：Docker Compose](#進階部署docker-compose)
 - [在 Open-WebUI 中連接](#在-open-webui-中連接)
 - [管理與啟用 Pipeline](#管理與啟用-pipeline)
+- [使用範例：Wikipedia Pipeline](#使用範例wikipedia-pipeline)
 - [常見問題](#常見問題)
 
 ---
@@ -166,6 +167,55 @@ Open WebUI (網頁)  ──管理介面──►  Pipeline Server (容器)
                                ├── wikipedia_pipeline.py
                                └── my_custom_pipeline.py
 ```
+
+---
+
+## 使用範例：Wikipedia Pipeline
+
+預設或從 GitHub 安裝後，常見的內建 Pipeline 為 **Wikipedia Pipeline**，可依關鍵字查詢維基百科並回傳摘要。
+
+### 功能說明
+
+| 功能 | 說明 |
+|------|------|
+| **搜尋維基百科** | 依關鍵字搜尋維基百科條目 |
+| **回傳摘要** | 回傳第一個符合條目的摘要（字數由 Valves 的 Word Limit 控制） |
+| **提供連結** | 提供「閱讀更多」與相關主題連結 |
+| **多主題查詢** | 支援用分號 `;` 分隔多個關鍵字，一次查多個主題 |
+
+### 如何使用
+
+1. 開啟 Open WebUI 聊天介面
+2. 在模型選擇處選擇 **Wikipedia Pipeline**（或 `wikipedia_pipeline`）
+3. 在輸入框輸入要查的主題或關鍵字
+
+**輸入範例：**
+
+| 輸入 | 說明 |
+|------|------|
+| `history of IBM` | 查 IBM 歷史 |
+| `Python programming` | 查 Python 程式語言 |
+| `Taiwan; Japan` | 用分號分隔，一次查台灣與日本兩個主題 |
+
+### 可調參數（Valves）
+
+在 **管理員控制台 → 設定 → Pipelines** 中可調整：
+
+| 參數 | 預設值 | 說明 |
+|------|--------|------|
+| **Rate Limit** | 5 | 每秒請求次數上限，避免過度呼叫維基百科 |
+| **Word Limit** | 200～300 | 摘要字數上限 |
+| **Wikipedia Host** | https://en.wikipedia.org/wiki | 維基百科網址，可改成 `https://zh.wikipedia.org/wiki` 查中文版 |
+
+### 與一般 LLM 的差異
+
+| 比較 | 一般 LLM（如 Ollama） | Wikipedia Pipeline |
+|------|------------------------|---------------------|
+| 資料來源 | 模型內建知識 | 即時查維基百科 |
+| 適用情境 | 一般對話、推理、寫作 | 查詢維基百科條目 |
+| 時效性 | 有訓練截止日 | 維基百科即時內容 |
+
+> **注意：** Wikipedia Pipeline 需要 `wikipedia` 套件。若從 GitHub URL 安裝失敗，需自訂 Dockerfile 並執行 `pip install wikipedia` 後重建映像。中文版範例可參考 [Pipeline_03 程式碼實作](../Pipeline_03_程式碼實作/README.md) 的 `wikipedia_pipeline_zh.py`。
 
 ---
 

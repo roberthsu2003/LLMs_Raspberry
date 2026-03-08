@@ -67,6 +67,7 @@ version: "3.9"
 services:
   mcpo:
     build: ./mcpo
+    image: mcpo
     container_name: mcpo
     ports:
       - "8000:8000"
@@ -81,6 +82,7 @@ networks:
 
 **說明：**
 
+- `image: mcpo`：只要有build就要指定映像名稱為 `mcpo`,如果沒有寫會產生檔案名稱為目錄名稱的映像
 - `build: ./mcpo`：指定 Dockerfile 所在目錄
 - `networks: webui-net`：與 Open-WebUI 使用相同網路，方便互通
 - `name: webui-net`：網路名稱固定為 `webui-net`，可與既有 Open-WebUI 共用
@@ -93,6 +95,7 @@ networks:
 services:
   mcpo:
     build: ./mcpo
+    image: mcpo
     container_name: mcpo
     ports:
       - "8000:8000"

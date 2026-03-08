@@ -1,0 +1,15 @@
+
+services:
+  mcpo:
+    build: ./mcpo
+    image: mcpo
+    container_name: mcpo
+    ports:
+      - "8000:8000"
+    networks:
+      - webui-net
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge

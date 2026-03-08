@@ -19,6 +19,10 @@
 
 單一 mcpo 容器透過 `config.json` 配置多個 MCP Server，對應不同的工具端點，由 Open-WebUI 外部工具統一連線。
 
+## 下方是實作範例目錄連結
+
+[實作範例目錄連結](./實作範例/同時安裝多個MCP_Server)
+
 ---
 
 ## 一、架構概念
@@ -40,7 +44,7 @@ Open-WebUI
 同時安裝多個MCP_Server/
 ├── compose.yaml
 ├── .env
-└── mcpo-server/
+└── mcpo/
     ├── Dockerfile
     └── config.json
 ```
@@ -99,7 +103,7 @@ CMD ["mcpo", "--port", "8000", "--config", "/app/config.json"]
 ```yaml
 services:
   mcpo:
-    build: ./mcpo-server
+    build: ./mcpo
     image: mcpo
     container_name: mcpo
     ports:
@@ -160,8 +164,8 @@ networks:
 
 | 名稱 | URL | 描述 |
 |------|-----|------|
-| mcp-tools | `http://mcpo:8000` | 時間查詢、天氣查詢等多種工具 |
-
+| mcp-tools | `http://mcpo:8000/time` | 時間查詢 |
+| mcp-tools | `http://mcpo:8000/weather` | 天氣查詢 |
 ---
 
 ## 七、啟動與驗證
@@ -194,6 +198,4 @@ docker ps
 
 ---
 
-## 實作範例
 
-完整範例位於：`OpenWebUI/mcp/實作範例/同時安裝多個MCP_Server/`

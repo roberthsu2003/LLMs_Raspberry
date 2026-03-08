@@ -7,6 +7,7 @@
 - [Pipeline 類別結構](#pipeline-類別結構)
 - [Valves 設定](#valves-設定)
 - [安裝與使用](#安裝與使用)
+- [測試與 Debug](#測試與-debug)
 
 ---
 
@@ -100,6 +101,14 @@ RUN pip install --no-cache-dir wikipedia
 ### 3. 在 Open-WebUI 中啟用
 
 Settings → Pipelines → 選擇「中文維基百科 Pipeline」→ 啟用
+
+---
+
+## 測試與 Debug
+
+使用 Python 虛擬環境進行本地開發、除錯與測試，可加快迭代速度。詳細說明請參考：
+
+> [Pipeline 測試與 Debug](../Pipeline_測試與Debug.md)
 
 ---
 

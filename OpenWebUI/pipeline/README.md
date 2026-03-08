@@ -46,6 +46,7 @@ Pipeline 會提供一個 **OpenAI 相容的 API server**，所以 Open-WebUI 可
 | 文件 | 說明 |
 |------|------|
 | [Pipeline 完整教學指南](./Pipeline_完整教學指南.md) | 完整版教學內容（含常見問題、觀念釐清、教學比喻） |
+| [Pipeline 測試與 Debug](./Pipeline_測試與Debug.md) | 虛擬環境開發、除錯與測試指南 |
 
 ---
 

@@ -216,29 +216,32 @@ asyncio.run(test_tools())
 ```
 Docker_compose快速部署open-webui/
 ├── docker-compose.yml
-├── mcpo-tools/
-    |── Dockerfile
-    |── server.py
-    ├── requirements.txt
-
+├── mcpo-custom/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── server.py
+└── ...
 ```
 
-### 7.2 mcpo/Dockerfile
+### 7.2 mcpo-custom/Dockerfile
+
+套件從 `requirements.txt` 安裝，映像內不含啟動指令（由 docker-compose 的 `command` 覆寫）：
 
 ```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY tools.py .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir mcpo
 
-RUN pip install --no-cache-dir \
-  mcpo \
-  requests
+COPY server.py .
 
 EXPOSE 8000
-
 ```
+
+> **說明：** `requirements.txt` 含 `mcp`，`mcpo` 需額外安裝以提供 HTTP 橋接。啟動指令放在 docker-compose 的 `command`，方便之後覆寫或切換不同腳本，無需重建映像。
 
 ### 7.3 docker-compose.yml 新增服務
 
@@ -260,17 +263,17 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  mcpo-weather:
-    build: ./mcpo-tools
-    container_name: mcpo-weather
+  mcpo-custom:
+    build: ./mcpo-custom
+    container_name: mcpo-custom
     restart: always
     networks:
       - webui-net
     ports:
-      - "8001:8000"
+      - "8003:8000"
     command: >
       mcpo --port 8000 --
-      python tools.py
+      python server.py
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -288,8 +291,23 @@ networks:
   webui-net:
     name: webui-net
     driver: bridge
-
 ```
+
+| 項目 | 說明 |
+|------|------|
+| `command` 在 yaml | 啟動指令放 compose，修改後重啟即可，無需 `docker build` |
+| `mcpo-custom` | 與第一章「自訂工具」對應，與第二章 `mcpo-weather` 區分 |
+
+#### 為什麼啟動指令放在 docker-compose 比較好？
+
+| 比較 | 放在 Dockerfile CMD | 放在 docker-compose `command` |
+|------|---------------------|------------------------------|
+| **修改指令** | 需執行 `docker build` 重建映像 | 改 yaml 後 `docker compose restart` 即可 |
+| **開發迭代** | 每次改指令都要重建，較慢 | 快速調整，適合學習與除錯 |
+| **同一映像多用途** | 一個映像只能跑一種指令 | 同一映像可跑不同腳本（如 `server.py`、`tools.py`） |
+| **埠號或參數調整** | 需重建 | 直接改 yaml 即可 |
+
+**建議：** 開發與教學階段將 `command` 放在 docker-compose；若部署到正式環境且指令已固定，可改回 Dockerfile 的 `CMD`，讓映像更自包含。
 
 ### 7.4 啟動與連線
 

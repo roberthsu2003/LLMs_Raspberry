@@ -24,6 +24,9 @@
 
 建議改用 `docker-compose.yml` 統一管理。
 
+## 下方是實作範例目錄連結
+
+[實作範例目錄連結](./實作範例/使用docker_compose整合Dockerfile)
 ---
 
 ## 一、專案結構建議
@@ -62,7 +65,6 @@ CMD ["mcpo", "--port", "8000", "--", "mcp-server-time", "--local-timezone=Asia/T
 在專案根目錄建立 `docker-compose.yml`：
 
 ```yaml
-version: "3.9"
 
 services:
   mcpo:

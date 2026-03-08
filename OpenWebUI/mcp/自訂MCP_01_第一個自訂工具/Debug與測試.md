@@ -84,7 +84,7 @@ def add(a: int, b: int) -> int:
     return result
 ```
 
-使用 mcpo 本機執行時，log 會直接輸出在終端機。
+使用 mcpo 本機執行時，透過 Swagger UI 呼叫工具後，log 會直接輸出在執行 mcpo 的終端機。
 
 ---
 

@@ -183,6 +183,36 @@ Open WebUI (網頁)  ──管理介面──►  Pipeline Server (容器)
 | **提供連結** | 提供「閱讀更多」與相關主題連結 |
 | **多主題查詢** | 支援用分號 `;` 分隔多個關鍵字，一次查多個主題 |
 
+### Wikipedia Pipeline 不使用任何 LLM
+
+**重要：** Wikipedia Pipeline 是**純檢索型 Pipeline**，**不會呼叫任何 LLM**（如 Ollama、GPT、Gemini）。
+
+運作流程：
+
+```
+使用者輸入（如 "history of IBM"）
+        │
+        ▼
+wikipedia.search(query)     ← 用 Python 的 wikipedia 套件搜尋
+        │
+        ▼
+wikipedia.page(title)       ← 取得維基百科頁面
+        │
+        ▼
+wiki_page.summary           ← 直接回傳維基百科的摘要文字
+        │
+        ▼
+回傳給使用者（未經 LLM 處理）
+```
+
+| 項目 | 說明 |
+|------|------|
+| **使用的「模型」** | 無 LLM，僅使用維基百科 API |
+| **資料來源** | 維基百科（透過 `wikipedia` 套件） |
+| **輸出** | 維基百科條目的原始摘要與連結 |
+
+在 Open WebUI 中雖以「模型」選項呈現，但回答完全來自維基百科檢索，不經過任何語言模型生成。
+
 ### 如何使用
 
 1. 開啟 Open WebUI 聊天介面

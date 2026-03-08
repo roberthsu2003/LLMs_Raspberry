@@ -1,0 +1,39 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080" # 宿主機可用 http://localhost:8080 存取
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux/Raspberry Pi 需要這行才能解析
+
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pipelines
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "9099:9099"
+    volumes:
+      - pipelines:/app/pipelines
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
+
+volumes:
+  open-webui:
+    name: open-webui
+  pipelines:
+    name: pipelines

@@ -13,21 +13,25 @@
 
 ## 範例檔
 
-本範例完整檔案位於 [範例檔](./範例檔/) 資料夾：
+本教學提供兩種部署方式的範例：
 
 ```
-範例檔/
-├── docker-compose.yml
-└── .env
+Pipeline_01_第一個Pipeline/
+├── 範例檔/                      # 選項 1：單獨運行 pipelines
+│   ├── docker-compose.yml
+│   └── .env
+└── 範例檔2_open-webui與pipelines/  # 選項 2：同時啟動 open-webui 和 pipelines
+    └── docker-compose.yml
 ```
 
-| 檔案 | 說明 |
+| 範例 | 說明 |
 |------|------|
-| [docker-compose.yml](./範例檔/docker-compose.yml) | 單一 pipelines 服務，port 9099 |
+| [範例檔](./範例檔/) | 選項 1：單獨運行 Pipeline Server，port 9099 |
+| [範例檔2_open-webui與pipelines](./範例檔2_open-webui與pipelines/) | 選項 2：同時啟動 Open-WebUI (8080) 與 Pipeline Server (9099) |
 
 ---
 
-## 快速開始：Docker Run
+## 快速開始(單獨運行pipelines)：Docker Run
 
 ### 步驟 1：拉取映像
 
@@ -50,27 +54,66 @@ docker run -d -p 9099:9099 \
 
 ```bash
 docker ps
-curl http://localhost:9099/health
+curl http://localhost:9099
+curl -H "Authorization: Bearer 0p3n-w3bu!" http://localhost:9099/v1/models
 ```
+
+| 指令 | 用途 |
+|------|------|
+| `docker ps` | 確認 `pipelines` 容器是否在運行 |
+| `curl http://localhost:9099` | 測試服務是否可連線（可能回傳 404，表示服務有回應） |
+| `curl -H "Authorization: Bearer 0p3n-w3bu!" http://localhost:9099/v1/models` | 取得可用模型列表；若回傳 JSON 即表示 Pipeline Server 正常運作 |
+
+**範例回傳：**
+
+```json
+{"data":[{"id":"wikipedia_pipeline","name":"Wikipedia Pipeline","object":"model","created":1772963859,"owned_by":"openai","pipeline":{"type":"pipe","valves":true}}],"object":"list","pipelines":true}
+```
+
+**回傳內容說明：**
+
+| 欄位 | 說明 |
+|------|------|
+| `data` | 可用模型／Pipeline 的陣列 |
+| `data[].id` | Pipeline 的唯一識別碼（如 `wikipedia_pipeline`） |
+| `data[].name` | 顯示名稱（如 `Wikipedia Pipeline`） |
+| `data[].object` | 固定為 `"model"`，符合 OpenAI API 規格 |
+| `data[].pipeline.type` | Pipeline 類型：`pipe`（管線）或 `filter`（過濾器） |
+| `data[].pipeline.valves` | 是否有可調參數（Valves） |
+| `pipelines` | `true` 表示此為 Pipeline Server 來源 |
+
+> **注意：** Pipeline Server 沒有 `/health` 端點，請使用 `/v1/models` 搭配 API Key 作為健康檢查。
 
 ---
 
 ## 進階部署：Docker Compose
+
+### 選項 1：單獨運行 pipelines
 
 ```bash
 cd 範例檔
 docker compose up -d
 ```
 
+### 選項 2：同時啟動 open-webui 和 pipelines
+
+```bash
+cd 範例檔2_open-webui與pipelines
+docker compose up -d
+```
+
+啟動後：
+- **Open-WebUI**：http://localhost:8080
+- **Pipeline Server**：http://localhost:9099
+
 **參數說明：**
 
 | 參數 | 說明 |
 |------|------|
-| `-p 9099:9099` | Pipeline API 埠號 |
+| `9099:9099` | Pipeline API 埠號 |
+| `8080:8080` | Open-WebUI 埠號（選項 2） |
 | `-v pipelines:/app/pipelines` | 存放 pipeline 程式碼的 volume |
 | `host.docker.internal:host-gateway` | 讓容器可訪問主機（如 Ollama） |
-
----
 
 ## 在 Open-WebUI 中連接
 
@@ -101,7 +144,7 @@ docker compose up -d
 ### 如何確認 Pipeline 正常運作？
 
 ```bash
-curl http://localhost:9099/health
+curl -H "Authorization: Bearer 0p3n-w3bu!" http://localhost:9099/v1/models
 docker logs pipelines
 ```
 

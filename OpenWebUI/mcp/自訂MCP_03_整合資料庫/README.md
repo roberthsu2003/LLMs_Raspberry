@@ -17,7 +17,7 @@
 
 ## 範例檔
 
-本範例完整檔案位於 [範例檔](./範例檔/) 資料夾，**架構與主專案一致**：
+本範例完整檔案位於 [範例檔](./範例檔/) 資料夾，**架構與主專案一致**。此範例整合自 [7.mcpo-sql](../7.mcpo-sql/) 的內容，並統一為與 MCP_01、MCP_02 相同的目錄結構。
 
 ```
 範例檔/
@@ -307,6 +307,22 @@ docker compose up -d --build
 **Open-WebUI 設定**：管理員控制台 → 設定 → 外部工具 → 新增 `http://postgres-mcp:8000`
 
 詳細 MCPO 設定與 Open WebUI 連線方式，請參考 [自訂MCP_04_整合mcpo部署](../自訂MCP_04_整合mcpo部署/README.md)。
+
+---
+
+## 從 7.mcpo-sql 遷移
+
+若你先前使用 [7.mcpo-sql](../7.mcpo-sql/) 的結構，可依下表對應遷移：
+
+| 7.mcpo-sql | 自訂MCP_03 範例檔 |
+|------------|-------------------|
+| `mcpo/tools.py` | `mcpo-custom/server.py` |
+| `mcpo/tools_test.py` | `mcpo-custom/test_tools.py` |
+| `mcpo/` 目錄 | `mcpo-custom/` 目錄 |
+| `build: ./mcpo` | `build: ./mcpo-custom` |
+| port 8001 | port 8002（避免與 MCP_02 衝突） |
+
+**PostgreSQL volume 路徑**：7.mcpo-sql 若使用 `/var/lib/postgresql`，請改為 `/var/lib/postgresql/data`（PostgreSQL 官方 image 的正確資料目錄）。
 
 ---
 

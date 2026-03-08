@@ -74,6 +74,7 @@ networks:
 
 ```other
 project/
+├── .env
 ├── docker-compose.yml
 └── mcpo/
     └── Dockerfile
@@ -141,32 +142,7 @@ http://mcpo:8000
 
 因為 service name = hostname
 
----
 
-# **🔥 進階優化（建議）**
-
-其實 mcpo 不一定要對外開 port。
-
-如果只是給 open-webui 用，可以改成：
-
-```other
-mcpo:
-    build: ./mcpo
-    container_name: mcpo
-    restart: always
-    networks:
-      - webui-net
-    expose:
-      - "8000"
-```
-
-expose 代表：
-
-👉 只給 container 內部使用
-
-👉 不對 host 開 port
-
-這樣更乾淨。
 
 
 

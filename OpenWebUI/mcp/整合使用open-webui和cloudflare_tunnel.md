@@ -14,10 +14,24 @@
 
 ---
 
-# **✅ 整合後完整 docker-compose.yml**
+## 下方是實作範例目錄連結
 
-```other
+[實作範例目錄連結](./實作範例/整合使用open-webui和cloudflare_tunnel)
+
+## **✅ 整合後完整 docker-compose.yml**
+
+
+```yaml
 services:
+  mcpo:
+    build: ./mcpo
+    image: mcpo
+    container_name: mcpo
+    ports:
+      - "8000:8000"
+    networks:
+      - webui-net
+
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
@@ -25,23 +39,13 @@ services:
     networks:
       - webui-net
     ports:
-      - "8080:8080"
+      - "8080:8080" # 宿主機可用 http://localhost:8080 存取
     volumes:
       - open-webui:/app/backend/data
     environment:
       OLLAMA_BASE_URL: http://host.docker.internal:11434
-      MCP_ENABLE: "true"
     extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-  mcpo:
-    build: ./mcpo
-    container_name: mcpo
-    restart: always
-    networks:
-      - webui-net
-    ports:
-      - "8000:8000"
+      - "host.docker.internal:host-gateway" # Linux/Raspberry Pi 需要這行才能解析
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -50,6 +54,7 @@ services:
     networks:
       - webui-net
     command: tunnel run --token ${CLOUDFLARE_TOKEN}
+    # cloudflared 指向 open-webui 的服務名稱與 port
 
 volumes:
   open-webui:
@@ -59,6 +64,8 @@ networks:
   webui-net:
     name: webui-net
     driver: bridge
+
+
 ```
 
 ---

@@ -22,6 +22,7 @@
 ```
 範例檔/
 ├── docker-compose.yml
+├── .env
 └── mcpo-custom/
     ├── Dockerfile
     ├── requirements.txt
@@ -163,22 +164,9 @@ python server.py
 
 ## 七、整合 mcpo 部署
 
-將自訂 MCP Server 整合至 Docker 環境，讓 Open-WebUI 能呼叫。
+將自訂 MCP Server 整合至 Docker 環境，讓 Open-WebUI 能呼叫。專案結構請參考上方 [範例檔](#範例檔)。
 
-### 7.1 專案結構
-
-```
-Docker_compose快速部署open-webui/
-├── docker-compose.yml
-├── .env
-├── mcpo-custom/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── server.py
-└── ...
-```
-
-### 7.2 mcpo-custom/Dockerfile
+### 7.1 mcpo-custom/Dockerfile
 
 套件從 `requirements.txt` 安裝，映像內不含啟動指令（由 docker-compose 的 `command` 覆寫）：
 
@@ -197,7 +185,7 @@ EXPOSE 8000
 
 > **說明：** `requirements.txt` 含 `mcp`（FastMCP）與 `mcpo`（HTTP 橋接），所有依賴統一管理。啟動指令放在 docker-compose 的 `command`，方便之後覆寫或切換不同腳本，無需重建映像。
 
-### 7.3 docker-compose.yml 新增服務
+### 7.2 docker-compose.yml 新增服務
 
 ```yaml
 services:
@@ -282,7 +270,7 @@ command: >
 
 **建議：** 開發與教學階段將 `command` 放在 docker-compose；若部署到正式環境且指令已固定，可改回 Dockerfile 的 `CMD`，讓映像更自包含。
 
-### 7.4 啟動與連線
+### 7.3 啟動與連線
 
 ```bash
 docker compose up -d --build

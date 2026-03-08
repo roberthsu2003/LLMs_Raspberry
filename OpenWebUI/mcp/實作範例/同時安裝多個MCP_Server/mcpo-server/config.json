@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "time": {
+      "command": "python",
+      "args": ["-m", "mcp_server_time", "--local-timezone=Asia/Taipei"]
+    },
+    "weather": {
+      "command": "python",
+      "args": ["-m", "mcp_weather_server"]
+    }
+  }
+}

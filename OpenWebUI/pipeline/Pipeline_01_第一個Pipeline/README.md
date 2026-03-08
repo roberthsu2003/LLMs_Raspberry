@@ -128,9 +128,44 @@ docker compose up -d
 
 ## 管理與啟用 Pipeline
 
-1. 前往 **Settings → Pipelines**
-2. 可從 GitHub URL 安裝範例，或上傳 Python 檔案
-3. Pipeline 程式碼存放在 `/app/pipelines`，若用 bind mount 可直接修改
+連線設定完成後，可在 Open WebUI 介面中管理 Pipeline。
+
+### 進入 Pipelines 管理頁面
+
+路徑：**管理員控制台 → 設定 → Pipelines 分頁**
+
+在此頁面可：
+- 查看已安裝的 Pipeline 列表
+- 啟用／停用個別 Pipeline
+- 調整 Valves（可調參數，如速率限制、字數上限等）
+- 安裝新的 Pipeline
+
+### 安裝 Pipeline 的兩種方式
+
+| 方式 | 適用情境 | 操作說明 |
+|------|----------|----------|
+| **從 GitHub URL 安裝** | 無額外依賴的範例 | 點選「從 GitHub URL 安裝」，貼上 `.py` 檔的 raw URL，例如：<br>`https://raw.githubusercontent.com/open-webui/pipelines/main/examples/pipelines/integrations/wikipedia_pipeline.py` |
+| **上傳 Python 檔案** | 自訂或本機開發的 Pipeline | 點選上傳，選擇本機的 `.py` 檔案，檔案會傳送至 Pipeline Server 的 `/app/pipelines` 目錄 |
+
+> **注意：** 從 URL 安裝僅適用於**無額外 Python 套件依賴**的 Pipeline。若 Pipeline 需要 `wikipedia`、`requests` 等套件，需自訂 Dockerfile 並重建映像。
+
+### Pipeline 程式碼存放位置
+
+Pipeline 程式碼實際存放在 **Pipeline Server 容器**內的 `/app/pipelines` 目錄：
+
+| Volume 類型 | 修改方式 |
+|-------------|----------|
+| **Named Volume**（`-v pipelines:/app/pipelines`） | 需透過 Open WebUI 上傳，或進入容器修改：`docker exec -it pipelines sh` |
+| **Bind Mount**（`-v ./pipelines:/app/pipelines`） | 直接在主機編輯 `./pipelines/` 下的 `.py` 檔，容器會自動重新載入 |
+
+```
+Open WebUI (網頁)  ──管理介面──►  Pipeline Server (容器)
+                                      │
+                                      ▼
+                               /app/pipelines/
+                               ├── wikipedia_pipeline.py
+                               └── my_custom_pipeline.py
+```
 
 ---
 

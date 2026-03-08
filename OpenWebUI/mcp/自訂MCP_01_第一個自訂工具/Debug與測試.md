@@ -4,6 +4,32 @@
 
 ---
 
+## 建立 Python 的虛擬環境
+
+進行本機測試前，建議先建立虛擬環境以隔離依賴。
+
+### 使用 uv（推薦）
+
+```bash
+cd 範例檔/mcpo-custom
+uv venv
+uv pip install -r requirements.txt
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+```
+
+> 詳細步驟請參考 [uv 開發環境](./uv開發環境.md)
+
+### 使用 venv + pip
+
+```bash
+cd 範例檔/mcpo-custom
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+---
+
 ## 方法一：直接呼叫工具函式（最簡單）
 
 在開發時，可先獨立測試工具邏輯，不透過 MCP 層。建立 `test_tools.py`：
@@ -27,14 +53,15 @@ python test_tools.py
 
 ## 方法二：透過 mcpo + Swagger UI（推薦）
 
-部署 mcpo 後，透過 Swagger 介面測試：
+在虛擬環境內使用 mcpo 指令啟動 MCP Server，透過 Swagger 介面測試：
 
 ```bash
-docker compose up -d --build
+cd 範例檔/mcpo-custom
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+mcpo --port 8000 -- python server.py
 ```
 
-開啟：`http://localhost:8003/docs`
-
+用瀏覽器開啟：`http://localhost:8000/docs`
 可看到所有已註冊的工具，並直接呼叫測試，無需透過 Open-WebUI。
 
 ---
@@ -57,7 +84,7 @@ def add(a: int, b: int) -> int:
     return result
 ```
 
-容器內執行時，用 `docker compose logs -f mcpo-custom` 查看輸出。
+使用 mcpo 本機執行時，log 會直接輸出在終端機。
 
 ---
 

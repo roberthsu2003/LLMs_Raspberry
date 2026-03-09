@@ -58,7 +58,7 @@
 
 3.  **安裝 OpenWebUI**：安裝並設定網頁使用者介面。
     > 📚 **OpenWebUI(docker run)安裝流程**：[OpenWebUI簡易安裝流程](./OpenWebUI/OpenWebUI簡易安裝流程說明.md)   
-    > 📚 **OpenWebUI(docker compose)**：[OpenWebUI詳細安裝流程](./OpenWebUI/OpenWebUI詳細安裝流程說明.md)  
+    > 📚 **OpenWebUI(docker compose)**：[OpenWebUI詳細安裝流程](./Docker_compose快速部署open-webui/README.md)  
     > 📚 **OpenWebUI操作說明**：[OpenWebUI操作說明](./OpenWebUI/OpenWebUI操作說明.md)      
 
 4. **OpenWebUI進階功能-需寫程式**

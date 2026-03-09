@@ -56,9 +56,16 @@
 
     > 📚 **詳細指南**：[Ollama 安裝流程說明](./ollama安裝流程說明/README.md)
 
-3.  **部署 OpenWebUI**：安裝並設定網頁使用者介面。
+3.  **安裝 OpenWebUI**：安裝並設定網頁使用者介面。
+    > 📚 **OpenWebUI安裝**：[OpenWebUI安裝](./OpenWebUI安裝/README.md)
+    
+    > 📚 **OpenWebUI操作說明**：[OpenWebUI操作說明](./OpenWebUI/OpenWebUI操作說明.md)
 
-    > 📚 **詳細指南**：[OpenWebUI](./OpenWebUI)   
+    > 📚 **詳細指南**：[OpenWebUI安裝流程說明](./OpenWebUI/OpenWebUI安裝流程說明.md)
+    > 📚 **詳細指南**：[OpenWebUI](./OpenWebUI) 
+
+    **OpenWebUI進階功能-需寫程式**
+
     > 📚 **OpenWebUI`Functions`| 管理員控制台->函式**：[Functions](./OpenWebUI/Functions/README.md)  
     > 📚 **OpenWebUI`工具(tools)`| 工作區->工具**：[工具](./OpenWebUI/工具.md)   
     > 📚 **OpenWebUI`MCP`| 工作區->設定->外部工具**：[MCP](./OpenWebUI/mcp)   

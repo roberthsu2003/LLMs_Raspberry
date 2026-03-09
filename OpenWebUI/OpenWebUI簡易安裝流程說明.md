@@ -114,9 +114,13 @@ docker run -d \
 ghcr.io/open-webui/open-webui:main
 ```
 
-> 注意:使用http://host.docker.internal:11434 
+> 注意:使用http://host.docker.internal:11434  
 > 這是docker的預設設定,可以讓容器內的服務訪問主機的服務,不用再手動設定ip地址
 
+> 注意:如果有使用其它的環境變數,必需手動設定,例如:Gemini API KEY,設定如下:  
+```bash
+-e GEMINI_API_KEY=個人的API KEY \
+```
 
 ### 第4-2步：連接到 Ollama
 

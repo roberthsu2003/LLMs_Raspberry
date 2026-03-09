@@ -119,7 +119,15 @@ ghcr.io/open-webui/open-webui:main
 
 > 注意:如果有使用其它的環境變數,必需手動設定,例如:Gemini API KEY,設定如下:  
 ```bash
+docker run -d \
+--add-host=host.docker.internal:host-gateway \
+-p 8080:8080 \
+-v open-webui:/app/backend/data \
+-e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
 -e GEMINI_API_KEY=個人的API KEY \
+--name open-webui \
+--restart always \
+ghcr.io/open-webui/open-webui:main
 ```
 
 ### 第4-2步：連接到 Ollama

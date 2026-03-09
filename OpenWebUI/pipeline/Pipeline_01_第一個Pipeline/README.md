@@ -138,7 +138,7 @@ docker compose up -d
 在此頁面可：
 - 查看已安裝的 Pipeline 列表
 - 啟用／停用個別 Pipeline
-- 調整 Valves（可調參數，如速率限制、字數上限等）
+- 在管線設定項目調整（可調參數，如速率限制、字數上限等）
 - 安裝新的 Pipeline
 
 ### 安裝 Pipeline 的兩種方式

@@ -89,13 +89,6 @@ Tunnel的主要用途是建立加密通道，保護資料傳輸並突破防火�
 > 📚 **cloudflare Tunnel**：[cloudflare Tunnel](./tunnel/cloudflare_tunnel.md)  
 
 ---
-### 使用Docker compose,快速部署open-webui相關容器
-
-使用Docker compose,快速部署open-webui相關容器,可以快速部署open-webui,cloudflare tunnel,pipeline server,MCPO server等相關容器
-
-> 📚 **Docker_compose快速部署open-webui**：[Docker_compose快速部署open-webui](./Docker_compose快速部署open-webui/README.md)
-
----
 
 ### 掌握 Docker
 

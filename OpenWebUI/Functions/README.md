@@ -60,7 +60,9 @@
 
 ### 2.5 實作範例
 
-1. **最簡單Filter結構**：[最簡單Filter結構](./filter/最簡單Filter結構.md)
+> **Filter的開發環境、測試和Debug**：[Filter的開發環境、測試和Debug](./filter/Filter的測試和Debug.md)
+
+1. **最簡單Filter結構**：[最簡單Filter結構](./filter/最簡單Filter結構.md)2. 
 2. **有感範例**：[在 AI 回答結尾自動加文字](./filter/在AI回答結尾自動加文字.md)
 3. **進階範例**：[語言過濾器程式碼](./filter/繁中轉換為英文.md) + 輸出加公司資訊
 

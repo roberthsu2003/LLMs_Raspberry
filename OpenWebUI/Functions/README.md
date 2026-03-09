@@ -30,7 +30,7 @@
 
 ## 第二章：Filter Function（過濾器）
 
-> 過濾器程式碼：[過濾器程式碼](./filter/README.md)
+> 官方Filter Function說明書：[Filter Function說明書](https://docs.openwebui.com/features/extensibility/plugin/functions/filter)
 
 ### 2.1 核心概念
 
@@ -60,9 +60,9 @@
 
 ### 2.5 實作範例
 
-1. **最簡單範例**：空骨架
+1. **最簡單範例**：[最簡單的Filter範例](./filter/最簡單的Filter範例.md)
 2. **有感範例**：在 AI 回答結尾自動加文字
-3. **進階範例**：繁中轉英文 + 輸出加公司資訊（可引用 `過濾器程式碼.md`）
+3. **進階範例**：繁中轉英文 + 輸出加公司資訊
 
 ### 2.6 Valves（可調參數）
 
@@ -73,10 +73,6 @@
 
 會出現在篩選器(Filters)中，可以選擇要使用的過濾器篩
 
-### 2.7 範例
-1. 最簡單的Filter範例：[最簡單的Filter範例](./filter/最簡單的Filter範例.md)
-2. 輸入時-將中文轉變為英文
-3. 輸出現-增加額外的資訊
 
 ---
 

@@ -35,11 +35,11 @@
 - 
 - 可以移除--restart always
 
-> 使用--add-host=host.docker.internal:host-gateway -> 會失敗(適合windows和mac,一般windows和mac不需要設定,預設就有了)
+> 使用--add-host=host.docker.internal:host-gateway -> 會失敗(適合raspberry,一般windows和mac不需要設定,預設就有了)
 
 ```bash
 docker run -d \
--p 3000:8080 \
+-p 8080:8080 \
 -v open-webui:/app/backend/data \
 -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
 --name open-webui \
@@ -49,7 +49,7 @@ ghcr.io/open-webui/open-webui:main
 
 ### 第2-2步:連接到 Ollama
 
-1.  **訪問 WebUI**：打開瀏覽器，輸入 `http://localhost:3000` 並註冊管理員帳號。
+1.  **訪問 WebUI**：打開瀏覽器，輸入 `http://localhost:8080` 並註冊管理員帳號。
 2.  **修改 API 位址**：進入「設定」 -> 「連線」，將 Ollama API 的位址修改為(預設已經是host.docker.internal:11434)：
     ```
     http://host.docker.internal:11434
@@ -105,26 +105,23 @@ ghcr.io/open-webui/open-webui:main
 
 ```bash
 docker run -d \
--p 3000:8080 \
+--add-host=host.docker.internal:host-gateway \
+-p 8080:8080 \
 -v open-webui:/app/backend/data \
--e OLLAMA_BASE_URL=http://pi4Robert0301:11434 \
+-e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
 --name open-webui \
 --restart always \
 ghcr.io/open-webui/open-webui:main
 ```
 
-> 注意:使用http://pi4Robert0301:11434 -> 做用主機名稱,可能不穩定,因為在家裏和在教室連線網路不同,最好使用ip地址  
->   
-> 在raspberry內,使用hostname -I -> 查看ip地址  
->    
-> 解法方式:  
-> 1. OLLAMA_BASE_URL參數直接改成ip地址  
-> 2. OLLAMA_BASE_URL參數使用主機名稱,等open-webui容器啟動後,再到連線內,手動設定OllAMA的ip地址  
+> 注意:使用http://host.docker.internal:11434 
+> 這是docker的預設設定,可以讓容器內的服務訪問主機的服務,不用再手動設定ip地址
+
 
 ### 第4-2步：連接到 Ollama
 
 1.  **訪問 WebUI**：打開瀏覽器，輸入 `http://localhost:3000` 並註冊管理員帳號。
-2.  **修改 API 位址**：進入「設定」 -> 「連線」，將 Ollama API 的位址修改為(預設已經是http://pi4Robert0301:11434)：
+2.  **修改 API 位址**：進入「設定」 -> 「連線」，將 Ollama API 的位址修改為(預設已經是http://host.docker.internal:11434)：
 
     ```
     http://pi4Robert0301:11434

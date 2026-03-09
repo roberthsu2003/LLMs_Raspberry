@@ -4,6 +4,7 @@
 
 - [前言](#前言)
 - [部署選項一覽](#部署選項一覽)
+- [選項 0:Open-WebUI + Gemini API KEY](#選項-0open-webui--gemini-api-key)
 - [選項 1：Open-WebUI + Cloudflare Tunnel-Host Network 模式](#選項-1open-webui--cloudflare-tunnel-host-network-模式)
 - [選項 2：Open-WebUI + Cloudflare Tunnel-Bridge Network 模式](#選項-2open-webui--cloudflare-tunnel-bridge-network-模式)
 - [選項 3：Open-WebUI + Cloudflare Tunnel + MCPO](#選項-3open-webui--cloudflare-tunnel--mcpo)
@@ -36,6 +37,44 @@
 | **5** | Open-WebUI + Cloudflare Tunnel + Pipeline + MCPO | 完整功能一次部署 |
 
 ---
+
+## 選項 0:Open-WebUI + Gemini API KEY
+
+**docker-compose.yml**
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: always
+    networks:
+      - webui-net
+    ports:
+      - "8080:8080" # 宿主機可用 http://localhost:8080 存取
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux/Raspberry Pi 需要這行才能解析
+
+volumes:
+  open-webui:
+    name: open-webui
+
+networks:
+  webui-net:
+    name: webui-net
+    driver: bridge
+```
+
+**.env**
+
+```bash
+GEMINI_API_KEY=個人的API KEY
+```
 
 ## 選項 1：Open-WebUI + Cloudflare Tunnel-Host Network 模式
 

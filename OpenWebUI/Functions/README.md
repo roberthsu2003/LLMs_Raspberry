@@ -2,36 +2,15 @@
 
 > 參考文件：[Open WebUI Functions 官方文件](https://docs.openwebui.com/features/extensibility/plugin/functions/)
 
-## 設定位置
-
-管理員控制台 -> 函式
-
 ---
 
-## 講義整體架構
-
-```
-Functions 講義
-├── 第一章：認識 Functions
-├── 第二章：Filter Function（過濾器）
-├── 第三章：Action Function（動作按鈕）
-├── 第四章：Pipe Function（管道／自訂模型）
-├── 第五章：安裝、啟用與指派
-└── 第六章：安全注意事項與實務建議
-```
-
----
-
-## 第一章：認識 Functions
-
-### 1.1 什麼是 Functions？
-
+### 什麼是 Functions？
 - **定義**：Functions 是 Open WebUI 的「插件」，用來擴充功能
 - **特點**：
   - 內建於 Open WebUI，不需額外複雜整合
   - 執行速度快、模組化
   - 純 Python 撰寫，可自由客製
-- **與 Tools 的差異**（重要釐清）：
+- **與 Tools(工具) 的差異**（重要釐清）：
   - **Tools**：模型可「選擇性呼叫」的外部工具（如查天氣、搜尋）
   - **Functions**：在系統層級運作，分為 Pipe、Filter、Action 三種
 
@@ -51,7 +30,7 @@ Functions 講義
 
 ## 第二章：Filter Function（過濾器）
 
-> 可整合現有 `過濾器程式碼.md` 內容
+> 過濾器程式碼：[過濾器程式碼](./filter/README.md)
 
 ### 2.1 核心概念
 

@@ -12,6 +12,9 @@
     │         → 直接開啟 HTML 檔案即可
     │
     └─ 是 → 檢查 package.json 內容
+            ├─ 有 next → 【類型 4】Next.js
+            │            → 需要：Node.js, npm（內建建置工具）
+            │
             ├─ 有 react/react-dom → 【類型 3】TypeScript + React
             │                       → 需要：Node.js, npm, Vite/Webpack
             │
@@ -30,6 +33,9 @@
 #### ✅ 檢查清單
 
 - [ ] 是否有 `package.json`？
+- [ ] 是否有 `next` 在 dependencies？（Next.js 專案）
+- [ ] 是否有 `next.config.js` 或 `next.config.ts`？（Next.js 專案）
+- [ ] 是否有 `app/` 或 `pages/` 資料夾？（Next.js 路由結構）
 - [ ] 是否有 `tsconfig.json`？
 - [ ] 是否有 `vite.config.ts` 或 `webpack.config.js`？
 - [ ] 是否有 `src/` 資料夾？
@@ -291,6 +297,113 @@ npm run preview
 
 ---
 
+## ▲ 類型 4：Next.js（React 全端框架）
+
+### 識別特徵
+
+**檔案結構：**
+```
+專案資料夾/
+├── package.json        # 有 next 依賴 ⭐
+├── next.config.js      # 或 next.config.ts、next.config.mjs ⭐
+├── tsconfig.json       # TypeScript 配置（選用）
+├── app/                # App Router（Next.js 13+）⭐
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+│   # 或 pages/         # Pages Router（舊版）
+│   #   ├── _app.tsx
+│   #   ├── index.tsx
+│   #   └── api/        # API 路由
+├── public/             # 靜態資源
+└── node_modules/       # 依賴套件
+```
+
+**關鍵指標：**
+- ✅ 有 `next` 在 `package.json` 的 `dependencies` ⭐
+- ✅ 有 `next.config.js`、`next.config.ts` 或 `next.config.mjs` ⭐
+- ✅ 有 `app/` 資料夾（App Router）或 `pages/` 資料夾（Pages Router）
+- ✅ 通常同時有 `react` 和 `react-dom`（Next.js 基於 React）
+- ✅ 可能有 `app/page.tsx`、`app/layout.tsx` 或 `pages/index.tsx`
+
+**package.json 範例：**
+```json
+{
+  "name": "my-next-app",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  }
+}
+```
+
+### 需要的工具
+
+- ✅ **Node.js**（安裝 npm，建議 18.17 以上）
+- ✅ **Next.js**（透過 npm 安裝，內建建置工具）
+- ✅ 程式碼編輯器（VS Code 推薦）
+
+### 如何設置和運行
+
+**步驟 1：安裝 Node.js**
+```bash
+# 檢查是否已安裝
+node --version
+npm --version
+```
+
+**步驟 2：安裝專案依賴**
+```bash
+cd 專案資料夾
+npm install
+```
+
+**步驟 3：啟動開發伺服器**
+```bash
+# 開發模式（熱重載）
+npm run dev
+
+# 瀏覽器訪問：http://localhost:3000
+```
+
+**步驟 4：建置生產版本**
+```bash
+# 編譯專案
+npm run build
+
+# 啟動生產伺服器
+npm run start
+```
+
+### Next.js 與 React（Vite/Webpack）的差異
+
+| 特徵 | Next.js | React（類型 3） |
+|------|---------|-----------------|
+| **建置工具** | 內建，無需額外配置 | 需 Vite 或 Webpack |
+| **路由** | 檔案系統路由（`app/` 或 `pages/`） | 需 react-router 等 |
+| **SSR/SSG** | 內建支援 | 需額外配置 |
+| **API 路由** | 內建（`app/api/` 或 `pages/api/`） | 需額外後端 |
+| **配置檔** | `next.config.js` | `vite.config.ts` 或 `webpack.config.js` |
+
+### 相關文件
+
+👉 [Node.js 和 npm 環境配置](../Node.js_npm_環境配置/README.md)
+
+---
+
 ## 🔧 快速檢查指令
 
 在專案根目錄執行以下指令，快速判斷專案類型：
@@ -298,6 +411,9 @@ npm run preview
 ### 檢查 package.json
 
 ```bash
+# 檢查是否有 Next.js（應優先於 React 檢查）
+cat package.json | grep -i '"next"'
+
 # 檢查是否有 React
 cat package.json | grep -i react
 
@@ -327,6 +443,10 @@ ls -la tsconfig.json
 ### 檢查建置工具
 
 ```bash
+# 檢查是否有 Next.js
+ls -la next.config.* 2>/dev/null
+ls -d app pages 2>/dev/null
+
 # 檢查是否有 Vite
 ls -la vite.config.* 2>/dev/null
 
@@ -341,16 +461,18 @@ cat package.json | grep -i "react-scripts"
 
 ## 📊 對照表
 
-| 特徵 | 類型 1<br>JavaScript | 類型 2<br>TypeScript | 類型 3<br>React + TypeScript |
-|------|:-------------------:|:-------------------:|:---------------------------:|
-| **package.json** | 無或極簡 | ✅ 有 | ✅ 有 |
-| **tsconfig.json** | ❌ 無 | ✅ 有 | ✅ 有 |
-| **.ts 檔案** | ❌ 無 | ✅ 有 | ✅ 有 |
-| **.tsx/.jsx 檔案** | ❌ 無 | ❌ 無 | ✅ 有 |
-| **react/react-dom** | ❌ 無 | ❌ 無 | ✅ 有 |
-| **建置工具** | ❌ 不需要 | TypeScript 編譯器 | Vite/Webpack |
-| **需要 Node.js** | ❌ 不需要 | ✅ 需要 | ✅ 需要 |
-| **運行方式** | 直接開啟 HTML | 編譯後開啟 | `npm run dev` |
+| 特徵 | 類型 1<br>JavaScript | 類型 2<br>TypeScript | 類型 3<br>React + TypeScript | 類型 4<br>Next.js |
+|------|:-------------------:|:-------------------:|:---------------------------:|:-----------------:|
+| **package.json** | 無或極簡 | ✅ 有 | ✅ 有 | ✅ 有 |
+| **tsconfig.json** | ❌ 無 | ✅ 有 | ✅ 有 | ✅ 通常有 |
+| **.ts 檔案** | ❌ 無 | ✅ 有 | ✅ 有 | ✅ 有 |
+| **.tsx/.jsx 檔案** | ❌ 無 | ❌ 無 | ✅ 有 | ✅ 有 |
+| **next** | ❌ 無 | ❌ 無 | ❌ 無 | ✅ 有 |
+| **react/react-dom** | ❌ 無 | ❌ 無 | ✅ 有 | ✅ 有 |
+| **app/ 或 pages/** | ❌ 無 | ❌ 無 | ❌ 無 | ✅ 有 |
+| **建置工具** | ❌ 不需要 | TypeScript 編譯器 | Vite/Webpack | 內建 |
+| **需要 Node.js** | ❌ 不需要 | ✅ 需要 | ✅ 需要 | ✅ 需要 |
+| **運行方式** | 直接開啟 HTML | 編譯後開啟 | `npm run dev` | `npm run dev` |
 
 ---
 
@@ -386,13 +508,17 @@ npm install
 
 ### Q4: 如何知道專案使用哪個建置工具？
 
-**A:** 檢查以下檔案：
+**A:** 檢查以下檔案或依賴（**建議依序檢查，Next.js 優先**）：
+- `package.json` 中有 `next` + `next.config.js/ts` → 使用 **Next.js**（內建建置）
 - `vite.config.ts` 或 `vite.config.js` → 使用 **Vite**
 - `webpack.config.js` → 使用 **Webpack**
 - `package.json` 中有 `react-scripts` → 使用 **Create React App**
-- `package.json` 中有 `next` → 使用 **Next.js**
 
-### Q5: 專案下載後無法運行？
+### Q5: 專案同時有 React 和 Next.js，怎麼判斷？
+
+**A:** 若 `package.json` 中有 `next` 依賴，應視為 **Next.js 專案（類型 4）**。Next.js 基於 React，但有自己的建置與路由系統。運行時使用 `npm run dev`，會啟動 Next.js 開發伺服器（預設 port 3000），而非 Vite 或 Webpack。
+
+### Q6: 專案下載後無法運行？
 
 **A:** 按照以下步驟檢查：
 
@@ -414,5 +540,6 @@ npm install
 ### 進階學習
 1. 掌握 TypeScript 後
 2. 學習 **類型 3（React + TypeScript）**
-3. 了解現代前端開發工具鏈
+3. 學習 **類型 4（Next.js）**：全端框架、SSR、檔案路由
+4. 了解現代前端開發工具鏈
 

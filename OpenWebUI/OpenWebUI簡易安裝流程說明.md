@@ -61,7 +61,8 @@ ghcr.io/open-webui/open-webui:main
 <a id="section-3"></a>
 ## 3. 安裝(適合raspberry)：連接到現有的 Ollama -> network:host
 
-> **注意**：此路徑適合已在 Raspberry Pi 上手動安裝並運行 Ollama 的使用者。   
+> **注意**：此路徑適合已在 Raspberry Pi 上手動安裝並運行 Ollama 的使用者。  
+> **注意**:如果有使用其它的環境變數,必需手動設定,例如:Gemini API KEY,設定如下: 
 > network:host 
 
 
@@ -74,6 +75,7 @@ docker run -d \
 --network=host \
 -v open-webui:/app/backend/data \
 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 \
+-e GEMINI_API_KEY=個人的API KEY \
 --name open-webui \
 --restart always \
 ghcr.io/open-webui/open-webui:main
@@ -96,6 +98,7 @@ ghcr.io/open-webui/open-webui:main
 <a id="section-4"></a>
 ## 4. 安裝(適合raspberry)：連接到現有的 Ollama -> network:bridge
 > **注意**：此路徑適合已在 Raspberry Pi 上手動安裝並運行 Ollama 的使用者。   
+> **注意**: 上次測試沒有成功,解決方式要建立一個自訂的network(尚未驗證)   
 > network:bridge 
 
 
@@ -115,8 +118,7 @@ ghcr.io/open-webui/open-webui:main
 ```
 
 > 注意:使用http://host.docker.internal:11434  
-> 這是docker的預設設定,可以讓容器內的服務訪問主機的服務,不用再手動設定ip地址
-
+> 這是docker的預設設定,可以讓容器內的服務訪問主機的服務,不用再手動設定ip地址  
 > 注意:如果有使用其它的環境變數,必需手動設定,例如:Gemini API KEY,設定如下:  
 ```bash
 docker run -d \

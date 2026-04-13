@@ -1,4 +1,4 @@
-# Open WebUI Functions 講義
+## Open WebUI Functions 講義
 
 > **官方參考**：[Open WebUI Functions 文件](https://docs.openwebui.com/features/extensibility/plugin/functions/)  
 > **說明**：本文件以「課堂講義」撰寫，建議搭配實機操作 Open WebUI 一併練習。
@@ -131,30 +131,58 @@
 from pydantic import BaseModel, Field
 from typing import Union, Generator, Iterator
 
-
-class Pipe:
+class Filter:
     class Valves(BaseModel):
-        prefix: str = Field(
-            default="[系統訊息]",
-            description="顯示在回覆前面的文字",
+        # 1. 布林值 (bool) -> UI 會呈現為「開關 (Toggle Switch)」
+        is_active: bool = Field(
+            default=True,
+            description="是否啟用此過濾功能",
         )
-        uppercase: bool = Field(
-            default=False,
-            description="是否將英文轉為大寫",
+        # 2. 整數 (int) -> UI 會呈現為「數字輸入框 (Number Input)」
+        max_length: int = Field(
+            default=50,
+            description="限制使用者訊息的最大長度",
+        )
+        # 3. 浮點數 (float) -> UI 會呈現為「可輸入小數的數字框」
+        intensity: float = Field(
+            default=0.5,
+            description="過濾強度 (0.0 到 1.0)",
+        )
+        # 4. 字串 (str) -> UI 會呈現為「文字輸入框 (Text Input)」
+        prefix: str = Field(
+            default="[System]",
+            description="要在訊息前加入的標記",
         )
 
     def __init__(self):
-        self.type = "pipe"
-        self.id = "valves_test"
-        self.name = "帶有設定的測試模型"
+        self.type = "filter"
+        self.id = "multi_type_valves_filter"
+        self.name = "全型態設定教學過濾器"
         self.valves = self.Valves()
 
-    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
-        user_message = body["messages"][-1]["content"]
-        response_text = f"{self.valves.prefix}：{user_message}"
-        if self.valves.uppercase:
-            response_text = response_text.upper()
-        return response_text
+    async def inlet(self, body: dict, user: dict) -> dict:
+        # 如果開關關閉，直接回傳原始內容
+        if not self.valves.is_active:
+            return body
+
+        messages = body["messages"]
+        if messages:
+            content = messages[-1]["content"]
+            
+            # 應用整數限制：如果太長就截斷
+            if len(content) > self.valves.max_length:
+                content = content[:self.valves.max_length]
+            
+            # 應用字串標記
+            content = f"{self.valves.prefix} {content}"
+            
+            # 模擬 float 強度的邏輯：如果強度很高，將文字轉為大寫
+            if self.valves.intensity > 0.8:
+                content = content.upper()
+
+            messages[-1]["content"] = content
+            
+        return body
 ```
 
 #### 2.6.3 優點

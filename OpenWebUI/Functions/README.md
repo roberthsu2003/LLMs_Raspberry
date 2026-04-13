@@ -123,7 +123,7 @@ Action 可於**每則對話訊息下方**建立**自訂互動按鈕**，當使�
 - 可利用 `__event_emitter__` 參數，即時向前端介面發送推播狀態或通知訊息。
 
 ### 3.4 基礎範例：訊息字數統計
-此範例將於訊息下方產生按鈕，點擊後計算該則訊息字數並推播通知 (完整說明見：[基礎 Action 範例](./action/基礎Action範例.md))。
+此範例將於訊息下方產生按鈕，點擊後會計算該則訊息字數，並將統計結果附加於訊息結尾。
 
 ```python
 """
@@ -144,31 +144,38 @@ class Action:
         __event_emitter__: Optional[Callable[..., Any]] = None,
     ) -> Optional[dict]:
         
-        # 取得當前訊息內容
-        message_content = body.get("message", {}).get("content", "")
+        # 取得所有對話
+        messages = body.get("messages", [])
+        if not messages:
+            return body
+
+        # 取得最後點擊欲處理的那則訊息
+        last_message = messages[-1]
+        message_content = last_message.get("content", "")
         message_len = len(message_content)
 
-        # 透過事件發射器 (Event Emitter) 傳送通知給前端
-        if __event_emitter__:
-            await __event_emitter__(
-                {
-                    "type": "status",
-                    "data": {
-                        "description": f"這則訊息的長度是：{message_len} 個字",
-                        "done": True,
-                    },
-                }
-            )
+        # ⚠️ 由於目前前端接收 Action 的 SSE 串流時易發生 JSON 解析錯誤
+        # 最穩定相容的做法是直接將結果附加在對話內容中並回傳 body
+        last_message["content"] += f"\n\n*(系統分析：這則訊息的長度是 {message_len} 個字)*"
 
-        return None
+        # 回傳變更後的 body 讓前端更新畫面
+        return body
 ```
 
 ### 3.5 測試 Action 功能
 1. 前往**聊天頁面**，發送任意文字訊息。  
 2. 於**該則訊息下方**工具列 (按讚、複製等圖示旁) 尋找新增的 Action 按鈕。  
-3. **點擊按鈕**，觀察畫面頂部彈出的系統通知是否正確顯示字數。
+3. **點擊按鈕**，觀察該則訊息的最下方是否多出了一段關於「字數統計」的附註。
 
 > **除錯提示**：若找不到按鈕，請確認該 Action 已於系統後台啟用，並已指派給當前對話使用的自訂模型。
+
+### 3.6 進階實作案例 (檔案下載實務)
+
+如果您已經熟悉基礎 Action 的掛載與操作邏輯，可以嘗試挑戰更進階實用的技巧：**如何在不污染系統碟的情況下，讓使用者一鍵下載對話記錄 (Word/Excel)**。利用修改訊息內容配合純文字的 Markdown 連結技巧，可以實現順暢的檔案導出。
+
+1. [👉 進階教學 1：導出為 Word 檔案](./action/導出為Word檔.md)
+2. [👉 進階教學 2：導出為 Excel 檔案](./action/導出為Excel檔.md)
+3. [👉 進階教學 3：多重格式導出選擇器](./action/多重格式導出.md)
 
 ---
 

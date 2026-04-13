@@ -1,4 +1,4 @@
-## Open WebUI Functions 講義
+!## Open WebUI Functions 講義
 
 > **官方參考**：[Open WebUI Functions 文件](https://docs.openwebui.com/features/extensibility/plugin/functions/)  
 > **說明**：本文件以「課堂講義」撰寫，建議搭配實機操作 Open WebUI 一併練習。
@@ -33,9 +33,10 @@
 3. 第三章：Action（動作按鈕）  
 4. 第四章：Pipe（自訂模型）  
 5. 第五章：安裝、啟用與指派  
-6. 第六章：安全與實務  
-7. 課後練習建議  
-8. 附錄  
+6. 第六章：依賴套件管理 (Requirements)
+7. 第七章：安全與實務  
+8. 第八章：課後練習建議  
+9. 第九章：附錄  
 
 （在編輯器或 GitHub 中可用「大綱／Outline」快速跳轉各節標題。）
 

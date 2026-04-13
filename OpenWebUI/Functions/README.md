@@ -223,6 +223,48 @@ class Pipe:
 ```
 **測試方法**：部署後，於對話視窗左上角的**模型下拉清單**中選擇「測試用鸚鵡模型」，發送文字即可看見回覆。
 
+### 4.5 進階技巧：自訂跟進問題 (Follow-up Suggestions)
+
+#### 為什麼會出現 `Question 1?`
+如果您啟用了 Open WebUI 的「聊天建議 (Chat Suggestions)」功能，每次您送出對話後，前端都會**自動發起第二次隱藏對話**，並在最後一句安插類似 `suggest 3 follow-up questions...` 的系統提示語，要求模型給出三個建議選項（預期回傳 JSON 陣列 `["選項A", "選項B"]`）。
+由於**基礎鸚鵡 Pipe 只會硬生生地把文字當成一般對話彈回去**，導致前端收到錯亂的非 JSON 格式字串並解析失敗崩潰，最終就會預設使用 `Question 1?`, `Question 2?`, `Question 3?` 這些**錯誤回退 (Fallback)** 墊檔文字。
+
+#### 實作「攔截器」來動態提供我們自己的選項
+我們可以修改原先的 `pipe` 方法，去判斷如果對方的最後一句話是在詢問 `follow-up` 等關鍵字，我們就不把它當作普通對話，而是直接「攔截」下來，並丟還一個標準的 **JSON 陣列字串**。
+
+```python
+import json
+from typing import Union, Generator, Iterator
+
+class Pipe:
+    def __init__(self):
+        self.type = "pipe"
+        self.id = "test_pipe"
+        self.name = "測試用鸚鵡模型"
+
+    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:
+        messages = body.get("messages", [])
+        if not messages:
+            return ""
+            
+        last_message = messages[-1].get("content", "")
+        
+        # [關鍵攔截]：如果發現系統是在詢問跟進問題 (通常帶有 follow-up 或 suggest 關鍵字)
+        if "follow-up" in last_message.lower() or "suggest" in last_message.lower():
+            # 必須回傳一個標準的 JSON 陣列字串！
+            custom_questions = [
+                "鸚鵡平常都吃什麼呀？", 
+                "鸚鵡的心情好嗎？", 
+                "再示範一次系統測試"
+            ]
+            return json.dumps(custom_questions, ensure_ascii=False)
+        
+        # 如果是一般正常對話，就正常回覆
+        response = f"[系統測試]：我收到了您的訊息，內容為「{last_message}」"
+        return response
+```
+當系統運行這段進階的 Pipe 時，您的對話框下方就會漂亮地長出您專屬的繁體中文客製按鈕了！如果您不需要這個功能，也可以直接前往 Open WebUI 【設定 ➔ 介面】將「生成跟進問題」關閉。
+
 ---
 
 ## 第五章：Valves (參數閥門)

@@ -88,6 +88,12 @@ skills/
 ---
 
 ## 📚 深入實作
+
 - [最常用 skill 清單（辦公室應用場景）](./最常用skill清單.md)
 - [如何讓 skill 讀取使用者上傳檔案](./如何讓skill讀取使用者上傳檔案.md)
-- [open-webui skill 範例（完整程式）](./open-webui_skill範例.md)
+
+## 📚 範例實作
+
+- [範例一：基礎 Prompt Skill（免寫程式碼）](./範例1_基礎Prompt_無程式碼.md)
+- [範例二：基礎 Python 工具（讓 AI 調用外部功能）](./範例2_基礎Python工具_計算機.md)
+- [範例三：高階 Python 腳本（檔案讀取與 UI 狀態回報）](./範例3_高階Python_檔案讀取與狀態回報.md)

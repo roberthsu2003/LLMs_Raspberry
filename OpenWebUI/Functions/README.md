@@ -262,6 +262,9 @@ class Pipe:
 ```
 當系統運行這段進階的 Pipe 時，您的對話框下方就會漂亮地長出您專屬的繁體中文客製按鈕了！如果您不需要這個功能，也可以直接前往 Open WebUI 【設定 ➔ 介面】將「生成跟進問題」關閉。
 
+### 進階實作案列
+1. [👉 串接外部 API (API Proxy Pipe)](./pipe/串接外部api_proxy_pipe.md)
+2. [👉 多模型管理 (Manifold Pipe)](./pipe/多模型管理.md)
 ---
 
 ## 第五章：Valves (參數閥門)

@@ -19,7 +19,8 @@
 title: 讀取實體檔案範例
 author: YourName
 version: 1.0
-requires: docxtpl
+description: 讀取實體檔案範例
+requirements: docxtpl
 """
 
 import os

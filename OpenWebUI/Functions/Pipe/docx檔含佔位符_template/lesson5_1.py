@@ -17,7 +17,7 @@ from google.genai import types
 from pydantic import BaseModel, Field
 
 
-TEMPLATE_PATH = "/app/backend/data/uploads/template_form_fixed.docx"
+TEMPLATE_PATH = "/app/backend/data/uploads/template_form.docx"
 
 FIELDS = [
     "name", "id_number", "phone", "email", "gender", "marital_status",

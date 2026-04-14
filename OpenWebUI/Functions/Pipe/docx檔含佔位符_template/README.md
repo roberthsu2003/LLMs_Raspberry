@@ -288,7 +288,7 @@ cp ~/Documents/template.docx ~/.local/lib/python3.11/site-packages/open_webui/ba
 
 此範例的強大亮點在於：
 1. **💡 對話式收集填表**：利用 `google-genai` 套件串接 Gemini API，以聊天的方式逐步向使用者索取履歷表需要的每一個欄位資訊。
-2. **🤖 自動填充 Word 範本**：當 AI 判斷資料齊全後，會自動輸出 JSON 格式供程式攔截，並呼叫 `docxtpl` 結合預設的 `template_form_fixed.docx` 產生出全新的檔案。
+2. **🤖 自動填充 Word 範本**：當 AI 判斷資料齊全後，會自動輸出 JSON 格式供程式攔截，並呼叫 `docxtpl` 結合預設的 `template_form.docx` 產生出全新的檔案。
 3. **📥 前端動態下載按鈕 (Base64)**：不將產生的檔案寫死在伺服器硬碟，而是透過記憶體暫存 (Buffer) 轉為 Base64 URI 下載連結，搭配 `__event_emitter__` 直接顯示在聊天畫面的按鈕上，使用者一鍵即可下載實體 Word 檔！
 
 ### 📂 範例檔案導覽

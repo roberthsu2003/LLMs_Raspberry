@@ -53,6 +53,7 @@ class Pipe:
 title: 讀取上傳檔案範例
 author: YourName
 version: 1.0
+description: 讀取使用者上傳檔案範例
 """
 
 class Pipe:
@@ -93,7 +94,8 @@ class Pipe:
 title: 內建環境產生 Docx 範例
 author: YourName
 version: 1.0
-requires: docxtpl
+description: 內建環境產生 Docx 範例
+requirements: docxtpl
 """
 
 from docxtpl import DocxTemplate
@@ -130,7 +132,8 @@ class Pipe:
 title: 指定範本目錄範例
 author: YourName
 version: 1.0
-requires: docxtpl
+description: 指定範本目錄範例
+requirements: docxtpl
 """
 
 import os
@@ -156,7 +159,8 @@ class Pipe:
 title: 透過內部 API 獲取檔案範例
 author: YourName
 version: 1.0
-requires: requests
+description: 透過內部 API 獲取檔案範例
+requirements: requests
 """
 
 import requests
@@ -188,6 +192,7 @@ class Pipeline:
 title: 路徑測試探測器
 author: YourName
 version: 1.0
+description: 用來測試與除錯可讀取路徑的探測器
 """
 
 import os

@@ -11,7 +11,7 @@
 ```
 使用者輸入資料
      ↓
-Pipe 發送 POST 至 http://host.docker.internal:11434
+Pipe 發送 POST 至 http://127.0.0.1:11434
      ↓
 Ollama (例如 gemma4:31b-cloud) 推論並對話收集欄位
      ↓
@@ -27,9 +27,9 @@ Base64 編碼，使用 event_emitter 發送 HTML 下載按鈕！
 ## 實務注意事項
 
 ### ⚠️ Docker 容器網路穿透問題
-如果您的 Open WebUI 運行在 Docker 內，而 Ollama 運行在宿主機 (Host Machine) 上，您必須注意「如何讓容器打到外面的 Ollama」。
-* **Windows / macOS**：可在此 Pipe 的 Valves 直接填入 `http://host.docker.internal:11434/v1/chat/completions`。
-* **Linux 主機**：預設沒有 `host.docker.internal`，請填入您宿主機的內網 IP（例如 `http://192.168.x.x:11434/v1/chat/completions`）或設定 docker network 的 Gateway IP。
+如果您的 Open WebUI 運行在 Docker 內，而 Ollama 運行在宿主機 (Host Machine) 上，依據您的環境可以直接連線到 `http://127.0.0.1:11434/v1/chat/completions`。
+* **網址設定**：可在此 Pipe 的 Valves 直接填入 `http://127.0.0.1:11434/v1/chat/completions`。
+* **Linux 主機 / Docker 網路**：如果 `127.0.0.1` 抓不到，請填入您宿主機的內網 IP（例如 `http://192.168.x.x:11434/v1/chat/completions`）或設定 docker network 的 Gateway IP。
 * **Ollama 設定**：若 Ollama 還是拒絕連線，請修改伺服器的環境變數 `OLLAMA_HOST=0.0.0.0` 並重新啟動 Ollama 服務。
 
 ### ⚠️ 地端模型的 "喋喋不休綜合症" 

@@ -78,14 +78,14 @@ SYSTEM_PROMPT = """你是一個履歷表單填寫助手。
 
 class Pipe:
     class Valves(BaseModel):
-        OLLAMA_API_URL: str = Field(default="http://host.docker.internal:11434/v1/chat/completions", description="Ollama API 端點 (相容 OpenAI 格式)")
+        OLLAMA_API_URL: str = Field(default="http://127.0.0.1:11434/v1/chat/completions", description="Ollama API 端點 (相容 OpenAI 格式)")
         OLLAMA_MODEL: str = Field(default="gemma4:31b-cloud", description="您本機的 Ollama 模型名稱")
 
     def __init__(self):
         self.valves = self.Valves()
 
     def _api_url(self):
-        return self.valves.OLLAMA_API_URL or os.environ.get("OLLAMA_API_URL", "http://host.docker.internal:11434/v1/chat/completions")
+        return self.valves.OLLAMA_API_URL or os.environ.get("OLLAMA_API_URL", "http://127.0.0.1:11434/v1/chat/completions")
 
     def _model_name(self):
         return self.valves.OLLAMA_MODEL or os.environ.get("OLLAMA_MODEL", "gemma4:31b-cloud")

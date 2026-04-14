@@ -65,7 +65,7 @@
 
     > 📚 **OpenWebUI`Functions`| 管理員控制台->函式**：[Functions](./OpenWebUI/Functions/README.md)  
     > 📚 **OpenWebUI`工具(tools)`| 工作區->工具**：[工具](./OpenWebUI/工具.md)   
-    > 📚 **OpenWebUI`技能(skills)`| 工作區->技能**：[技能](./OpenWebUI/技能/README.md) 
+    > 📚 **OpenWebUI`技能(skills)`| 工作區->技能**：[技能](./OpenWebUI/技能/README.md)   
     > 📚 **OpenWebUI`MCP`| 工作區->設定->外部工具**：[MCP](./OpenWebUI/mcp)   
     > 📚 **OpenWebUI`pipeline`| 工作區->設定->pipeline**：[pipeline](./OpenWebUI/pipeline)  
     

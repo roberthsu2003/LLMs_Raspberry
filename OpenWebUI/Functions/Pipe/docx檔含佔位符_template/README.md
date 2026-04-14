@@ -286,14 +286,23 @@ cp ~/Documents/template.docx ~/.local/lib/python3.11/site-packages/open_webui/ba
 
 為了讓大家徹底了解「範本讀取」加上「AI 邏輯」的威力，本目錄提供了一個完整的整合型實戰範例：**履歷表單助手** (`resume_assistant_pipe.py`)。
 
+> ⚠️ **重要前置作業**：
+> 此實戰範例的底層邏輯依賴 Google Gemini API 驅動。使用前請務必至 [Google AI Studio](https://aistudio.google.com/) 申請免付費的 **GEMINI_API_KEY**，安裝 Pipe 後，您必須直接在 Open WebUI 介面的「設定 (Valves)」區塊中填入該金鑰才能順利運行！
+
 此範例的強大亮點在於：
 1. **💡 對話式收集填表**：利用 `google-genai` 套件串接 Gemini API，以聊天的方式逐步向使用者索取履歷表需要的每一個欄位資訊。
 2. **🤖 自動填充 Word 範本**：當 AI 判斷資料齊全後，會自動輸出 JSON 格式供程式攔截，並呼叫 `docxtpl` 結合預設的 `template_form.docx` 產生出全新的檔案。
 3. **📥 前端動態下載按鈕 (Base64)**：不將產生的檔案寫死在伺服器硬碟，而是透過記憶體暫存 (Buffer) 轉為 Base64 URI 下載連結，搭配 `__event_emitter__` 直接顯示在聊天畫面的按鈕上，使用者一鍵即可下載實體 Word 檔！
 
 ### 📂 範例檔案導覽
-- **[程式碼本體：resume_assistant_pipe.py](./resume_assistant_pipe.py)**：Open WebUI 的 Pipe 原始碼，可直接複製貼上至您的環境中使用（記得先將範本準備好）。
-- **[深度解析：注意事項.md](./注意事項.md)**：👉 **強烈建議閱讀！** 裡面解析了各種不可不知的開發進階眉角，例如：如何處理 Gemini 歷史對話格式問題、如何關閉擾人的自動函數呼叫、以及為何必須用 `__event_emitter__` 渲染下載按鈕。
+
+**如果您使用商用 Gemini API：**
+- **[程式碼本體：resume_assistant_pipe.py](./resume_assistant_pipe.py)**：適合想要極速開發、強悍解讀能力的開發者。
+- **[深度解析：注意事項.md](./注意事項.md)**：👉 **強烈建議閱讀！** 裡面解析了歷史對話格式轉換、關閉 function calling 與前端 `__event_emitter__` 渲染按鈕的機制。
+
+**如果您擁有自己的地端 Ollama 環境（100% 隱私落地）：**
+- **[Ollama 版程式：resume_assistant_ollama_pipe.py](./resume_assistant_ollama_pipe.py)**：拔除外部依賴，透過 `requests` 純地端連線打入 Ollama API。
+- **[Ollama 開發眉角：注意事項_ollama.md](./注意事項_ollama.md)**：解決了純地端常見的「Docker 容器網路互不通（host.docker.internal）」與「地端模型一直講廢話破壞 JSON 格式」的實務痛點。
 
 ### 🚀 快速測試
 當您設定好這個 Pipe 之後，可以一口氣貼上以下**這段測試對話**給 AI，享受全自動化生成的快感：

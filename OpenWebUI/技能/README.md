@@ -87,11 +87,7 @@ skills/
 
 ---
 
-## 📚 延伸學習資源
-
-如果您想深入實作，以下為您整理了相關的進階教學資源，請參考各篇獨立文件：
-
-- [1️⃣ Skill vs Tools](./1-Skill_vs_Tools.md)
-- [2️⃣ open-webui skill 範例（完整程式）](./2-open-webui_skill範例.md)
-- [3️⃣ 如何讓 skill 讀取使用者上傳檔案](./3-如何讓skill讀取使用者上傳檔案.md)
-- [4️⃣ 最常用 skill 清單（教學版）](./4-最常用skill清單.md)
+## 📚 深入實作
+- [最常用 skill 清單（辦公室應用場景）](./最常用skill清單.md)
+- [如何讓 skill 讀取使用者上傳檔案](./如何讓skill讀取使用者上傳檔案.md)
+- [open-webui skill 範例（完整程式）](./open-webui_skill範例.md)

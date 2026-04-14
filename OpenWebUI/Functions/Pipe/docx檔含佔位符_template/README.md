@@ -284,7 +284,7 @@ cp ~/Documents/template.docx ~/.local/lib/python3.11/site-packages/open_webui/ba
 
 ## 六、 實戰進階範例：履歷表單助手
 
-為了讓大家徹底了解「範本讀取」加上「AI 邏輯」的威力，本目錄提供了一個完整的整合型實戰範例：**履歷表單助手** (`lesson5_1.py`)。
+為了讓大家徹底了解「範本讀取」加上「AI 邏輯」的威力，本目錄提供了一個完整的整合型實戰範例：**履歷表單助手** (`resume_assistant_pipe.py`)。
 
 此範例的強大亮點在於：
 1. **💡 對話式收集填表**：利用 `google-genai` 套件串接 Gemini API，以聊天的方式逐步向使用者索取履歷表需要的每一個欄位資訊。
@@ -292,7 +292,7 @@ cp ~/Documents/template.docx ~/.local/lib/python3.11/site-packages/open_webui/ba
 3. **📥 前端動態下載按鈕 (Base64)**：不將產生的檔案寫死在伺服器硬碟，而是透過記憶體暫存 (Buffer) 轉為 Base64 URI 下載連結，搭配 `__event_emitter__` 直接顯示在聊天畫面的按鈕上，使用者一鍵即可下載實體 Word 檔！
 
 ### 📂 範例檔案導覽
-- **[程式碼本體：lesson5_1.py](./lesson5_1.py)**：Open WebUI 的 Pipe 原始碼，可直接複製貼上至您的環境中使用（記得先將範本準備好）。
+- **[程式碼本體：resume_assistant_pipe.py](./resume_assistant_pipe.py)**：Open WebUI 的 Pipe 原始碼，可直接複製貼上至您的環境中使用（記得先將範本準備好）。
 - **[深度解析：注意事項.md](./注意事項.md)**：👉 **強烈建議閱讀！** 裡面解析了各種不可不知的開發進階眉角，例如：如何處理 Gemini 歷史對話格式問題、如何關閉擾人的自動函數呼叫、以及為何必須用 `__event_emitter__` 渲染下載按鈕。
 
 ### 🚀 快速測試

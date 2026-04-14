@@ -15,6 +15,13 @@
 **✅ 可以讀取** - 您可以直接存取容器內的 `/app/backend/data/uploads` 等實體路徑來讀取檔案。
 
 ```python
+"""
+title: 讀取實體檔案範例
+author: YourName
+version: 1.0
+requires: docxtpl
+"""
+
 import os
 from docxtpl import DocxTemplate
 
@@ -42,6 +49,12 @@ class Pipe:
 **✅ 可以讀取** - 如果使用者是在對話對話框中臨時上傳檔案，可以透過 `__files__` 參數進行存取：
 
 ```python
+"""
+title: 讀取上傳檔案範例
+author: YourName
+version: 1.0
+"""
+
 class Pipe:
     def pipe(self, body: dict, __user__=None, __files__: list = []) -> str:
         # 存取上傳的檔案
@@ -76,6 +89,13 @@ class Pipe:
 直接在 Open WebUI UI 中建立 Function -> Pipe，沒有額外的容器隔離問題，能直接存取路徑。
 
 ```python
+"""
+title: 內建環境產生 Docx 範例
+author: YourName
+version: 1.0
+requires: docxtpl
+"""
+
 from docxtpl import DocxTemplate
 import os
 
@@ -106,6 +126,13 @@ class Pipe:
 不依賴會與使用者上傳混雜的 uploads 目錄，改用自訂的掛載位置（如 `/app/templates`）。
 
 ```python
+"""
+title: 指定範本目錄範例
+author: YourName
+version: 1.0
+requires: docxtpl
+"""
+
 import os
 from docxtpl import DocxTemplate
 
@@ -125,6 +152,13 @@ class Pipe:
 如果您的架構受限只能使用獨立 Pipelines 伺服器，就必須使用 API 獲取檔案。
 
 ```python
+"""
+title: 透過內部 API 獲取檔案範例
+author: YourName
+version: 1.0
+requires: requests
+"""
+
 import requests
 
 class Pipeline:
@@ -150,6 +184,12 @@ class Pipeline:
 如果不確定腳本可以讀到什麼，可以先在 Pipe 裡寫一個除錯探測器：
 
 ```python
+"""
+title: 路徑測試探測器
+author: YourName
+version: 1.0
+"""
+
 import os
 
 class Pipe:
@@ -217,6 +257,11 @@ docker cp C:\Users\您的使用者\Documents\template.docx open-webui:/app/backe
 **Mac / Linux 用戶：**
 ```bash
 docker cp ~/Documents/template.docx open-webui:/app/backend/data/uploads/
+```
+
+**驗證是否成功：**
+```bash
+docker exec open-webui ls -la /app/backend/data/uploads/
 ```
 
 ### 3️⃣ 不使用 Docker 而是純 Python (PiOS Local) 執行

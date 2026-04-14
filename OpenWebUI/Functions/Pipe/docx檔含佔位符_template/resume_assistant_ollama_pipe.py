@@ -79,7 +79,7 @@ SYSTEM_PROMPT = """你是一個履歷表單填寫助手。
 class Pipe:
     class Valves(BaseModel):
         OLLAMA_API_URL: str = Field(default="http://127.0.0.1:11434/v1/chat/completions", description="Ollama API 端點 (相容 OpenAI 格式)")
-        OLLAMA_MODEL: str = Field(default="gemma4:31b-cloud", description="您本機的 Ollama 模型名稱")
+        OLLAMA_MODEL: str = Field(default="gpt-oss:20b-cloud", description="您本機的 Ollama 模型名稱")
 
     def __init__(self):
         self.valves = self.Valves()
@@ -101,13 +101,27 @@ class Pipe:
         filename = "履歷表_{}.docx".format(data.get("name", "output"))
         return b64, filename
 
+    def _download_link(self, b64, filename):
+        mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        data_uri = "data:{};base64,{}".format(mime, b64)
+        return "[📥 點擊此處立即下載 {}]({})".format(filename, data_uri)
+
     def _extract_action(self, text):
-        match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
+        match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
         if match:
             try:
                 return json.loads(match.group(1))
             except Exception:
                 pass
+        
+        # 嘗試尋找無 markdown tag、直接裸露的 JSON
+        match = re.search(r"(\{.*\})", text, re.DOTALL)
+        if match:
+            try:
+                return json.loads(match.group(1))
+            except Exception:
+                pass
+
         return None
 
     async def pipe(self, body, __user__=None, __event_emitter__=None):
@@ -137,8 +151,20 @@ class Pipe:
                 "Content-Type": "application/json"
             }
 
-            response = requests.post(api_url, json=payload, headers=headers)
+            if __event_emitter__:
+                await __event_emitter__({
+                    "type": "status",
+                    "data": {"description": "🧠 正在呼叫 Ollama 進行地端推論 (大型模型可能需時數十秒至數分鐘，請耐心等候...)", "done": False}
+                })
+
+            response = requests.post(api_url, json=payload, headers=headers, timeout=300)
             response.raise_for_status()
+
+            if __event_emitter__:
+                await __event_emitter__({
+                    "type": "status",
+                    "data": {"description": "✅ Ollama 推論完成，正在產生回應！", "done": True}
+                })
 
             # 解析 OpenAI 相容格式的回應
             result = response.json()
@@ -148,18 +174,47 @@ class Pipe:
             action = self._extract_action(reply_text)
             if action and action.get("action") == "generate_form":
                 form_data = action.get("data", {})
-                b64, filename = self._generate_docx_base64(form_data)
-                clean = re.sub(r"```json.*?```", "", reply_text, flags=re.DOTALL).strip()
+                
+                clean = re.sub(r"```(?:json)?.*?```", "", reply_text, flags=re.DOTALL).strip()
+                if clean == reply_text or clean.startswith("{"):
+                    clean = re.sub(r"\{.*\}", "", reply_text, flags=re.DOTALL).strip()
 
-                mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                data_uri = "data:{};base64,{}".format(mime, b64)
-                download_link = "\n\n---\n✅ **表單已產生**：\n\n[📥 點擊此處立即下載 {}]({})".format(filename, data_uri)
-
-                return clean + download_link
+                try:
+                    b64, filename = self._generate_docx_base64(form_data)
+                    markdown_link = self._download_link(b64, filename)
+                    success_msg = f"\n\n---\n✅ **表單已產生**：\n\n{markdown_link}\n"
+                    
+                    if __event_emitter__:
+                        # 透過事件發射器直接推送 Markdown 連結
+                        await __event_emitter__({
+                            "type": "message",
+                            "data": {"content": success_msg}
+                        })
+                        return clean
+                    else:
+                        return clean + success_msg + "\n\n[系統未開啟 event_emitter，無法渲染載點]"
+                        
+                except Exception as docx_err:
+                    err_msg = (
+                        f"\n\n---\n❌ **產生 Word 檔案失敗**\n\n"
+                        f"**錯誤原因**：讀取或渲染範本檔 `{TEMPLATE_PATH}` 時失敗。\n\n"
+                        f"**詳細訊息**：`{str(docx_err)}`\n\n"
+                        f"> 💡 **開發提示**：系統可能遇到了 `TemplateSyntaxError: Expected an expression` 錯誤，這通常代表被掛載的 `.docx` 範本中包含了「空白的」或「語法錯誤的」 Jinja2 標籤（例如不小心打出了 `{{{{ }}}}` 但中間沒內容）。請用 Word 開啟您的上傳檔案，仔細檢查是否有殘留的大括號標記！"
+                    )
+                    if __event_emitter__:
+                        await __event_emitter__({
+                            "type": "message",
+                            "data": {"content": err_msg}
+                        })
+                        return clean
+                    else:
+                        return clean + err_msg
 
             return reply_text
 
         except requests.exceptions.ConnectionError:
             return f"❌ 無法連線至 Ollama 主機：{api_url}。請確認 Ollama 正在運行且開啟 OLLAMA_HOST=0.0.0.0。"
         except Exception as e:
-            return "❌ 發生錯誤：{}".format(str(e))
+            import traceback
+            tb = traceback.format_exc()
+            return "❌ 發生錯誤：{}\n\n```python\n{}\n```".format(str(e), tb)

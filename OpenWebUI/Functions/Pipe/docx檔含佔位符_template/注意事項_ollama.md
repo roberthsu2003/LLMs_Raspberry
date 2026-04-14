@@ -43,3 +43,55 @@ Base64 編碼，使用 event_emitter 發送 HTML 下載按鈕！
 
 ### 🔧 如何改變模型？
 您不需要修改這支程式碼。安裝好這個 Pipe 後，在 Open WebUI 左側的「Valves (設定)」中，您可以隨時更新 `OLLAMA_MODEL` 欄位為您本機安裝的其他模型名稱（例如 `llama3:8b` 或是 `gemma4:31b-cloud`），儲存即可即時生效。
+
+---
+
+## 👨‍🏫 程式碼新手導讀（為初學者準備）
+
+了解這份腳本是如何和地端模型溝通的，對未來的開發非常有幫助！以下是核心程式碼的白話文拆解：
+
+### 1. 發送請求給地端 Ollama
+```python
+# 準備要傳給 Ollama 的設定與聊天內容
+payload = {
+    "model": self._model_name(),
+    "messages": payload_messages,
+    "stream": False,
+    # 降低 temperature (溫度)，限制 AI 的「創造力」，讓它乖乖照格式給 JSON
+    "temperature": 0.2 
+}
+
+# 就像在瀏覽器輸入網址一樣，透過 requests 模組對 Ollama 送出 POST 請求
+response = requests.post(api_url, json=payload, headers=headers, timeout=300)
+# 檢查有沒有出錯（例如 Ollama 沒開大門）
+response.raise_for_status()
+```
+* **這是做什麼的？** 這是標準的 HTTP 請求寫法。我們把對話包裝成一包資料 (`payload`)，然後把它當作包裹「寄」給本機的 Ollama 伺服器，等待 Ollama 算完後把包裹寄回來 (`response`)。
+* **初學者小知識**：`temperature` 越低，AI 的回答越死板、越不容易亂講話，這對「強制產出 JSON 表單」非常重要！
+
+### 2. 強悍的字串清理 (Regex 正則表達式)
+```python
+def _extract_action(self, text):
+    # 第一種找法：尋找被 Markdown 語法包起來的 JSON 
+    # (例如 ```json { ... } ```)
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if match:
+        return json.loads(match.group(1))
+    
+    # 第二種找法：有時候地端模型會忘記寫 Markdown 標記，直接吐出 { ... }
+    match = re.search(r"(\{.*\})", text, re.DOTALL)
+    if match:
+        return json.loads(match.group(1))
+```
+* **這是做什麼的？** `re.search` 是 Python 強大的「超級搜尋」功能。地端的模型常常不受控，有時候會囉唆地說「這是我幫你整理的：```{...}```」。我們透過這兩段程式碼，像是在沙堆裡找黃金一樣，精確地把大括號 `{ }` 包住的部分挖出來，無視外面的廢話！
+* **初學者小知識**：`re.DOTALL` 是讓搜尋引擎知道「文字可能有很多行」，連換行符號都一起搜尋進去。
+
+### 3. Open-WebUI 本機端進度回報
+```python
+if __event_emitter__:
+    await __event_emitter__({
+        "type": "status",
+        "data": {"description": "🧠 正在呼叫 Ollama 進行地端推論...", "done": False}
+    })
+```
+* **這是做什麼的？** 地端推論通常很慢，尤其是載入龐大模型時。這段程式碼會在使用者的聊天畫面上方顯示「載入中」的閃爍圖示 (`status`)，這樣使用者才不會以為系統當機了！當計算完成後，只要再發送一次 `done: True`，載入圖示就會消失。

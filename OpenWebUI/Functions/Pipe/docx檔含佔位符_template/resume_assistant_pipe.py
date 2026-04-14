@@ -168,14 +168,23 @@ class Pipe:
             action = self._extract_action(reply_text)
             if action and action.get("action") == "generate_form":
                 form_data = action.get("data", {})
-                b64, filename = self._generate_docx_base64(form_data)
+                
                 clean = re.sub(r"```json.*?```", "", reply_text, flags=re.DOTALL).strip()
-
-                mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                data_uri = "data:{};base64,{}".format(mime, b64)
-                download_link = "\n\n---\n✅ **表單已產生**：\n\n[📥 點擊此處立即下載 {}]({})".format(filename, data_uri)
-
-                return clean + download_link
+                
+                try:
+                    b64, filename = self._generate_docx_base64(form_data)
+                    mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    data_uri = "data:{};base64,{}".format(mime, b64)
+                    download_link = "\n\n---\n✅ **表單已產生**：\n\n[📥 點擊此處立即下載 {}]({})".format(filename, data_uri)
+                    return clean + download_link
+                except Exception as docx_err:
+                    err_msg = (
+                        f"\n\n---\n❌ **產生 Word 檔案失敗**\n\n"
+                        f"**錯誤原因**：讀取或渲染範本檔 `{TEMPLATE_PATH}` 時失敗。\n\n"
+                        f"**詳細訊息**：`{str(docx_err)}`\n\n"
+                        f"> 💡 **開發提示**：系統可能遇到了 `TemplateSyntaxError: Expected an expression` 錯誤，這通常代表被掛載的 `.docx` 範本中包含了「空白的」或「語法錯誤的」 Jinja2 標籤（例如不小心打出了 `{{{{ }}}}` 但中間沒內容）。請用 Word 開啟您的上傳檔案，仔細檢查是否有殘留的大括號標記！"
+                    )
+                    return clean + err_msg
 
             return reply_text
 

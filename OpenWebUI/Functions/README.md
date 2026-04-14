@@ -265,6 +265,7 @@ class Pipe:
 ### 進階實作案列
 1. [👉 串接外部 API (API Proxy Pipe)](./pipe/串接外部api_proxy_pipe.md)
 2. [👉 多模型管理 (Manifold Pipe)](./pipe/多模型管理.md)
+3. [👉 docx檔含佔位符_template/README.md](./pipe/docx檔含佔位符_template/README.md)
 ---
 
 ## 第五章：Valves (參數閥門)

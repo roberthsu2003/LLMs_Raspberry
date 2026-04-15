@@ -40,7 +40,7 @@ class Pipe:
             description="Ollama OpenAI 相容 API（chat completions）",
         )
         OLLAMA_MODEL: str = Field(
-            default="llama3.2",
+            default="gemma4:31b-cloud",
             description="本機 ollama 已下載的模型名稱（與 ollama list 一致）",
         )
 

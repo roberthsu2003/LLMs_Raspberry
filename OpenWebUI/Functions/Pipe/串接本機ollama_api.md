@@ -145,9 +145,48 @@ Ollama 的 `/v1` 相容 API 格式與 OpenAI 完全一致：
 
 > [!TIP]
 > **延伸進階**：
-> 若你需要**狀態列提示**（顯示「正在呼叫 Ollama…」），可將 `pipe` 改為 `async def pipe(self, body, __user__=None, __event_emitter__=None)`，並在 `requests.post` 前後呼叫 `__event_emitter__` 發送狀態事件。
+> 若你需要**狀態列提示**（顯示「正在呼叫 Ollama…」），可以直接複製以下完整程式碼。此版本將 `pipe` 改為了 `async def pipe`，並在 `requests.post` 前後呼叫 `__event_emitter__` 來發送狀態事件。
 >
 > ```python
+> """
+> title: 本機 Ollama 代理 Pipe (含狀態提示版)
+> author: YourName
+> version: 1.0
+> requirements: requests, pydantic
+> """
+> 
+> import os
+> from typing import Union, Generator, Iterator
+> 
+> import requests
+> from pydantic import BaseModel, Field
+> 
+> 
+> class Pipe:
+>     class Valves(BaseModel):
+>         OLLAMA_API_URL: str = Field(
+>             default="http://127.0.0.1:11434/v1/chat/completions",
+>             description="Ollama OpenAI 相容 API（chat completions）",
+>         )
+>         OLLAMA_MODEL: str = Field(
+>             default="gemma2:2b",
+>             description="本機 ollama 已下載的模型名稱（與 ollama list 一致）",
+>         )
+> 
+>     def __init__(self):
+>         self.type = "pipe"
+>         self.id = "ollama_proxy_pipe_async"
+>         self.name = "本機 Ollama 代理模型"
+>         self.valves = self.Valves()
+> 
+>     def _api_url(self):
+>         return self.valves.OLLAMA_API_URL or os.environ.get(
+>             "OLLAMA_API_URL", "http://127.0.0.1:11434/v1/chat/completions"
+>         )
+> 
+>     def _model_name(self):
+>         return self.valves.OLLAMA_MODEL or os.environ.get("OLLAMA_MODEL", "llama3.2")
+> 
 >     async def pipe(self, body: dict, __user__: dict = None, __event_emitter__=None) -> Union[str, Generator, Iterator]:
 >         # 1. 透過 __event_emitter__ 發送正在呼叫的狀態
 >         if __event_emitter__:
@@ -155,26 +194,56 @@ Ollama 的 `/v1` 相容 API 格式與 OpenAI 完全一致：
 >                 "type": "status",
 >                 "data": {"description": "正在呼叫本機 Ollama 推論中...", "done": False}
 >             })
->
+> 
+>         api_url = self._api_url()
+>         if not api_url:
+>             if __event_emitter__:
+>                 await __event_emitter__({"type": "status", "data": {"description": "❌ 缺少 API URL", "done": True}})
+>             return "❌ 請設定 OLLAMA_API_URL"
+> 
+>         messages = body.get("messages", [])
+>         if not messages:
+>             if __event_emitter__:
+>                 await __event_emitter__({"type": "status", "data": {"description": "✅ 完成", "done": True}})
+>             return ""
+> 
+>         # 與 OpenAI 相容的 JSON 格式
+>         payload = {
+>             "model": self._model_name(),
+>             "messages": messages,
+>             "stream": False,
+>             "temperature": 0.7,
+>         }
+>         headers = {"Content-Type": "application/json"}
+> 
 >         try:
->             # 執行原本的請求邏輯
->             api_url = self._api_url()
->             response = requests.post(api_url, json={
->                 "model": self._model_name(),
->                 "messages": body.get("messages", []),
->                 "stream": False,
->             }, timeout=300)
+>             # 呼叫本機 API，設定較長的 timeout 以應對地端推論延遲
+>             response = requests.post(
+>                 api_url, json=payload, headers=headers, timeout=300
+>             )
 >             response.raise_for_status()
->
+>             result = response.json()
+> 
 >             # 2. 結束前發送完成狀態（done: True）
 >             if __event_emitter__:
 >                 await __event_emitter__({
 >                     "type": "status",
 >                     "data": {"description": "Ollama 處理完成", "done": True}
 >                 })
->
->             return response.json()["choices"][0]["message"]["content"]
->
+> 
+>             return result["choices"][0]["message"]["content"]
+> 
+>         except requests.exceptions.ConnectionError:
+>             error_msg = (
+>                 f"❌ 無法連線至 Ollama：{api_url}。"
+>                 "請確認 Ollama 正在執行；若在 Docker 內連宿主機，請勿使用 127.0.0.1。"
+>             )
+>             if __event_emitter__:
+>                 await __event_emitter__({
+>                     "type": "status",
+>                     "data": {"description": "連線失敗", "done": True}
+>                 })
+>             return error_msg
 >         except Exception as e:
 >             # 發生錯誤也記得把狀態關閉
 >             if __event_emitter__:

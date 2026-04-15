@@ -1,4 +1,4 @@
-## 串接外部 API (API Proxy Pipe) — Gemini 範例
+## 串接外部 Gemini API (API Proxy Pipe) 
 
 在實際應用中，我們通常會用 Pipe 來串接**自己的**模型或雲端 API。本範例改為使用 **Google Gemini API**（以 **Valves** 填寫 API Key，並將整段對話歷程轉成 Gemini 的 `Content` 後呼叫 `generate_content`）。
 

@@ -283,8 +283,10 @@ class Pipe:
 </details>
 
 ### 進階實作案列
-1. [👉 串接外部 API (API Proxy Pipe)](./Pipe/串接外部api_proxy_pipe.md)
-2. [👉 多模型管理 (Manifold Pipe)](./Pipe/多模型管理.md)
+1. [👉 串接本機 Ollama](./Pipe/串接本機ollama_api.md)
+
+2. [👉 串接外部 Gemini API key (API Proxy Pipe)](./Pipe/串接外部api_proxy_pipe.md)
+
 3. [👉 docx檔含佔位符_template/README.md](./Pipe/docx檔含佔位符_template/README.md)
 ---
 

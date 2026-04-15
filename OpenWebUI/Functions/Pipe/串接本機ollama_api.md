@@ -146,4 +146,43 @@ Ollama 的 `/v1` 相容 API 格式與 OpenAI 完全一致：
 > [!TIP]
 > **延伸進階**：
 > 若你需要**狀態列提示**（顯示「正在呼叫 Ollama…」），可將 `pipe` 改為 `async def pipe(self, body, __user__=None, __event_emitter__=None)`，並在 `requests.post` 前後呼叫 `__event_emitter__` 發送狀態事件。
+>
+> ```python
+>     async def pipe(self, body: dict, __user__: dict = None, __event_emitter__=None) -> Union[str, Generator, Iterator]:
+>         # 1. 透過 __event_emitter__ 發送正在呼叫的狀態
+>         if __event_emitter__:
+>             await __event_emitter__({
+>                 "type": "status",
+>                 "data": {"description": "正在呼叫本機 Ollama 推論中...", "done": False}
+>             })
+>
+>         try:
+>             # 執行原本的請求邏輯
+>             api_url = self._api_url()
+>             response = requests.post(api_url, json={
+>                 "model": self._model_name(),
+>                 "messages": body.get("messages", []),
+>                 "stream": False,
+>             }, timeout=300)
+>             response.raise_for_status()
+>
+>             # 2. 結束前發送完成狀態（done: True）
+>             if __event_emitter__:
+>                 await __event_emitter__({
+>                     "type": "status",
+>                     "data": {"description": "Ollama 處理完成", "done": True}
+>                 })
+>
+>             return response.json()["choices"][0]["message"]["content"]
+>
+>         except Exception as e:
+>             # 發生錯誤也記得把狀態關閉
+>             if __event_emitter__:
+>                 await __event_emitter__({
+>                     "type": "status",
+>                     "data": {"description": f"發生錯誤: {e}", "done": True}
+>                 })
+>             return f"❌ 呼叫失敗: {e}"
+> ```
+
 

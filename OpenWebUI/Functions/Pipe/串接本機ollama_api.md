@@ -9,8 +9,8 @@ Open WebUI 傳入的每一則訊息通常是 `{"role": "...", "content": "..."}`
 
 > [!IMPORTANT]
 > **Container 部署須知**：
-> 若 Open WebUI 跑在 **Docker 容器**內，而 Ollama 裝在**宿主機**上，容器裡的 `http://127.0.0.1:11434` 指向的是**容器自己**，通常**連不到**宿主機的 Ollama。
-> - **Linux/Windows/Mac**: 建議使用 `http://host.docker.internal:11434/v1/chat/completions`。
+> 若 Open WebUI 跑在 **Docker 容器**內，而 Ollama 裝在**宿主機**上，容器裡的 `http://127.0.0.1:11434` 指向的是**容器自己**，主要建置容器時使用 `--network=host`
+> - **Linux/Windows/Mac**: 建議使用 `http://127.0.0.1:11434/v1/chat/completions`。
 > - **Ollama 設定**: 務必確認 Ollama 有監聽對應介面（例如設定環境變數 `OLLAMA_HOST=0.0.0.0`）。
 
 ---

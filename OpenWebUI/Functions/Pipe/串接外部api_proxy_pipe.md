@@ -1,8 +1,10 @@
 ## 串接外部 API (API Proxy Pipe) — Gemini 範例
 
-在實際應用中，我們通常會用 Pipe 來串接自已的模型。本範例改為使用 **Google Gemini API**（以 **Valves** 填寫 API Key，並將整段對話歷程轉成 Gemini 的 `Content` 後呼叫 `generate_content`。
+在實際應用中，我們通常會用 Pipe 來串接**自己的**模型或雲端 API。本範例改為使用 **Google Gemini API**（以 **Valves** 填寫 API Key，並將整段對話歷程轉成 Gemini 的 `Content` 後呼叫 `generate_content`）。
 
-**核心概念**：在 Pipe 內建立 `genai.Client(api_key=...)`，把 `body["messages"]` 映射成 `user` / `model` 角色，再回傳 `response.text` 作為 Open WebUI 的模型回覆。
+**為什麼要把 `body["messages"]` 轉成 `history`？** Open WebUI 傳進 Pipe 的 `messages`，格式是「介面與內部對話流程」約定好的**純資料**：常見為一連串字典，例如 `role` 可能是 `user`、`assistant`、`system` 等，欄位名與語意都依 Open WebUI／OpenAI 相容慣例而定。相對地，**Google Gemini 的 Python SDK** 要求你送出的內容是另一套型別與結構（例如 `types.Content`、`types.Part`），且對話角色在 Gemini 端主要區分為 **`user`** 與 **`model`**，呼叫方式也是 `client.models.generate_content(...)` 這條路徑，**並不能**直接把 Open WebUI 的 `messages` 原封不動丟給 Gemini。因此必須在 Pipe 裡做一次**轉換**（範例裡用 `history` 這個串列承接轉好的內容）：把「前端／Open WebUI 的訊息陣列」對應成「Gemini API 看得懂的物件序列」。兩邊是**不同的 API／不同的操作介面**，資料形狀與角色命名都不相同，這正是要手動轉換的主要原因。
+
+**核心概念**：在 Pipe 內建立 `genai.Client(api_key=...)`，將 `body["messages"]` **映射並組裝**成 Gemini 所需的 `history`（`user`／`model` 與 `Content`／`Part`），再回傳 `response.text` 作為 Open WebUI 畫面上的模型回覆。
 
 > **Container 部署須知**：Open WebUI 常以 **Docker／Docker Compose** 跑在容器裡。若你打算用 **環境變數** 提供金鑰（讓 Pipe 裡的 `os.environ.get("GEMINI_API_KEY", "")` 讀得到），請在**建立或更新容器**時就一併設定，例如在 `docker-compose.yml` 的 `environment:` 區塊加入 `GEMINI_API_KEY: <你的金鑰>`，或使用 `docker run ... -e GEMINI_API_KEY=<你的金鑰> ...`。僅在主機的 shell 匯出變數，**不會**自動進到容器內；若未傳入，程式在容器裡會讀不到該變數。若改為只在 Open WebUI 介面的 Pipe **Valves** 填寫 API Key，則可不必依賴容器環境變數（仍建議以 Valves 或秘密管理機制擇一，避免金鑰外洩）。
 
@@ -56,7 +58,7 @@ class Pipe:
         try:
             client = genai.Client(api_key=api_key)
 
-            # 與 resume_assistant_pipe 相同：將 Open WebUI 訊息轉成 Gemini 的 Content 串
+            # 將 Open WebUI 訊息轉成 Gemini 的 Content 串
             history = []
             for msg in messages[:-1]:
                 role = "user" if msg.get("role") == "user" else "model"

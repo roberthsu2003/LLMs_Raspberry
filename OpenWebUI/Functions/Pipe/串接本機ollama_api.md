@@ -9,8 +9,14 @@
 **前置需求**：
 
 - Function 的 **`requirements`**：`requests, pydantic`（Open WebUI 可能已內建其一，仍建議寫明）。
-- 本機已安裝並啟動 Ollama，且已 `ollama pull` 目標模型。
+- 本機已安裝並啟動 Ollama。
 - 在 Pipe 的 **Valves** 設定 `OLLAMA_API_URL`、`OLLAMA_MODEL`，必要時搭配環境變數 `OLLAMA_API_URL`／`OLLAMA_MODEL`。
+
+> **務必先在本機下載（取得）模型**  
+> Pipe 裡填的 `OLLAMA_MODEL` 必須是 **Ollama 已經下載好** 的模型名稱（與 `ollama list` 顯示的一致）。若尚未下載就呼叫 API，會回傳錯誤或找不到模型。  
+> - **建議**：在終端機執行 **`ollama pull <模型名>`** 只下載、不進入互動，例如：`ollama pull gemma4:31b-cloud`。  
+> - **亦可**：執行 **`ollama run gemma4:31b-cloud`**——若本機尚無此模型，Ollama 會**先下載**再進入互動對話；確認能正常對話後再關閉，即可在 Open WebUI 裡把 Valves 的 `OLLAMA_MODEL` 設成同一個名稱。  
+> 名稱請與官方／Ollama Library 上的標籤完全一致（含版本與標籤，例如 `:31b-cloud`）。
 
 ```python
 """

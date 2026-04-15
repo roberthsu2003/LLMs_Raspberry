@@ -219,6 +219,17 @@ class Pipe:
         return response
 ```
 **測試方法**：部署後，於對話視窗左上角的**模型下拉清單**中選擇「測試用鸚鵡模型」，發送文字即可看見回覆。
+<details>
+<summary>💡 點此查看程式碼詳細解說</summary>
+
+- **基本設定 (`__init__`)**：
+  - `self.type = "pipe"`：宣告這是一個 Pipe 類型的 Function。
+  - `self.id` 與 `self.name`：定義系統內部的唯一識別碼與前端顯示的模型名稱。啟動此 Pipe 後，聊天介面的模型清單就會出現對應的選項。
+- **處理邏輯 (`pipe` 方法)**：
+  - 此方法會接收前端傳來的 `body` 字典參數。最重要的資訊都放在 `body["messages"]` 這個對話歷史陣列中。
+  - `body["messages"][-1]["content"]`：透過 `[-1]` 取出陣列的最後一筆元素，藉此獲得使用者最新傳送的文字內容。
+  - 因為這是一個最簡單的回聲範例，所以完全沒有呼叫外部 API 或 LLM。我們只是單純將取出的訊息內容包裝進新字串中並直接 `return`，系統便會將這個字串作為生成結果顯示給使用者看。
+</details>
 
 ### 4.5 進階技巧：自訂跟進問題 (Follow-up Suggestions)
 
@@ -260,7 +271,16 @@ class Pipe:
         response = f"[系統測試]：我收到了您的訊息，內容為「{last_message}」"
         return response
 ```
-當系統運行這段進階的 Pipe 時，您的對話框下方就會漂亮地長出您專屬的繁體中文客製按鈕了！如果您不需要這個功能，也可以直接前往 Open WebUI 【設定 ➔ 介面】將「生成跟進問題」關閉。
+<details>
+<summary>💡 點此查看程式碼詳細解說</summary>
+
+- **關鍵攔截 (`if "follow-up" in ...`)**：這是本段程式碼的核心。當前端介面在每次對話結束後自動發起「建議跟進問題」的請求時，提示詞通常會包含 `follow-up` 或 `suggest`，透過判斷這些字眼，我們可以區分這是一般對話還是系統的隱藏請求。
+- **回傳 JSON 陣列 (`json.dumps(...)`)**：前端在處理「跟進問題」時，預期收到的是一個 JSON 格式的字串陣列。因此我們使用 `json.dumps()` 將 Python 的串列轉換為 JSON 字串，並設定 `ensure_ascii=False` 以確保繁體中文字元能正確顯示。
+- **防止錯誤回退 (Fallback)**：如果不實作這個攔截邏輯，基礎版 Pipe 就會把系統發出的 `suggest 3 follow-up questions...` 當成一般對話語句並原樣彈回。這會導致前端由於接收不到預期的 JSON 而崩潰，最終只能顯示預設的錯誤回退文字 `Question 1?`。
+
+> 當系統運行這段進階的 Pipe 時，您的對話框下方就會漂亮地長出您專屬的繁體中文客製按鈕了！如果您不需要這個功能，也可以直接前往 Open WebUI 【設定 ➔ 介面】將「生成跟進問題」關閉。
+
+</details>
 
 ### 進階實作案列
 1. [👉 串接外部 API (API Proxy Pipe)](./Pipe/串接外部api_proxy_pipe.md)

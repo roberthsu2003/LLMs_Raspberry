@@ -113,7 +113,7 @@ class Pipe:
 | 欄位名 | 說明 | 預設值 |
 | :--- | :--- | :--- |
 | **OLLAMA_API_URL** | 完整路徑需含 `/v1/chat/completions` | `http://127.0.0.1:11434/v1/chat/completions` |
-| **OLLAMA_MODEL** | 必須與 `ollama list` 顯示的標籤完全一致 | `gemma2:2b` |
+| **OLLAMA_MODEL** | 必須與 `ollama list` 顯示的標籤完全一致 | `gemma4:31b-cloud` |
 | **timeout** | 因地端模型推論較慢，預設設為 300 秒 | `300` |
 
 ---

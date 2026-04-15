@@ -1,6 +1,6 @@
 ## 串接本機 Ollama 模型 (API Proxy Pipe)
 
-在實際應用中，我們可以用 Pipe 把 Open WebUI 的對話**轉發**到同一台機器（或區網內）執行的 **Ollama**。Ollama 提供與 **OpenAI Chat Completions 相容**的 HTTP API（`/v1/chat/completions`），因此不必像 Gemini 那樣改成另一套 SDK 物件；只要把 `body["messages"]` 組進 JSON 再 `POST` 即可。寫法可對照 [`resume_assistant_ollama_pipe.py`](./docx檔含佔位符_template/resume_assistant_ollama_pipe.py) 中的 `requests.post`、`payload` 與回應解析。
+在實際應用中，我們可以用 Pipe 把 Open WebUI 的對話**轉發**到同一台機器（或區網內）執行的 **Ollama**。Ollama 提供與 **OpenAI Chat Completions 相容**的 HTTP API（`/v1/chat/completions`），只要把 `body["messages"]` 組進 JSON 再 `POST` 即可。
 
 **為什麼轉發時多半可以直接用 `messages`？** Open WebUI 傳入的每一則訊息通常是 `{"role": "...", "content": "..."}`，與 Ollama 這條相容 API 所期待的欄位一致（例如 `user`、`assistant`、`system`）。與 **Gemini** 那類必須轉成 `Content`／`Part` 的 API 不同，這裡**兩邊的操作介面相近**，Pipe 裡主要是**指定模型名稱、端點 URL、溫度**等參數，再把回應裡的 `choices[0].message.content` 回傳給畫面。
 

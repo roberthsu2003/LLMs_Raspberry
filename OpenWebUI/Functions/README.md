@@ -26,10 +26,10 @@
 ## 目錄
 
 1. [第一章：認識 Functions](#第一章認識-functions)
-2. [第二章：Filter Function (過濾器)](#第二章filter-function-過濾器)
-3. [第三章：Action Function (動作按鈕)](#第三章action-function-動作按鈕)
-4. [第四章：Pipe Function (管道與自訂模型)](#第四章pipe-function-管道與自訂模型)
-5. [第五章：Valves (參數閥門)](#第五章valves-參數閥門)
+2. [第二章：Valves (參數閥門)](#第二章valves-參數閥門)
+3. [第三章：Filter Function (過濾器)](#第三章filter-function-過濾器)
+4. [第四章：Action Function (動作按鈕)](#第四章action-function-動作按鈕)
+5. [第五章：Pipe Function (管道與自訂模型)](#第五章pipe-function-管道與自訂模型)
 6. [第六章：安裝、啟用與指派](#第六章安裝啟用與指派)
 
 *（於編輯器或 GitHub 平台中，可利用「大綱 / Outline」功能快速導覽各節）*
@@ -67,33 +67,89 @@
 
 ---
 
-## 第二章：Filter Function (過濾器)
+## 第二章：Valves (參數閥門)
+
+在 Open WebUI 系統中，**Valves** 提供了一種極佳的設計模式，負責將程式碼內的「變數」轉換成 UI 介面上的**輸入框、開關、數字欄位**，讓終端使用者能在**不動任何 `.py` 檔案**的情況下自訂參數 (如：API 金鑰、調整提示詞)。
+
+> **注意**：**Pipe**、**Filter**、**Action** 三種 Function 皆支援 Valves 架構。
+
+### 2.1 核心優勢
+- **資訊安全**：避免將敏感資訊 (Tokens, API Keys) 寫死 (Hardcoded) 於程式碼內。
+- **動態調整**：使用者於介面存檔後，下次對話即可自動套用新配置，即時生效。
+- **型態映射**：利用 `Pydantic` 實作自動綁定變數型別與對應的前端 UI 元件。
+
+| 設定之變數型別 | UI 元件呈現樣貌 |
+|---------|-------------|
+| `str` | 文字輸入框 |
+| `bool` | 開關 (Toggle Switch) |
+| `int` / `float` | 數字輸入框 |
+
+### 2.2 實作範例 (以 Filter 為例)
+```python
+from pydantic import BaseModel, Field
+
+class Filter:
+    class Valves(BaseModel):
+        # UI 開關設定
+        is_active: bool = Field(
+            default=True,
+            description="是否啟用此附加文字功能",
+        )
+        # UI 文字輸入設定
+        prefix: str = Field(
+            default="[System Alarm]",
+            description="要在訊息之前加入的標記文字",
+        )
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def inlet(self, body: dict, user: dict) -> dict:
+        # 動態讀取 Valves 設定
+        if not self.valves.is_active:
+            return body
+
+        messages = body.get("messages", [])
+        if messages:
+             # 加工加入 prefix 字串
+             messages[-1]["content"] = f"{self.valves.prefix} {messages[-1]['content']}"
+            
+        return body
+```
+
+### 2.3 介面設定路徑
+1. 開啟 **Functions (函式)** 清單頁面。
+2. 點擊該 Function 右側的 **⚙️ 齒輪 (Settings)** 圖示。
+3. 切換至 **Valves** 分頁區塊，在此改變的值將實質覆寫程式碼內的 `default` 值。
+
+---
+## 第三章：Filter Function (過濾器)
 
 > **官方說明**：[Filter Function](https://docs.openwebui.com/features/extensibility/plugin/functions/filter)
 
-### 2.1 核心概念
+### 3.1 核心概念
 Filter 扮演「資料攔截器」的角色，可在 AI 模型接收與回覆的過程中對內容進行後加工。
 - **Inlet (入口)**：於送進模型**之前**處理（如：修改使用者輸入、附加系統提示、驗證請求）。  
 - **Outlet (出口)**：於模型回答**之後**處理（如：過濾敏感字詞、修改最終顯示文字）。
 
-### 2.2 運作流程圖
+### 3.2 運作流程圖
 ```text
 使用者輸入 → [Filter: Inlet] → LLM AI 模型 → [Filter: Outlet] → 顯示最終結果給使用者
 ```
 
-### 2.3 Filter 與 Tool 的比較
+### 3.3 Filter 與 Tool 的比較
 | 比較項目 | Tool (工具) | Filter (過濾器) |
 |----------|--------------|------------------|
 | **執行時機** | AI 認為有需要時才隨機呼叫 | **每則對話都會強制經過** (依指派設定) |
 | **概念比喻** | 賦予 AI 「特殊技能」 | 設定對話流的「安檢門」 |
 | **實際作用** | 獲取外部資訊 (如查資料) | 分析或修改訊息本體內容 |
 
-### 2.4 最小可用架構
+### 3.4 最小可用架構
 - 類別名稱必須嚴格為 `Filter` (系統規範，**不可更改**)。  
 - 需實作 `inlet()` 或 `outlet()` 方法 (依需求擇一，或兩者皆寫)。  
 - 常用參數為 `body: dict`，內含 `messages` 陣列等重要欄位。
 
-### 2.5 實作範例參考
+### 3.5 實作範例參考
 > **開發與除錯指南**：[Filter 的測試和 Debug](./filter/Filter的測試和Debug.md)
 
 建議依難度循序閱讀以下範例：
@@ -103,23 +159,22 @@ Filter 扮演「資料攔截器」的角色，可在 AI 模型接收與回覆的
 4. **進階應用**：[繁中轉換為英文](./filter/繁中轉換為英文.md) (搭配公司資訊輸出)
 
 ---
+## 第四章：Action Function (動作按鈕)
 
-## 第三章：Action Function (動作按鈕)
-
-### 3.1 核心概念
+### 4.1 核心概念
 Action 可於**每則對話訊息下方**建立**自訂互動按鈕**，當使用者**點選**該按鈕時，才會觸發您所撰寫的系統邏輯。
 
-### 3.2 常見使用情境
+### 4.2 常見使用情境
 - 執行長文摘要、重點翻譯。
 - 提供一鍵複製、匯出至特定系統之功能。
 - 打造客製化工作流程與快捷鍵。
 
-### 3.3 基本架構
+### 4.3 基本架構
 - 類別名稱必須嚴格命名為 `Action`。  
 - 核心方法為：`async def action(self, body, __user__, __event_emitter__)`。  
 - 可利用 `__event_emitter__` 參數，即時向前端介面發送推播狀態或通知訊息。
 
-### 3.4 基礎範例：訊息字數統計
+### 4.4 基礎範例：訊息字數統計
 此範例將於訊息下方產生按鈕，點擊後會計算該則訊息字數，並將統計結果附加於訊息結尾。
 
 ```python
@@ -176,14 +231,14 @@ class Action:
 
 > 注意:當滑鼠移到Action按鈕時，顯示的名稱並非由程式碼決定，而是由建立Action時所填寫的名稱決定。
 
-### 3.5 測試 Action 功能
+### 4.5 測試 Action 功能
 1. 前往**聊天頁面**，發送任意文字訊息。  
 2. 於**該則訊息下方**工具列 (按讚、複製等圖示旁) 尋找新增的 Action 按鈕。  
 3. **點擊按鈕**，觀察該則訊息的最下方是否多出了一段關於「字數統計」的附註。
 
 > **除錯提示**：若找不到按鈕，請確認該 Action 已於系統後台啟用，並已指派給當前對話使用的自訂模型。
 
-### 3.6 進階實作案例 (檔案下載實務)
+### 4.6 進階實作案例 (檔案下載實務)
 
 如果您已經熟悉基礎 Action 的掛載與操作邏輯，可以嘗試挑戰更進階實用的技巧：**如何在不污染系統碟的情況下，讓使用者一鍵下載對話記錄 (Word/Excel)**。利用修改訊息內容配合純文字的 Markdown 連結技巧，可以實現順暢的檔案導出。
 
@@ -196,25 +251,24 @@ class Action:
 7. [👉 進階教學 7：多重格式導出選擇器](./action/多重格式導出.md)
 
 ---
+## 第五章：Pipe Function (管道與自訂模型)
 
-## 第四章：Pipe Function (管道與自訂模型)
-
-### 4.1 核心概念
+### 5.1 核心概念
 Pipe 允許我們創造出**全新自訂模型**，使其與一般大語言模型並列於介面上的**模型選擇清單**中，但實際上它的底層處理流程可以被任意定義與抽換。
 
-### 4.2 常見使用情境
+### 5.2 常見使用情境
 - 串接非預設支援的外部 API。
 - 整合多個模型實現複雜的提詞鏈 (Prompt Chain)。
 - 介接公司內部搜尋引擎或其他非 AI 功能 (如：天氣服務、IoT 裝置)。
 
-### 4.3 基本架構
+### 5.3 基本架構
 - 類別名稱必須命名為：`Pipe`
 - 核心方法為：`pipe(self, body: dict) -> Union[str, Generator, Iterator]`
 - 在 `__init__` 中設定 `self.id` (系統識別碼) 與 `self.name` (前端顯示名稱)。
 
 > **重要觀念**：啟動 Pipe 後，系統清單會**自動**出現對應選項，無需另外於模型管理頁面手動建立實體模型。
 
-### 4.4 基礎範例：鸚鵡回聲 Pipe
+### 5.4 基礎範例：鸚鵡回聲 Pipe
 這是一個最小可運行的 Pipe 範例：它會攔截使用者最後一句話，不呼叫任何 AI 模型，直接回傳固定格式的字串對話。
 
 ```python
@@ -252,7 +306,7 @@ class Pipe:
   - 因為這是一個最簡單的回聲範例，所以完全沒有呼叫外部 API 或 LLM。我們只是單純將取出的訊息內容包裝進新字串中並直接 `return`，系統便會將這個字串作為生成結果顯示給使用者看。
 </details>
 
-### 4.5 進階技巧：自訂跟進問題 (Follow-up Suggestions)
+### 5.5 進階技巧：自訂跟進問題 (Follow-up Suggestions)
 
 #### 為什麼會出現 `Question 1?`
 如果您啟用了 Open WebUI 的「聊天建議 (Chat Suggestions)」功能，每次您送出對話後，前端都會**自動發起第二次隱藏對話**，並在最後一句安插類似 `suggest 3 follow-up questions...` 的系統提示語，要求模型給出三個建議選項（預期回傳 JSON 陣列 `["選項A", "選項B"]`）。
@@ -309,63 +363,6 @@ class Pipe:
 2. [👉 串接外部 Gemini API key (API Proxy Pipe)](./Pipe/串接外部api_proxy_pipe.md)
 
 3. [👉 docx檔含佔位符_template/README.md](./Pipe/docx檔含佔位符_template/README.md)
----
-
-## 第五章：Valves (參數閥門)
-
-在 Open WebUI 系統中，**Valves** 提供了一種極佳的設計模式，負責將程式碼內的「變數」轉換成 UI 介面上的**輸入框、開關、數字欄位**，讓終端使用者能在**不動任何 `.py` 檔案**的情況下自訂參數 (如：API 金鑰、調整提示詞)。
-
-> **注意**：**Pipe**、**Filter**、**Action** 三種 Function 皆支援 Valves 架構。
-
-### 5.1 核心優勢
-- **資訊安全**：避免將敏感資訊 (Tokens, API Keys) 寫死 (Hardcoded) 於程式碼內。
-- **動態調整**：使用者於介面存檔後，下次對話即可自動套用新配置，即時生效。
-- **型態映射**：利用 `Pydantic` 實作自動綁定變數型別與對應的前端 UI 元件。
-
-| 設定之變數型別 | UI 元件呈現樣貌 |
-|---------|-------------|
-| `str` | 文字輸入框 |
-| `bool` | 開關 (Toggle Switch) |
-| `int` / `float` | 數字輸入框 |
-
-### 5.2 實作範例 (以 Filter 為例)
-```python
-from pydantic import BaseModel, Field
-
-class Filter:
-    class Valves(BaseModel):
-        # UI 開關設定
-        is_active: bool = Field(
-            default=True,
-            description="是否啟用此附加文字功能",
-        )
-        # UI 文字輸入設定
-        prefix: str = Field(
-            default="[System Alarm]",
-            description="要在訊息之前加入的標記文字",
-        )
-
-    def __init__(self):
-        self.valves = self.Valves()
-
-    async def inlet(self, body: dict, user: dict) -> dict:
-        # 動態讀取 Valves 設定
-        if not self.valves.is_active:
-            return body
-
-        messages = body.get("messages", [])
-        if messages:
-             # 加工加入 prefix 字串
-             messages[-1]["content"] = f"{self.valves.prefix} {messages[-1]['content']}"
-            
-        return body
-```
-
-### 5.3 介面設定路徑
-1. 開啟 **Functions (函式)** 清單頁面。
-2. 點擊該 Function 右側的 **⚙️ 齒輪 (Settings)** 圖示。
-3. 切換至 **Valves** 分頁區塊，在此改變的值將實質覆寫程式碼內的 `default` 值。
-
 ---
 
 ## 第六章：安裝、啟用與指派

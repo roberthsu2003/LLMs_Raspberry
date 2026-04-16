@@ -8,9 +8,12 @@
 比起申請 Slack Webhook，Telegram 的這項功能「**完全免費**、**申請極速**、**而且永遠不會過期**」，所以非常推薦做為串接教學的第一站！
 
 ### 🤖 申請與設定三步圖解：
-1. **取得 Token**：在 Telegram 搜尋框尋找 `@BotFather` (官方爸爸)，點擊 Start 後輸入 `/newbot` 建立機器人。依照指示取個好名字後，系統就會噴給您長長一串的 `HTTP API Token`。
-2. **取得 Chat ID**：接著在 Telegram 搜尋 `@userinfobot` 或 `@getmyid_bot`，一樣點擊 Start，它馬上會吐出您個人專屬的數字 ID（例如：`123456789`）。
-3. **填入設定 (Valves)**：回到 Open WebUI，將這兩個數值貼到這個 Action 的 Valves (管理介面的設定齒輪) 欄位中，立刻就可以一鍵把重要的總結傳進自己的手機裡！
+1. **取得 Token**：點擊左上角的 **Search (搜尋列)**，尋找 `@BotFather` (官方爸爸)，點擊 Start 後輸入 `/newbot` 建立機器人。依照指示取個好名字後，系統就會噴給您長長一串的 `HTTP API Token`。
+2. **取得 Chat ID (您的專屬帳號數字)**：
+   - 這裡的 Chat ID 其實就是您個人的 Telegram 帳號 ID，並不需要特別建立群組！
+   - 請**再次點擊左上角的搜尋列**，搜尋 `@userinfobot` (🌟 絕對不要把它當成訊息傳給別人喔！要在搜尋列找)。找到並進入後點擊下方的 Start，它馬上會吐出 `Id: 123456789`，這串數字就是 Chat ID。
+3. **⚠️ 關鍵防呆機制 (絕對要執行)**：因為 Telegram 規定機器人不能主動密人（防翻群機制），所以您必須**第三次回到左上角搜尋列**，搜尋您在第一步建立的機器人名稱，進入對話框並**點擊最下方的 [Start] 按鈕**！做完這步它才擁有把訊息發給您的權限！
+4. **填入設定 (Valves)**：回到 Open WebUI，將剛剛獲得的 `Token` 與 `Chat ID` 貼到這個 Action 的 Valves (管理介面的設定齒輪) 欄位中，立刻就可以一鍵把重要的對話總結傳進自己的手機裡！
 
 ```python
 """
@@ -78,14 +81,19 @@ class Action:
             # Telegram Bot API URL
             api_url = f"https://api.telegram.org/bot{self.valves.bot_token}/sendMessage"
             
+            # 確保訊息不會超過 Telegram 的 4096 字元上限
+            if len(message_content) > 4000:
+                message_content = message_content[:4000] + "...\n\n(❗️字數過長，已截斷)"
+            
             # 加入發送者名稱提示
             sender = __user__.get("name", "一般使用者") if __user__ else "使用者"
-            formatted_msg = f"🔔 **來自 {sender} 的備忘錄**:\n\n{message_content}"
+            formatted_msg = f"🔔 來自【{sender}】的備忘錄:\n\n{message_content}"
             
             payload = {
                 "chat_id": self.valves.chat_id,
-                "text": formatted_msg,
-                "parse_mode": "Markdown" # 讓 Telegram 支援字體加粗等排版
+                "text": formatted_msg
+                # ⚠️ 這裡刻意不使用 "parse_mode": "Markdown" 
+                # 因為 AI 產生的內容常有未閉合的星號、底線等特殊符號，會導致 Telegram 解析失敗報錯
             }
             
             response = requests.post(api_url, json=payload, timeout=10)

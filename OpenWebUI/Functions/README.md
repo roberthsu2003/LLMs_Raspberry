@@ -189,12 +189,11 @@ class Action:
 
 1. [👉 進階教學 1：事件發射器範例](./action/事件發射器.md)
 2. [👉 進階教學 2：生成 QR Code](./action/生成QRCode.md)
-3. [👉 進階教學 3：保存會話到檔案](./action/保存會話到檔案.md)
+3. [👉 進階教學 3：導出為 Word 檔案](./action/導出為Word檔.md)
 4. [👉 進階教學 4：送出 Slack 通知](./action/送出Slack通知.md)
 5. [👉 進階教學 5：中英翻譯小助手](./action/中英翻譯小助手.md)
-6. [👉 進階教學 6：導出為 Word 檔案](./action/導出為Word檔.md)
-7. [👉 進階教學 7：導出為 Excel 檔案](./action/導出為Excel檔.md)
-8. [👉 進階教學 8：多重格式導出選擇器](./action/多重格式導出.md)
+6. [👉 進階教學 6：導出為 Excel 檔案](./action/導出為Excel檔.md)
+7. [👉 進階教學 7：多重格式導出選擇器](./action/多重格式導出.md)
 
 ---
 

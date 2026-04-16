@@ -125,4 +125,68 @@ class Action:
         
         return {"status": "completed"}
 ```
+<details>
+<summary>💡 程式碼說明和工作流程</summary>
+
+## 📋 程式概述
+這個 Action 示範了當使用者點擊按鈕後，如何萃取當前的最後一則對話，並利用 Python 的 `requests` 套件，將文字透過 Telegram Bot API 傳送到個人的手機中。整個過程也利用 `__event_emitter__` 來達成前端的狀態推播。
+
+---
+
+## 🔄 Workflow 流程圖
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant OpenWebUI
+    participant Action程式
+    participant TelegramAPI
+
+    User->>OpenWebUI: 點擊「送出 Telegram 通知」按鈕
+    OpenWebUI->>Action程式: 觸發 action() 並傳送對話 body
+    
+    Action程式->>OpenWebUI: __event_emitter__ (status: 正在發送到 Telegram...)
+    Action程式->>Action程式: 取得對話陣列的最後一句話
+    Action程式->>Action程式: 檢查長度是否超過 4000 字
+    
+    Action程式->>TelegramAPI: POST /sendMessage (帶上 Token 與 Chat ID)
+    TelegramAPI-->>Action程式: 回傳成功/失敗 JSON 結果
+    
+    Action程式->>OpenWebUI: __event_emitter__ (message: ✅ 訊息已傳送)
+    OpenWebUI->>User: 介面跳出成功提示
+```
+
+---
+
+## 📝 關鍵技術與防呆詳解
+
+### 1. Valves 的環境變數注入
+```python
+class Valves(BaseModel):
+    bot_token: str = Field(default="")
+    chat_id: str = Field(default="")
+```
+將 API Token 與 Chat ID 寫成 Valves 的好處是，**您（或其它使用者）不需要硬改 Python 程式碼**。任何不懂程式的人拿到這隻腳本，只要在網頁後台填入自己的 Token，就能馬上讓這隻功能生效。
+
+### 2. 關於 Telegram 的兩個隱形大坑 (文字處理)
+```python
+# 坑一：字數過長會被 Telegram 拒絕
+if len(message_content) > 4000:
+    message_content = message_content[:4000] + "...\n\n(❗️字數過長，已截斷)"
+
+# 坑二：刻意不使用 parse_mode (Markdown)
+payload = {
+    "chat_id": self.valves.chat_id,
+    "text": formatted_msg
+}
+```
+- **字數限制**：Telegram API 一次推播的最大長度大約是 4096 個字元。因為 AI 返回的總結很容易超長，如果不利用 `[:4000]` 先強制截斷，這個 API 就會直接報錯死掉。
+- **Markdown 解析崩潰**：初學者很常加上 `"parse_mode": "Markdown"` 想讓字體變粗。但 AI 產生的原始文字常常有「未成對閉合」的星號 `**` 或底線 `_`。只要少一個閉合符號，Telegram 就會噴出 `can't parse entities` 的錯誤。**保持純文字發送**是最安全、最暴力的防呆解法。
+
+### 3. 一邊做一邊回報進度 (`__event_emitter__`)
+在這部腳本中我們兩次呼叫了 `__event_emitter__`：
+1. **傳送前** (`type: status`)：在畫面右下角轉圈圈，顯示「正在發送到 Telegram...」，安撫使用者的等待焦慮。
+2. **傳送後** (`type: message`)：收到 HTTP 200 OK 之後，直接把「✅ 成功送出」寫到聊天室畫面上，給予使用者最直接的正向回饋。
+
+</details>
 

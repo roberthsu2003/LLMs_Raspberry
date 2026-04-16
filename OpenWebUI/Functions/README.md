@@ -362,9 +362,9 @@ class Pipe:
 
 2. [👉 串接外部 Gemini API key (API Proxy Pipe)](./Pipe/串接外部api_proxy_pipe.md)
 
-3. [👉 台北市youbike既時狀況查詢](./Pipe/台北市youbike既時狀況查詢.md)
+3. [👉 台北市youbike即時查詢](./Pipe/台北市youbike即時查詢.md)
 
-3. [👉 docx檔含佔位符_template/README.md](./Pipe/docx檔含佔位符_template/README.md)
+4. [👉 docx檔含佔位符_template/README.md](./Pipe/docx檔含佔位符_template/README.md)
 ---
 
 ## 第六章：安裝、啟用與指派
